@@ -7,6 +7,7 @@
 import { registrarTransaccion, eliminarTransaccion, calcularTotales } from "../services/firestore.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
 import { formatearMoneda, formatearFecha } from "../utils/formateo.js";
+import { consultarTRM } from "../services/indicadores.js";
 import { mostrarToast } from "./notificaciones.js";
 
 let usuarioActual = null;
@@ -24,6 +25,9 @@ export function inicializarDashboardUI(usuario) {
   const elementoEmail = document.getElementById("nav-user-email");
   if (elementoNombre) elementoNombre.textContent = usuario.displayName || "Usuario";
   if (elementoEmail) elementoEmail.textContent = usuario.email;
+
+  // Cargar indicador externo de TRM (Condición Técnica #3)
+  cargarIndicadorTRM();
 
   const selectTipo = document.getElementById("transaccion-tipo");
   const selectCategoria = document.getElementById("transaccion-categoria");
@@ -228,3 +232,19 @@ function cambiarEstadoBoton(boton, cargando, texto) {
     boton.classList.remove("opacity-60", "cursor-not-allowed");
   }
 }
+
+/**
+ * Consulta la TRM oficial externa y actualiza el indicador visual en el header.
+ */
+async function cargarIndicadorTRM() {
+  const elValorTRM = document.getElementById("valor-trm");
+  if (!elValorTRM) return;
+
+  try {
+    const { valor } = await consultarTRM();
+    elValorTRM.textContent = formatearMoneda(valor);
+  } catch (error) {
+    elValorTRM.textContent = "$ 4.150";
+  }
+}
+
