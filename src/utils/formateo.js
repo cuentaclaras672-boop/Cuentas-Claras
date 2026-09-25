@@ -8,9 +8,10 @@
  * Formatea un número como moneda colombiana (COP) o la divisa especificada.
  * @param {number|string} valor - Cantidad numérica a formatear.
  * @param {string} [moneda='COP'] - Código ISO de la moneda (COP, USD, EUR).
+ * @param {number} [decimales=0] - Cantidad de dígitos decimales a mostrar.
  * @returns {string} Texto formateado con signo de moneda y separadores de miles.
  */
-export function formatearMoneda(valor, moneda = 'COP') {
+export function formatearMoneda(valor, moneda = 'COP', decimales = 0) {
   const numero = typeof valor === 'number' ? valor : parseFloat(valor);
 
   if (isNaN(numero)) {
@@ -20,9 +21,19 @@ export function formatearMoneda(valor, moneda = 'COP') {
   return new Intl.NumberFormat('es-CO', {
     style: 'currency',
     currency: moneda,
-    minimumFractionDigits: 0,
-    maximumFractionDigits: 0
+    minimumFractionDigits: decimales,
+    maximumFractionDigits: decimales
   }).format(numero);
+}
+
+/**
+ * Formatea específicamente la TRM con dos decimales de precisión oficial.
+ * Ejemplo: "$ 3.329,61"
+ * @param {number|string} valor - Valor de la TRM.
+ * @returns {string} TRM formateada con centavos.
+ */
+export function formatearTRM(valor) {
+  return formatearMoneda(valor, 'COP', 2);
 }
 
 /**

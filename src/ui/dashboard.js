@@ -6,7 +6,7 @@
 
 import { registrarTransaccion, eliminarTransaccion, calcularTotales } from "../services/firestore.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
-import { formatearMoneda, formatearFecha } from "../utils/formateo.js";
+import { formatearMoneda, formatearFecha, formatearTRM } from "../utils/formateo.js";
 import { consultarTRM } from "../services/indicadores.js";
 import { mostrarToast } from "./notificaciones.js";
 
@@ -242,9 +242,9 @@ async function cargarIndicadorTRM() {
 
   try {
     const { valor } = await consultarTRM();
-    elValorTRM.textContent = formatearMoneda(valor);
+    elValorTRM.textContent = formatearTRM(valor);
   } catch (error) {
-    elValorTRM.textContent = "$ 4.150";
+    elValorTRM.textContent = "$ 3.329,61";
   }
 }
 
