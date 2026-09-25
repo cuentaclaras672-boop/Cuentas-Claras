@@ -25,16 +25,20 @@
 
 ## 2. Tareas del Sprint Backlog (Medidas para el Burndown)
 
-| ID Tarea | Descripción | Responsable | Estado |
-|---|---|---|---|
-| **T-01** | Configuración de conexión y Singleton de Firebase SDK v10 | Daniel Cortes | Terminado (Done) |
-| **T-02** | Implementación de validaciones defensivas de autenticación en `auth.js` | Juan Diego Peraza | Terminado (Done) |
-| **T-03** | Modelado de la clase `Transaccion` con serialización a Firestore | Yerson Niño | Terminado (Done) |
-| **T-04** | Creación de listener en tiempo real `onSnapshot` en `firestore.js` | Daniel Cortes | Terminado (Done) |
-| **T-05** | Consumo vía `fetch` del servicio público de la TRM del dólar | Juan Diego Peraza | Terminado (Done) |
-| **T-06** | Maquetación con Tailwind CSS de vistas Login y Dashboard | Jorman Palacios | Terminado (Done) |
-| **T-07** | Desarrollo del sistema desacoplado de notificaciones Toasts | Fabián Córdoba | Terminado (Done) |
-| **T-08** | Pruebas de integración, verificación de sintaxis y documentación | Todo el equipo | Terminado (Done) |
+| ID Tarea | Descripción | Responsable | Periodo | Estado |
+|---|---|---|:---:|:---:|
+| **Tarea 1.1** | Configurar credenciales y SDK Firebase | Juan Diego Peraza | 18 ago - 21 ago | **Done** |
+| **Tarea 1.2** | Diseñar formulario visual de Login en HTML/Tailwind | Juan Diego Peraza | 20 ago - 23 ago | **Done** |
+| **Tarea 1.3** | Lógica de autenticación con Firebase Auth | Juan Diego Peraza | 23 ago - 27 ago | **Done** |
+| **Tarea 1.4** | Persistencia de sesión y logout | Juan Diego Peraza | 27 ago - 30 ago | **Done** |
+| **Tarea 2.1** | Definir colección transacciones en Firestore | Daniel Cortes / Juan Diego Peraza | 21 ago - 24 ago | **Done** |
+| **Tarea 2.2** | Modal para captura de montos y categorías | Jorman Palacios | 24 ago - 27 ago | **Done** |
+| **Tarea 2.3** | Función de inserción `addDoc` a Firestore | Juan Diego Peraza | 27 ago - 31 ago | **Done** |
+| **Tarea 2.4** | Pruebas de persistencia ante recarga | Fabián Córdoba | 31 ago - 03 sep | **Done** |
+| **Tarea 3.1** | Diseñar tarjeta hero de Saldo Disponible | Jorman Palacios | 26 ago - 29 ago | **Done** |
+| **Tarea 3.2** | Consulta reactiva `onSnapshot` a Firestore | Daniel Cortes | 29 ago - 01 sep | **Done** |
+| **Tarea 3.3** | Algoritmo de cálculo de saldos en JavaScript | Yerson Niño | 01 sep - 03 sep | **Done** |
+| **Tarea 3.4** | Pruebas de actualización de balance en vivo | Fabián Córdoba / Juan Diego Peraza | 03 sep - 05 sep | **Done** |
 
 ---
 
