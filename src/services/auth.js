@@ -72,7 +72,8 @@ export function traducirErrorAuth(error) {
     case "auth/invalid-email":
       return "El formato del correo electrónico es inválido.";
     case "auth/operation-not-allowed":
-      return "El método de autenticación no está habilitado en Firebase Console.";
+    case "auth/configuration-not-found":
+      return "El proveedor de correo y contraseña no está habilitado en Firebase Console. Por favor actívalo en la pestaña Authentication.";
     case "auth/weak-password":
       return "La contraseña es muy débil. Debe tener un mínimo de 6 caracteres.";
     case "auth/user-disabled":
