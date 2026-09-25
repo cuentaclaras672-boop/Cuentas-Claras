@@ -1,8 +1,8 @@
 # Acta de Sprint Planning — Sprint 2
 **Proyecto:** Cuentas Claras — Gestión de Finanzas Compartidas en el Hogar  
-**Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas  
-**Duración del Sprint:** 4 semanas (Semanas 6 a 9: del 7 de septiembre al 10 de octubre de 2026)  
-**Fecha de Corte:** 26 de septiembre de 2026 (Promedio del Sprint 2)  
+**Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
+**Duración del Sprint:** 4 semanas (del 07 de septiembre al 10 de octubre de 2026)  
+**Fecha de Corte:** 26 de septiembre de 2026 (Semana 8 · Promedio del Sprint 2)  
 **Cierre Programado:** Sustentación 2 (entre el 5 y el 10 de octubre de 2026)  
 
 ---
@@ -11,70 +11,129 @@
 
 | Rol | Integrante | Responsabilidad Principal en Sprint 2 |
 |---|---|---|
-| **Product Owner** | Juan Diego Peraza Amado | Priorización del Backlog de Sprint 2, definición de criterios de aceptación de Bolsillos y Deudas. |
-| **Scrum Master** | Fabián Eduardo Córdoba | Monitoreo del flujo de trabajo en el tablero de Miro/Planner, límites WIP y facilitación de Dailies. |
-| **Development Team** | Daniel Felipe Cortes | Persistencia en Firestore de bolsillos y cálculo de amortizaciones de deudas. |
-| **Development Team** | Jorman Palacios Murillo | Diseño e integración visual en Tailwind de las tarjetas de bolsillos y filtros interactivos. |
-| **Development Team** | Yerson Niño Guerrero | Modelos de dominio (`Bolsillo.js`, `Deuda.js`) y validaciones defensivas de negocio. |
+| **Product Owner** | Juan Diego Peraza Amado | Priorización del Backlog, definición de criterios de aceptación y apoyo en UI de préstamos. |
+| **Scrum Master** | Fabián Eduardo Córdoba | Monitoreo del flujo de trabajo en Miro, gestión de calidad, pruebas y verificación de Toasts. |
+| **Development Team** | Daniel Felipe Cortes | Persistencia en Firestore de bolsillos, deudas compuestas e inyección de control de errores. |
+| **Development Team** | Jorman Palacios Murillo | Diseño e integración visual en Tailwind de tarjetas de bolsillos, filtros y maquetación de modales. |
+| **Development Team** | Yerson Niño Guerrero | Modelado de entidades de dominio (`Bolsillo.js`, `Deuda.js`) y algoritmos puros de filtrado. |
 
 ---
 
 ## 2. Objetivo del Sprint 2 (Sprint Goal)
-> *"Expandir las capacidades del hogar implementando el módulo de bolsillos de ahorro para propósitos fijos, el registro y control de préstamos informales a terceros, la optimización de consultas de historial con filtrado dinámico y la consolidación del manejo visible de errores, garantizando un incremento funcional robusto para la Sustentación 2."*
+> *"Incorporar la gestión de bolsillos de ahorro y el control de deudas con filtrado dinámico para planificar metas conjuntas y conciliar préstamos informales."*
 
 ---
 
 ## 3. Estado de Historias de Usuario en el Tablero de Miro / Planner (Al 26 de Septiembre de 2026)
 
-De acuerdo con el avance del equipo promediando el Sprint 2, las historias comprometidas se distribuyen en las columnas del tablero:
-
 ```
-+------------------+-----------------------------+-----------------------+---------------------+
-|   POR HACER      |   WORK IN PROGRESS (WIP)    |      EN PRUEBAS       |   TERMINADO (DONE)  |
-+------------------+-----------------------------+-----------------------+---------------------+
-|                  | [HU-04] Bolsillos de Ahorro | [HU-05] Historial con | [HU-01] Auth (S1)   |
-|                  | [HU-06] Control de Deudas   |         Filtros       | [HU-02] CRUD (S1)   |
-|                  |                             | [HU-07] Manejo de     | [HU-03] Saldo (S1)  |
-|                  |                             |         Errores       |                     |
-+------------------+-----------------------------+-----------------------+---------------------+
++--------------------+--------------------------------+-----------------------+---------------------+
+|     POR HACER      |     WORK IN PROGRESS (WIP)     |      EN PRUEBAS       |   TERMINADO (DONE)  |
++--------------------+--------------------------------+-----------------------+---------------------+
+|                    | • [HU-04] Bolsillos de Ahorro  | • [HU-05] Historial y | • [HU-01] Auth (S1) |
+|                    | • [HU-06] Control de Deudas    |           Filtros     | • [HU-02] CRUD (S1) |
+|                    |                                | • [HU-07] Manejo de   | • [HU-03] Saldo (S1)|
+|                    |                                |           Errores     |                     |
++--------------------+--------------------------------+-----------------------+---------------------+
 ```
 
-### Detalle de las Historias de Usuario del Sprint 2:
+---
 
-#### [HU-04] Bolsillos de Ahorro / Cajas con Propósitos Fijos
-- **Estado Actual:** **En Desarrollo (Work In Progress - WIP)**
+## 4. Historias de Usuario del Sprint 2 y Descomposición de Tareas
+
+### [HU-04] Bolsillos de Ahorro / Cajas con Propósitos Fijos
+- **Talla y Estimación:** Talla M (8 Story Points).
+- **Prioridad:** Alta (Núcleo funcional del Sprint Goal 2).
+- **Estado Actual:** **En Desarrollo (Work In Progress - WIP)**.
 - **Descripción:** Como miembro del hogar, quiero crear bolsillos específicos (ej. citas, bebé, viajes, emergencias) asignándoles una meta monetaria y fondos, para separar el dinero disponible para gastos inmediatos del dinero con un propósito específico.
 - **Criterios de Aceptación:**
   - Creación de bolsillos con nombre, meta y saldo acumulado.
   - Transferencia de fondos desde el saldo general hacia el bolsillo.
   - Barra de progreso porcentual respecto a la meta.
-
-#### [HU-05] Historial de Movimientos con Búsqueda y Filtros Dinámicos
-- **Estado Actual:** **En Pruebas (Testing)**
-- **Descripción:** Como usuario, quiero buscar transacciones por concepto y filtrarlas simultáneamente por categoría, fecha o ámbito (Personal/Compartido), para conciliar rápidamente cualquier movimiento sin revisar libretas ni múltiples extractos bancarios.
-- **Criterios de Aceptación:**
-  - Búsqueda en tiempo real por texto descriptivo.
-  - Filtro combinado por ámbito y categoría.
-  - Cumplimiento de la Condición Técnica #4 de la materia.
-
-#### [HU-06] Registro y Seguimiento de Deudas / Préstamos Informales
-- **Estado Actual:** **En Desarrollo (Work In Progress - WIP)**
-- **Descripción:** Como usuario, quiero registrar los préstamos informales realizados a amigos o familiares indicando monto, deudor, fecha y estado (Pendiente / Saldado), para evitar olvidos y recuperar el dinero prestado sin generar fricciones interpersonales.
-- **Criterios de Aceptación:**
-  - Registro de cuenta por cobrar con nombre del deudor y monto.
-  - Registro de abonos parciales o liquidación total.
-  - Impacto en el balance patrimonial (activo diferido vs saldo líquido).
-
-#### [HU-07] Manejo de Errores Visible y Notificaciones Contextuales
-- **Estado Actual:** **En Pruebas (Testing)**
-- **Descripción:** Como usuario, quiero recibir alertas visuales claras e instantáneas ante fallos de conexión, campos incompletos o rechazos de base de datos, para entender qué ocurrió y corregirlo sin que la aplicación quede congelada o en blanco.
-- **Criterios de Aceptación:**
-  - Notificaciones flotantes Toasts con tiempos de expiración y códigos de color según severidad.
-  - Cumplimiento de la Condición Técnica #5 de la materia.
+- **Descomposición de Tareas (Ejecución: 25 de septiembre al 1 de octubre):**
+  - **Tarea 4.1:** Modelar la colección y estructura de datos de los bolsillos.  
+    *Responsable:* Yerson Niño (Capa de Dominio).  
+    *Acción esperada:* Crear el archivo `src/models/Bolsillo.js` con validaciones defensivas y métodos de serialización Firestore.
+  - **Tarea 4.2:** Funciones asíncronas para transferir fondos.  
+    *Responsable:* Daniel Cortes (Integración Firebase).  
+    *Acción esperada:* Programar en `src/services/firestore.js` la transacción que descuenta dinero del saldo disponible y lo suma al bolsillo.
+  - **Tarea 4.3:** Maquetar las tarjetas de bolsillos y barra de progreso.  
+    *Responsable:* Jorman Palacios (Capa UI/UX).  
+    *Acción esperada:* Diseñar en Tailwind CSS dentro de `public/index.html` las tarjetas dinámicas de bolsillos con su barra de progreso.
+  - **Tarea 4.4:** Lógica matemática del porcentaje y pruebas de integración.  
+    *Responsable:* Fabián Córdoba (Calidad / Scrum Master).  
+    *Acción esperada:* Programar el cálculo que llena la barra de progreso (ej. meta \$100.000, acumulado \$50.000 = 50%) y certificar que la UI no sufra desbordamientos.
 
 ---
 
-## 4. Proyección hacia el Cierre de Sprint (Primera Semana de Octubre)
-- **27 sep - 01 oct:** Finalización del desarrollo de HU-04 (Bolsillos) y HU-06 (Deudas).
-- **02 oct - 04 oct:** Pruebas de integración, verificación de persistencia en Firestore y simulación de modificación en vivo (§7.2).
-- **05 oct - 10 oct:** **Sustentación 2** frente al docente evaluador.
+### [HU-05] Historial de Movimientos con Búsqueda y Filtros Dinámicos
+- **Talla y Estimación:** Talla S (5 Story Points).
+- **Prioridad:** Alta (Cumplimiento obligatorio de la Condición Técnica #4 de la rúbrica).
+- **Estado Actual:** **En Pruebas (Testing)**.
+- **Descripción:** Como usuario, quiero buscar transacciones por concepto y filtrarlas simultáneamente por categoría, fecha o ámbito (Personal/Compartido), para conciliar rápidamente cualquier movimiento sin revisar libretas ni múltiples extractos bancarios.
+- **Criterios de Aceptación:** Búsqueda en tiempo real por texto descriptivo y filtro combinado por ámbito y categoría.
+- **Descomposición de Tareas (Ejecución: 21 al 28 de septiembre):**
+  - **Tarea 5.1:** Diseñar barra de búsqueda y selectores en HTML/Tailwind.  
+    *Responsable:* Jorman Palacios (UI).  
+    *Acción esperada:* Integrar el campo de búsqueda por texto (`input[type="search"]`) en la cabecera del historial en `public/index.html`.
+  - **Tarea 5.2:** Programar lógica de filtrado combinado en el array de memoria.  
+    *Responsable:* Yerson Niño (Lógica).  
+    *Acción esperada:* Refactorizar la función de filtrado en `src/ui/dashboard.js` para aplicar filtros compuestos (ámbito + categoría + texto).
+  - **Tarea 5.3:** Adaptar la consulta `onSnapshot` en `firestore.js` para indexar datos.  
+    *Responsable:* Daniel Cortes (Servicios).  
+    *Acción esperada:* Optimizar la consulta en tiempo real para traer datos limpios ordenados cronológicamente.
+  - **Tarea 5.4:** Pruebas de renderizado de resultados y estados vacíos.  
+    *Responsable:* Fabián Córdoba (Calidad).  
+    *Acción esperada:* Validar que al no encontrar coincidencias se muestre un mensaje amigable ("No se encontraron transacciones").
+
+---
+
+### [HU-06] Registro y Seguimiento de Deudas / Préstamos a Terceros
+- **Talla y Estimación:** Talla M (8 Story Points).
+- **Prioridad:** Media (Funcionalidad de negocio clave para el valor de la app, complementaria a las condiciones técnicas).
+- **Estado Actual:** **En Desarrollo (Work In Progress - WIP)**.
+- **Descripción:** Como usuario, quiero registrar préstamos realizados a amigos o familiares indicando monto, deudor, fecha y estado (Pendiente/Saldado), para recuperar el dinero sin fricciones.
+- **Criterios de Aceptación:** Registro de cuenta por cobrar, capacidad de registrar abonos parciales y visualización del impacto patrimonial (activo diferido).
+- **Descomposición de Tareas (Ejecución: 25 de septiembre al 2 de octubre):**
+  - **Tarea 6.1:** Crear la clase constructora `Deuda.js` en la capa de modelos.  
+    *Responsable:* Yerson Niño (Capa de Dominio).  
+    *Acción esperada:* Crear `src/models/Deuda.js` con estados `PENDIENTE`, `PAGADA_PARCIAL`, `SALDADA`.
+  - **Tarea 6.2:** Crear métodos CRUD en Firestore para la colección deudas.  
+    *Responsable:* Daniel Cortes (Servicios).  
+    *Acción esperada:* Programar `registrarDeuda()`, `abonarDeuda()` y `escucharDeudas()` en `src/services/firestore.js`.
+  - **Tarea 6.3:** Crear modal de "Nuevo Préstamo" y tabla de deudores.  
+    *Responsable:* Juan Diego Peraza (Product Owner / UI Support).  
+    *Acción esperada:* Maquetar en Tailwind la sección visual de control de préstamos e historial de deudores.
+  - **Tarea 6.4:** Lógica matemática para calcular abonos y liquidación de deuda.  
+    *Responsable:* Jorman Palacios (Lógica de Presentación).  
+    *Acción esperada:* Programar el recálculo dinámico de saldo pendiente por cobrar tras cada abono.
+
+---
+
+### [HU-07] Manejo de Errores Visible y Notificaciones Contextuales
+- **Talla y Estimación:** Talla S (3 Story Points).
+- **Prioridad:** Crítica (Garantiza la Condición Técnica Obligatoria #5: *"El usuario se entera de forma útil. No pantallazos en blanco"*).
+- **Estado Actual:** **En Pruebas (Testing)**.
+- **Descripción:** Como usuario, quiero recibir alertas visuales claras e instantáneas ante fallos de conexión o rechazos de base de datos, para entender qué ocurrió sin que la aplicación quede congelada.
+- **Criterios de Aceptación:** Uso de notificaciones flotantes (Toasts) con tiempos de expiración y códigos de color según la severidad del error.
+- **Descomposición de Tareas (Ejecución: 28 de septiembre al 4 de octubre):**
+  - **Tarea 7.1:** Maquetar la alerta Toast en Tailwind CSS (Estados: Éxito, Error, Info, Advertencia).  
+    *Responsable:* Jorman Palacios (UI).  
+    *Acción esperada:* Diseñar y afinar los estilos visuales de los badges en `src/ui/notificaciones.js`.
+  - **Tarea 7.2:** Escribir el módulo independiente `notificaciones.js` para renderizar Toasts dinámicos.  
+    *Responsable:* Fabián Córdoba (Scrum Master / Calidad).  
+    *Acción esperada:* Validar la creación dinámica del contenedor `#cc-toast-container` y el temporizador de auto-cierre.
+  - **Tarea 7.3:** Inyectar las llamadas de Toast dentro de todos los bloques `catch` de `auth.js` y `firestore.js`.  
+    *Responsable:* Daniel Cortes (Servicios).  
+    *Acción esperada:* Asegurar que cualquier promesa rechazada desencadene un Toast visible con mensaje traducido al español.
+  - **Tarea 7.4:** Forzar caídas de red desde el navegador para probar la visibilidad de los errores en pantalla.  
+    *Responsable:* Fabián Córdoba (Calidad).  
+    *Acción esperada:* Simular modo offline en DevTools (F12) y documentar capturas de pantalla para la Sustentación 2.
+
+---
+
+## 5. Resumen de Capacidad del Sprint 2
+- **Historias Planificadas:** 4 Historias de Usuario.
+- **Total Story Points:** **24 SP** ($8 + 5 + 8 + 3$).
+- **Velocidad Promedio Requerida:** 6 SP por semana para el equipo (ritmo ágil balanceado y sostenible).
+- **Distribución de Carga:** Todos los 5 integrantes tienen asignaciones específicas e individuales en el código fuente.

@@ -22,7 +22,7 @@
 - **Hito de Cierre:** **Sustentación 2 (Entre el 5 y 10 de octubre)**
 - **Estado:** **EN CURSO (Promediando Sprint a fecha 26 de septiembre de 2026)**
 - **Sprint Goal en Ejecución:**
-  > *"Expandir las capacidades del hogar implementando el módulo de bolsillos de ahorro para metas específicas, el registro y seguimiento de deudas o préstamos informales a terceros, y la optimización de consultas de historial con filtrado avanzado y manejo de errores visible."*
+  > *"Incorporar la gestión de bolsillos de ahorro y el control de deudas con filtrado dinámico para planificar metas conjuntas y conciliar préstamos informales."*
 - **Historias de Usuario en Tránsito en el Tablero (Miro / Planner):**
   - **HU-04: Bolsillos de Ahorro / Cajas Fijas** — Fondos con propósitos específicos (*En Desarrollo / WIP*).
   - **HU-05: Historial con Filtros Avanzados y Búsqueda** — Búsqueda por texto, fechas y categoría (*En Pruebas*).

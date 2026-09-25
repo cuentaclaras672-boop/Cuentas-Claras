@@ -19,6 +19,27 @@ A fecha del **26 de septiembre de 2026**, el equipo se encuentra a mitad del Spr
 | **HU-06: Control de Préstamos a Terceros** | 8 SP | Juan Diego Peraza / Daniel Cortes | **Work in Progress (WIP)** |
 | **HU-07: Manejo Visible de Errores** | 3 SP | Fabián Córdoba | **En Pruebas (Testing)** |
 
+### 1.1 Desglose de Tareas de Sprint 2 en el Tablero
+
+| ID Tarea | Descripción | Responsable | Periodo | Estado en Miro |
+|---|---|---|:---:|:---:|
+| **Tarea 4.1** | Modelar colección y estructura de `Bolsillo.js` | Yerson Niño | 25 sep - 27 sep | **WIP** |
+| **Tarea 4.2** | Funciones asíncronas para transferir fondos en Firestore | Daniel Cortes | 27 sep - 29 sep | **Por Hacer** |
+| **Tarea 4.3** | Maquetar tarjetas de bolsillos y barras de progreso (Tailwind) | Jorman Palacios | 28 sep - 30 sep | **Por Hacer** |
+| **Tarea 4.4** | Lógica matemática del porcentaje y pruebas de UI | Fabián Córdoba | 30 sep - 01 oct | **Por Hacer** |
+| **Tarea 5.1** | Diseñar barra de búsqueda y selectores en HTML/Tailwind | Jorman Palacios | 21 sep - 23 sep | **En Pruebas** |
+| **Tarea 5.2** | Lógica de filtrado combinado en array en `dashboard.js` | Yerson Niño | 23 sep - 25 sep | **En Pruebas** |
+| **Tarea 5.3** | Adaptar consulta `onSnapshot` en `firestore.js` | Daniel Cortes | 25 sep - 27 sep | **En Pruebas** |
+| **Tarea 5.4** | Pruebas de renderizado de resultados y estados vacíos | Fabián Córdoba | 27 sep - 28 sep | **En Pruebas** |
+| **Tarea 6.1** | Crear clase constructora `Deuda.js` en dominio | Yerson Niño | 25 sep - 27 sep | **WIP** |
+| **Tarea 6.2** | Métodos CRUD en Firestore para subcolección deudas | Daniel Cortes | 27 sep - 29 sep | **Por Hacer** |
+| **Tarea 6.3** | Modal de "Nuevo Préstamo" y tabla de deudores | Juan Diego Peraza | 29 sep - 01 oct | **Por Hacer** |
+| **Tarea 6.4** | Lógica para calcular abonos y liquidación de deuda | Jorman Palacios | 01 oct - 02 oct | **Por Hacer** |
+| **Tarea 7.1** | Maquetar alerta Toast en Tailwind (Éxito, Error, Info) | Jorman Palacios | 28 sep - 30 sep | **En Pruebas** |
+| **Tarea 7.2** | Escribir módulo independiente `notificaciones.js` | Fabián Córdoba | 30 sep - 02 oct | **En Pruebas** |
+| **Tarea 7.3** | Inyectar llamadas Toast en bloques `catch` de servicios | Daniel Cortes | 02 oct - 03 oct | **En Pruebas** |
+| **Tarea 7.4** | Pruebas forzando caídas de red (Modo offline en F12) | Fabián Córdoba | 03 oct - 04 oct | **En Pruebas** |
+
 ---
 
 ## 2. Registro de Dailies de Sprint 2 (Muestreo del Periodo)
