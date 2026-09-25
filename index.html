@@ -2,33 +2,13 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cuentas Claras</title>
-  
-  <!-- Importar Firebase desde CDN -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-
-    // PEGA AQUÍ TU firebaseConfig
-    const firebaseConfig = {
-      apiKey: "AIzaSyDLVw72vEnRmrm_CRFLKlZoxsHxHtxLzk0",
-      authDomain: "bdcuentasclaras-b1814.firebaseapp.com",
-      projectId: "bdcuentasclaras-b1814",
-      storageBucket: "bdcuentasclaras-b1814.firebasestorage.app",
-      messagingSenderId: "632619284326",
-      appId: "1:632619284326:web:b08f98785f80aff4b8baa7"
-    };
-
-    // Inicializar Firebase
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-
-    console.log("🔥 Firebase conectado exitosamente a Cuentas Claras");
+  <meta http-equiv="refresh" content="0; url=./public/index.html">
+  <title>Redirigiendo a Cuentas Claras...</title>
+  <script>
+    window.location.href = "./public/index.html";
   </script>
 </head>
-<body style="font-family: system-ui; background: #0F172A; color: white; padding: 2rem;">
-  <h1>Cuentas Claras</h1>
-  <p>Entorno configurado correctamente. Revisa la consola (F12).</p>
+<body style="font-family: system-ui; background: #0B1120; color: white; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0;">
+  <p>Redirigiendo a <a href="./public/index.html" style="color: #818CF8;">Cuentas Claras (public/index.html)</a>...</p>
 </body>
 </html>
