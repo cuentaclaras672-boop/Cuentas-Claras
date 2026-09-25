@@ -41,105 +41,84 @@
 
 ---
 
-## 4. Historias de Usuario del Sprint 2 y Descomposición de Tareas
+## 4. Descomposición y Cronograma de Tareas por Historia de Usuario (4 Semanas)
 
-### [HU-04] Bolsillos de Ahorro / Cajas con Propósitos Fijos
-- **Talla y Estimación:** Talla M (8 Story Points).
-- **Prioridad:** **Alta** (Núcleo funcional del Product Goal).
-- **Estado Actual:** **En Desarrollo (Work In Progress - WIP)**.
-- **Descripción:** Como miembro del hogar, quiero crear bolsillos específicos (ej. citas, bebé, viajes, emergencias) asignándoles una meta monetaria y fondos, para separar el dinero disponible para gastos inmediatos del dinero con un propósito específico.
-- **Criterios de Aceptación:**
-  - Creación de bolsillos con nombre, meta y saldo acumulado.
-  - Transferencia de fondos desde el saldo general hacia el bolsillo.
-  - Barra de progreso porcentual respecto a la meta.
-- **Descomposición de Tareas (Ejecución: 25 de septiembre al 1 de octubre):**
-  - **Tarea 4.1:** Modelar la colección y estructura de datos de los bolsillos.  
-    *Responsable:* Yerson Niño (Capa de Dominio).  
-    *Acción esperada:* Crear el archivo `src/models/Bolsillo.js` con validaciones defensivas y métodos de serialización Firestore.
-  - **Tarea 4.2:** Funciones asíncronas para transferir fondos.  
-    *Responsable:* Daniel Cortes (Integración Firebase).  
-    *Acción esperada:* Programar en `src/services/firestore.js` la transacción que descuenta dinero del saldo disponible y lo suma al bolsillo.
-  - **Tarea 4.3:** Maquetar las tarjetas de bolsillos y barra de progreso.  
-    *Responsable:* Jorman Palacios (Capa UI/UX).  
-    *Acción esperada:* Diseñar en Tailwind CSS dentro de `public/index.html` las tarjetas dinámicas de bolsillos con su barra de progreso.
-  - **Tarea 4.4:** Lógica matemática del porcentaje y pruebas de integración.  
-    *Responsable:* Fabián Córdoba (Calidad / Scrum Master).  
-    *Acción esperada:* Programar el cálculo que llena la barra de progreso (ej. meta \$100.000, acumulado \$50.000 = 50%) y certificar que la UI no sufra desbordamientos.
-
----
+El trabajo se distribuye a lo largo de las 4 semanas del sprint (Semanas 6, 7, 8 y 9) para garantizar un flujo continuo y sostenible:
 
 ### [HU-05] Historial de Movimientos con Búsqueda y Filtros Dinámicos
 - **Talla y Estimación:** Talla S (5 Story Points).
-- **Prioridad:** **Alta** (Garantiza el cumplimiento obligatorio de la **Condición Técnica #4** de la rúbrica).
-- **Estado Actual:** **En Pruebas (Testing)**.
+- **Prioridad:** **Alta** (Garantiza el cumplimiento obligatorio de la **Condición Técnica #4**).
+- **Estado Actual al 26 de septiembre:** **En Pruebas (Testing)**.
 - **Descripción:** Como usuario, quiero buscar transacciones por concepto y filtrarlas simultáneamente por categoría, fecha o ámbito (Personal/Compartido), para conciliar rápidamente cualquier movimiento sin revisar libretas ni múltiples extractos bancarios.
-- **Criterios de Aceptación:** Búsqueda en tiempo real por texto descriptivo y filtro combinado por ámbito y categoría.
-- **Descomposición de Tareas (Ejecución: 21 al 28 de septiembre):**
+- **Descomposición de Tareas:**
   - **Tarea 5.1:** Diseñar barra de búsqueda y selectores en HTML/Tailwind.  
-    *Responsable:* Jorman Palacios (UI).  
-    *Acción esperada:* Integrar el campo de búsqueda por texto (`input[type="search"]`) en la cabecera del historial en `public/index.html`.
-  - **Tarea 5.2:** Programar lógica de filtrado combinado en el array de memoria.  
-    *Responsable:* Yerson Niño (Lógica).  
-    *Acción esperada:* Refactorizar la función de filtrado en `src/ui/dashboard.js` para aplicar filtros compuestos (ámbito + categoría + texto).
+    *Responsable:* Jorman Palacios (UI) | **09 sep - 12 sep** | *Estado:* Done.
+  - **Tarea 5.2:** Programar lógica de filtrado combinado en el array en `dashboard.js`.  
+    *Responsable:* Yerson Niño (Lógica) | **13 sep - 16 sep** | *Estado:* Done.
   - **Tarea 5.3:** Adaptar la consulta `onSnapshot` en `firestore.js` para indexar datos.  
-    *Responsable:* Daniel Cortes (Servicios).  
-    *Acción esperada:* Optimizar la consulta en tiempo real para traer datos limpios ordenados cronológicamente.
-  - **Tarea 5.4:** Pruebas de renderizado de resultados y estados vacíos.  
-    *Responsable:* Fabián Córdoba (Calidad).  
-    *Acción esperada:* Validar que al no encontrar coincidencias se muestre un mensaje amigable ("No se encontraron transacciones").
+    *Responsable:* Daniel Cortes (Servicios) | **16 sep - 20 sep** | *Estado:* Done.
+  - **Tarea 5.4:** Pruebas de renderizado de resultados y validación de estados vacíos.  
+    *Responsable:* Fabián Córdoba (Calidad) | **21 sep - 26 sep** | *Estado:* **En Pruebas**.
 
 ---
 
 ### [HU-06] Integración Externa de Indicadores Económicos y Conversión Multidivisa
 - **Talla y Estimación:** Talla S (5 Story Points).
-- **Prioridad:** **Alta** (Garantiza el cumplimiento obligatorio de la **Condición Técnica #3** de la rúbrica).
-- **Estado Actual:** **En Pruebas (Testing)**.
+- **Prioridad:** **Alta** (Garantiza el cumplimiento obligatorio de la **Condición Técnica #3**).
+- **Estado Actual al 26 de septiembre:** **En Pruebas (Testing)**.
 - **Descripción:** Como miembro del hogar, quiero consultar en tiempo real la TRM oficial del dólar y visualizar la equivalencia de mis saldos y metas de ahorro en USD, para tomar decisiones financieras informadas frente a compras en moneda extranjera o inflación.
-- **Criterios de Aceptación:**
-  - Consumo asíncrono vía `fetch` de una API pública oficial con la TRM del día.
-  - Mecanismo defensivo de respaldo (fallback offline) ante fallos de conexión externa.
-  - Visualización del indicador en la cabecera del Dashboard y conversión referencial COP/USD.
-- **Descomposición de Tareas (Ejecución: 25 de septiembre al 2 de octubre):**
-  - **Tarea 6.1:** Servicio modular de consumo de API TRM con fallback offline.  
-    *Responsable:* Daniel Cortes (Servicios).  
-    *Acción esperada:* Modularizar y blindar `src/services/indicadores.js` con tipado defensivo y control de latencia.
-  - **Tarea 6.2:** Función de conversión monetaria (COP a USD) y utilidades matemáticas.  
-    *Responsable:* Yerson Niño (Dominio / Utilidades).  
-    *Acción esperada:* Implementar en `src/utils/formateo.js` el cálculo de equivalencia de divisas y formateo internacional.
-  - **Tarea 6.3:** Componente visual de indicador y toggle multidivisa en el Dashboard.  
-    *Responsable:* Juan Diego Peraza / Jorman Palacios (Product Owner / UI).  
-    *Acción esperada:* Integrar el badge interactivo de la TRM en el header y permitir alternar visualización de metas de ahorro en USD.
-  - **Tarea 6.4:** Pruebas de latencia, excepciones de red y validación en vivo.  
-    *Responsable:* Fabián Córdoba (Calidad / Scrum Master).  
-    *Acción esperada:* Simular caídas del endpoint externo y verificar que la aplicación continúe operando con el valor referencial seguro.
+- **Descomposición de Tareas:**
+  - **Tarea 6.1:** Spike técnico y servicio modular de consumo de API TRM con fallback offline (`indicadores.js`).  
+    *Responsable:* Daniel Cortes (Servicios) | **10 sep - 14 sep** | *Estado:* Done.
+  - **Tarea 6.2:** Función de conversión de divisa (COP a USD) y utilidades matemáticas en `formateo.js`.  
+    *Responsable:* Yerson Niño (Dominio / Utilidades) | **15 sep - 19 sep** | *Estado:* Done.
+  - **Tarea 6.3:** Componente visual de indicador y toggle multidivisa en el Dashboard (`index.html`).  
+    *Responsable:* Juan Diego Peraza / Jorman Palacios (PO / UI) | **20 sep - 24 sep** | *Estado:* Done.
+  - **Tarea 6.4:** Pruebas de latencia, excepciones de red y validación en vivo frente a evaluadores.  
+    *Responsable:* Fabián Córdoba (Calidad / Scrum Master) | **24 sep - 28 sep** | *Estado:* **En Pruebas**.
 
 ---
 
 ### [HU-07] Manejo de Errores Visible y Notificaciones Contextuales
 - **Talla y Estimación:** Talla S (3 Story Points).
 - **Prioridad:** **Crítica** (Garantiza la **Condición Técnica #5**: *"El usuario se entera de forma útil. No pantallazos en blanco"*).
-- **Estado Actual:** **En Pruebas (Testing)**.
+- **Estado Actual al 26 de septiembre:** **En Pruebas (Testing)**.
 - **Descripción:** Como usuario, quiero recibir alertas visuales claras e instantáneas ante fallos de conexión o rechazos de base de datos, para entender qué ocurrió sin que la aplicación quede congelada.
-- **Criterios de Aceptación:** Uso de notificaciones flotantes (Toasts) con tiempos de expiración y códigos de color según la severidad del error.
-- **Descomposición de Tareas (Ejecución: 28 de septiembre al 4 de octubre):**
+- **Descomposición de Tareas:**
   - **Tarea 7.1:** Maquetar la alerta Toast en Tailwind CSS (Estados: Éxito, Error, Info, Advertencia).  
-    *Responsable:* Jorman Palacios (UI).  
-    *Acción esperada:* Diseñar y afinar los estilos visuales de los badges en `src/ui/notificaciones.js`.
+    *Responsable:* Jorman Palacios (UI) | **12 sep - 16 sep** | *Estado:* Done.
   - **Tarea 7.2:** Escribir el módulo independiente `notificaciones.js` para renderizar Toasts dinámicos.  
-    *Responsable:* Fabián Córdoba (Scrum Master / Calidad).  
-    *Acción esperada:* Validar la creación dinámica del contenedor `#cc-toast-container` y el temporizador de auto-cierre.
-  - **Tarea 7.3:** Inyectar las llamadas de Toast dentro de todos los bloques `catch` de `auth.js` y `firestore.js`.  
-    *Responsable:* Daniel Cortes (Servicios).  
-    *Acción esperada:* Asegurar que cualquier promesa rechazada desencadene un Toast visible con mensaje traducido al español.
-  - **Tarea 7.4:** Forzar caídas de red desde el navegador para probar la visibilidad de los errores en pantalla.  
-    *Responsable:* Fabián Córdoba (Calidad).  
-    *Acción esperada:* Simular modo offline en DevTools (F12) y documentar capturas de pantalla para la Sustentación 2.
+    *Responsable:* Fabián Córdoba (Scrum Master / Calidad) | **16 sep - 20 sep** | *Estado:* Done.
+  - **Tarea 7.3:** Inyectar las llamadas de Toast dentro de todos los bloques `catch` de servicios.  
+    *Responsable:* Daniel Cortes (Servicios) | **21 sep - 24 sep** | *Estado:* Done.
+  - **Tarea 7.4:** Forzar caídas de red desde el navegador para probar la visibilidad de los errores en pantalla (Modo offline en F12).  
+    *Responsable:* Fabián Córdoba (Calidad) | **25 sep - 29 sep** | *Estado:* **En Pruebas**.
 
 ---
 
-## 5. Resumen de Capacidad del Sprint 2
-- **Historias Planificadas:** 4 Historias de Usuario (Todas con Prioridad Alta o Crítica).
-- **Total Story Points:** **21 SP** ($8 + 5 + 5 + 3$).
-- **Velocidad Promedio Requerida:** 5.25 SP por semana para el equipo (ritmo ágil balanceado, sostenible y seguro).
-- **Alineación Académica:** Al finalizar este sprint, el equipo certifica el **100% de las 7 condiciones técnicas obligatorias** de la asignatura TIC42695.
-- **Nota de Backlog:** La historia de *Control de Deudas y Préstamos a Terceros* se traslada estratégicamente al **Sprint 3**, integrándose con la liquidación avanzada entre convivientes.
+### [HU-04] Bolsillos de Ahorro / Cajas con Propósitos Fijos
+- **Talla y Estimación:** Talla M (8 Story Points).
+- **Prioridad:** **Alta** (Núcleo funcional del Product Goal del Hogar).
+- **Estado Actual al 26 de septiembre:** **En Desarrollo (Work In Progress - WIP)**.
+- **Descripción:** Como miembro del hogar, quiero crear bolsillos específicos (ej. citas, bebé, viajes, emergencias) asignándoles una meta monetaria y fondos, para separar el dinero disponible para gastos inmediatos del dinero con un propósito específico.
+- **Descomposición de Tareas:**
+  - **Tarea 4.1:** Modelar la colección y estructura de datos de `Bolsillo.js` en dominio.  
+    *Responsable:* Yerson Niño (Capa de Dominio) | **18 sep - 22 sep** | *Estado:* Done.
+  - **Tarea 4.2:** Funciones asíncronas para transferir fondos en Firestore.  
+    *Responsable:* Daniel Cortes (Integración Firebase) | **23 sep - 27 sep** | *Estado:* **WIP (En Desarrollo)**.
+  - **Tarea 4.3:** Maquetar las tarjetas de bolsillos y barra de progreso en Tailwind.  
+    *Responsable:* Jorman Palacios (Capa UI/UX) | **27 sep - 30 sep** | *Estado:* Por Hacer.
+  - **Tarea 4.4:** Lógica matemática del porcentaje y pruebas de integración final.  
+    *Responsable:* Fabián Córdoba (Calidad / Scrum Master) | **30 sep - 03 oct** | *Estado:* Por Hacer.
+
+---
+
+## 5. Resumen de Capacidad y Ritmo del Sprint 2
+- **Historias Planificadas:** 4 Historias de Usuario (Todas Prioridad Alta o Crítica).
+- **Total Story Points:** **21 SP** ($5 + 5 + 3 + 8$).
+- **Ritmo Semanal:** ~5.25 SP por semana, distribuido equitativamente entre los 5 miembros del equipo.
+- **Cadencia hacia la Sustentación 2:**
+  - **Semana 6 (07 - 12 sep):** Planning, estimación, diseño y arranque de tareas visuales y de servicio.
+  - **Semana 7 (14 - 19 sep):** Construcción de filtros, TRM y toasts.
+  - **Semana 8 (21 - 26 sep - HOY):** Fase de QA/Testing en HU-05, HU-06 y HU-07; desarrollo activo de transferencias de bolsillos (HU-04 WIP).
+  - **Semana 9 (28 sep - 04 oct):** Integración completa, pruebas de regresión, verificación de consola en cero y preparación para la Sustentación 2 (05 - 10 oct).
