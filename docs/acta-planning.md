@@ -8,11 +8,13 @@
 
 ## 1. Roles del Equipo Scrum
 
-| Rol | Responsable | Funciones Principales |
+| Rol | Integrante | Responsabilidad Principal |
 |---|---|---|
-| **Product Owner** | Equipo Cuentas Claras | Definición y priorización del Product Backlog, criterios de aceptación y valor de negocio. |
-| **Scrum Master** | Equipo Cuentas Claras | Facilitación de ceremonias, remoción de impedimentos técnicos y aseguramiento de buenas prácticas. |
-| **Development Team** | Juan Diego Peraza & Equipo | Diseño de arquitectura en capas, desarrollo frontend (Vanilla JS + Tailwind), integración con Firebase v10. |
+| **Product Owner** | Juan Diego Peraza Amado | Priorización del Backlog, definición de valor de negocio y validación de criterios de aceptación. |
+| **Scrum Master** | Fabián Eduardo Córdoba | Facilitación de ceremonias ágiles, remoción de impedimentos y cumplimiento de la Definition of Done. |
+| **Development Team** | Daniel Felipe Cortes | Integración con servicios de Firebase y APIs externas (TRM). |
+| **Development Team** | Jorman Palacios Murillo | Capa de presentación (UI/UX) con Tailwind CSS y componentes reactivos. |
+| **Development Team** | Yerson Niño Guerrero | Capa de dominio, modelos de datos y programación defensiva. |
 
 ---
 
@@ -29,7 +31,7 @@
 - **Para** acceder de manera privada y segura a la gestión financiera de mi hogar.
 - **Criterios de Aceptación:**
   - Validación defensiva de formato de correo y contraseña (mínimo 6 caracteres).
-  - Almacenamiento seguro en Firebase Authentication.
+  - Almacenamiento seguro en Firebase Authentication SDK v10.
   - Notificaciones flotantes (Toast) ante errores o éxito.
 
 ### HU-02: Registro de Movimientos Financieros
@@ -38,7 +40,7 @@
 - **Para** mantener las finanzas organizadas y transparentes con mis convivientes.
 - **Criterios de Aceptación:**
   - Persistencia asíncrona real en Cloud Firestore (colección `transacciones`).
-  - Validación del monto (número positivo > 0).
+  - Validación estricta del monto (número positivo > 0).
   - Selector dinámico de categorías según el tipo (Ingreso o Gasto).
 
 ### HU-03: Dashboard y Resumen en Tiempo Real

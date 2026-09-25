@@ -1,92 +1,142 @@
 # Cuentas Claras 🏠💳
-**Aplicación Web para la Gestión de Finanzas Compartidas en el Hogar**
+**Plataforma Web para la Gestión de Finanzas Compartidas en el Hogar**
 
-Proyecto universitario de ingeniería de software desarrollado bajo metodologías ágiles (**Scrum**), diseñado con arquitectura en capas, alta cohesión, bajo acoplamiento y preparado para sustentaciones con modificación de código en vivo.
-
----
-
-## 🚀 Stack Tecnológico
-
-- **Frontend:** HTML5 semántico, Vanilla JavaScript (Módulos ES6+ nativos) y Tailwind CSS. Sin frameworks pesados.
-- **Backend as a Service (BaaS):** Firebase SDK v10 (Cloud Firestore & Firebase Authentication).
-- **Control de Versiones:** Git & GitHub bajo convención de commits semánticos.
+Aplicación web desarrollada como proyecto de ingeniería bajo el marco de trabajo ágil (**Scrum**). Diseñada con una arquitectura modular por capas en Vanilla JavaScript (ES6+) y Tailwind CSS, respaldada por Firebase SDK v10 como Backend as a Service (BaaS).
 
 ---
 
-## 🏛️ Arquitectura por Capas
+## 📌 1. La Propuesta
 
-El proyecto implementa una estricta separación de responsabilidades:
+La convivencia en pareja y las relaciones interpersonales (familiares o amigos) suelen deteriorarse e incluso terminar debido a la mala gestión del dinero y la falta de acuerdos financieros. Al compartir una vida, surge la necesidad de dividir equitativamente gastos comunes (arriendo, servicios, mercado) y establecer fondos conjuntos (para un activo, viajes), además de lidiar con préstamos informales a terceros que rara vez se devuelven. 
+
+Llevar este control en libretas, actualizando tablas de cálculo de forma manual o revisando múltiples aplicaciones bancarias dispersas resulta desgastante, genera desconfianza y provoca discusiones por la falta de claridad sobre *"quién puso qué"* y con cuánto dinero real se cuenta.
+
+---
+
+## 🔍 2. A quién observamos y qué aprendimos
+
+Observamos a parejas jóvenes que recién inician la convivencia (basado en nuestra propia experiencia directa) y a personas que prestan dinero a su círculo cercano. 
+
+Aprendimos que el principal detonante de los problemas no es la falta de ingresos, sino la falta de claridad y herramientas para conciliar las cuentas. Descubrimos que tener la información financiera descentralizada impide visualizar cuánto dinero es de uso personal y cuánto está comprometido para las responsabilidades conjuntas o metas a corto plazo (como el fondo de citas).
+
+---
+
+## 🎯 3. Product Goal
+
+> **Lograr que las parejas y usuarios individuales centralicen la gestión de sus compromisos financieros (gastos compartidos, metas de ahorro y control de préstamos a terceros), reduciendo el estrés y el tiempo de cuadre de cuentas a menos de 5 minutos semanales, y logrando un registro activo de al menos el 80% de sus movimientos financieros al finalizar las 16 semanas del semestre.**
+
+---
+
+## 📋 4. Product Backlog Inicial
+
+1. **Módulo de "Cajas / Bolsillos":** Separación y visualización de fondos con propósitos fijos (ej. citas, bebé, viajes, emergencias).
+2. **Registro y Seguimiento de Préstamos Informales:** Control de estado de deudas y préstamos a amigos o familiares.
+3. **Dashboard Centralizado:** Visualización en tiempo real del saldo consolidado del hogar, balance neto e ingresos vs. gastos.
+4. **Control de Acceso Seguro:** Sistema de autenticación para que solo los miembros autorizados visualicen y gestionen la información financiera.
+
+---
+
+## 🛠️ 5. Cumplimiento de las Siete Condiciones Técnicas
+
+| # | Condición Técnica | Implementación en Cuentas Claras | Módulo Responsable |
+|---|---|---|---|
+| **1** | **Persistencia Real** | Almacenamiento persistente en base de datos NoSQL Cloud Firestore. Prohibido el uso de memoria volátil o `localStorage` para balances financieros. Operaciones CRUD y sincronización en tiempo real (`onSnapshot`). | [`src/services/firestore.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/firestore.js) |
+| **2** | **Sesión o Control de Acceso** | Autenticación basada en Firebase Authentication SDK v10 (email y contraseña), asegurando la privacidad y el aislamiento de datos por usuario y hogar. | [`src/services/auth.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/auth.js) |
+| **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar en tiempo real) para fundamentar decisiones de ahorro en el hogar. | `src/services/` *(Consumo API TRM)* |
+| **4** | **Consulta con Filtrado** | Historial dinámico e interactivo de movimientos con capacidad de filtrado por ámbito (Personal / Compartido), tipo (Ingreso / Gasto) y categoría. | [`src/ui/dashboard.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/dashboard.js) |
+| **5** | **Manejo de Errores Visible** | Captura defensiva de fallos de red, validaciones y base de datos con `try/catch`, proyectados en pantalla mediante notificaciones flotantes contextuales (Toasts). El usuario nunca experimenta pantallas en blanco. | [`src/ui/notificaciones.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/notificaciones.js) |
+| **6** | **Repositorio de Código** | Repositorio formal en GitHub con trazabilidad de commits semánticos, ramas por funcionalidad y contribuciones individuales del equipo. | Control de versiones Git / GitHub |
+| **7** | **Documentación Técnica** | Documentación exhaustiva en `README.md` junto con los artefactos de gestión ágil en la carpeta `docs/` (`acta-planning.md`, `definition-of-done.md`, `sprint-goals.md`). | [`README.md`](file:///c:/Users/jdperaza/Cuentas_Claras/README.md) y [`docs/`](file:///c:/Users/jdperaza/Cuentas_Claras/docs) |
+
+---
+
+## 🏛️ 6. Arquitectura de Software por Capas
+
+El proyecto implementa una estricta **Separación de Responsabilidades (SoC - Separation of Concerns)** para garantizar alta cohesión, bajo acoplamiento y facilidad de mantenimiento:
 
 ```
 cuentas-claras/
-├── public/                 # Capa Estática accesible por el cliente
-│   ├── index.html          # Interfaz principal (Dashboard y Autenticación)
-│   ├── style.css           # Estilos personalizados y directivas de Tailwind
-│   └── assets/             # Recursos gráficos e iconografía
-├── src/                    # Código Fuente Modular
-│   ├── models/             # CAPA DE DOMINIO: Entidades y reglas de negocio
-│   │   └── Transaccion.js  # Modelo Transaccion, categorías, tipos y validación defensiva
-│   ├── services/           # CAPA DE INFRAESTRUCTURA: Conexión externa (Firebase)
-│   │   ├── auth.js         # Servicio de autenticación (Login, Registro, Logout)
-│   │   └── firestore.js    # Persistencia asíncrona y listeners en tiempo real
-│   ├── ui/                 # CAPA DE PRESENTACIÓN: Manipulación del DOM
-│   │   ├── ui-auth.js      # Interacción de formularios y estados de autenticación
-│   │   ├── dashboard.js    # Renderizado reactivo de balances, filtros y movimientos
+├── public/                 # Capa de Presentación Estática (Cliente)
+│   ├── index.html          # Interfaz de usuario (Autenticación y Dashboard)
+│   ├── style.css           # Estilos personalizados y utilidades de Tailwind
+│   └── assets/             # Recursos multimedia e iconografía
+├── src/                    # Código Fuente Modular (ES6+ Modules)
+│   ├── models/             # CAPA DE DOMINIO
+│   │   └── Transaccion.js  # Entidad Transaccion, categorías y validación defensiva
+│   ├── services/           # CAPA DE INFRAESTRUCTURA (Conexión Externa)
+│   │   ├── auth.js         # Firebase Auth (Registro, Login, Logout, Observer)
+│   │   └── firestore.js    # Firebase Firestore (Persistencia y Real-time)
+│   ├── ui/                 # CAPA DE PRESENTACIÓN (Manipulación del DOM)
+│   │   ├── ui-auth.js      # Formularios de acceso y alternancia de vistas
+│   │   ├── dashboard.js    # Renderizado reactivo de tarjetas y tabla con filtros
 │   │   └── notificaciones.js # Notificaciones flotantes (Toasts) para errores visibles
-│   ├── utils/              # CAPA TRANSVERSAL: Funciones puras
-│   │   └── formateo.js     # Formato de moneda COP, parseo y fechas legibles
-│   └── app.js              # Orquestador principal del ciclo de vida de la aplicación
+│   ├── utils/              # CAPA TRANSVERSAL
+│   │   └── formateo.js     # Formato de divisa (COP), fechas y parseo seguro
+│   └── app.js              # Orquestador del ciclo de vida de la aplicación
 ├── docs/                   # Documentación de Gestión Ágil (Scrum)
 │   ├── acta-planning.md    # Acta de Sprint Planning y Backlog priorizado
 │   ├── definition-of-done.md # Criterios de calidad Definition of Done (DoD)
-│   └── sprint-goals.md     # Metas de los Sprints
-└── README.md               # Documentación técnica general
+│   └── sprint-goals.md     # Metas de los Sprints del semestre
+└── README.md               # Documentación general del proyecto
 ```
-
-### Reglas de Diseño Obligatorias Cumplidas:
-1. **Independencia de la Capa de Servicios:** `auth.js` y `firestore.js` no interactúan con el DOM (`document.getElementById`). Únicamente retornan promesas o notifican mediante callbacks.
-2. **Persistencia Real:** Cero almacenamiento de finanzas en memoria volátil o `localStorage`. Todo movimiento se sincroniza en Cloud Firestore.
-3. **Manejo Visible de Errores:** Ninguna excepción queda silenciada ni deja pantallas en blanco. Todos los fallos se traducen al español y se despliegan mediante el módulo de Toasts.
-4. **Programación Defensiva (Fail-Fast):** Las entidades y servicios validan tipos y datos antes de realizar peticiones de red.
 
 ---
 
-## ⚙️ Cómo Ejecutar el Proyecto
+## 🔥 7. Configuración del Entorno Firebase
 
-Dado que la aplicación utiliza módulos nativos de JavaScript (`import`/`export`), debe servirse mediante un servidor HTTP local para evitar restricciones CORS del protocolo `file://`:
+La conexión con Firebase se realiza mediante el SDK modular v10. Para configurar el proyecto:
 
-### Opción 1: Con VS Code (Live Server)
-1. Instala la extensión **Live Server** en Visual Studio Code.
-2. Haz clic derecho sobre `public/index.html` (o `index.html` raíz).
-3. Selecciona **"Open with Live Server"**.
+1. Crear un proyecto en la [Consola de Firebase](https://console.firebase.google.com/).
+2. Habilitar **Firebase Authentication** con el proveedor de **Correo electrónico / Contraseña**.
+3. Crear una base de datos **Cloud Firestore** en modo de producción o prueba con la colección `transacciones`.
+4. Registrar una aplicación web en Firebase y verificar que las credenciales en [`src/services/auth.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/auth.js) coincidan con el proyecto:
 
-### Opción 2: Con Node.js (npx serve)
+```javascript
+export const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT_ID.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_PROJECT_ID.firebasestorage.app",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID"
+};
+```
+
+---
+
+## 💻 8. Ejecución en Entorno Local
+
+Dado que la aplicación emplea módulos nativos de JavaScript (`import`/`export`), debe ejecutarse mediante un servidor HTTP local para cumplir con las directivas CORS del navegador:
+
+### Usando Visual Studio Code
+- Instalar la extensión **Live Server**.
+- Hacer clic derecho sobre [`public/index.html`](file:///c:/Users/jdperaza/Cuentas_Claras/public/index.html) y seleccionar **"Open with Live Server"**.
+
+### Usando Node.js
 ```bash
 npx serve .
 ```
-Abre en el navegador: `http://localhost:3000/public/index.html`
+Acceder a: `http://localhost:3000/public/index.html`
 
-### Opción 3: Con Python
+### Usando Python
 ```bash
 python -m http.server 8000
 ```
-Abre en el navegador: `http://localhost:8000/public/index.html`
+Acceder a: `http://localhost:8000/public/index.html`
 
 ---
 
-## 🎯 Guía para Sustentación en Vivo (Defensa con Docentes)
+## 👥 9. Equipo de Desarrollo
 
-| Petición del Evaluador | Archivo a Modificar | Línea / Función |
-|---|---|---|
-| *"Cambia las reglas de validación de contraseña o email"* | `src/services/auth.js` | `validarCredenciales()` |
-| *"Agrega o cambia una categoría de gasto"* | `src/models/Transaccion.js` | `CATEGORIAS_GASTO` |
-| *"Exige que el monto mínimo de gasto sea $1.000 COP"* | `src/models/Transaccion.js` | `validar()` |
-| *"Cambia el diseño o color de las notificaciones Toast"* | `src/ui/notificaciones.js` | `ESTILOS_TOAST` |
-| *"Modifica el formato de la moneda o fecha"* | `src/utils/formateo.js` | `formatearMoneda()` / `formatearFecha()` |
-| *"Cambia la consulta para filtrar solo gastos"* | `src/services/firestore.js` | `escucharTransacciones()` |
+| Integrante | Rol en el Proyecto |
+|---|---|
+| **Juan Diego Peraza Amado** | Desarrollador Frontend / Arquitectura de Software |
+| **Daniel Felipe Cortes** | Desarrollador Frontend / Integración de Servicios |
+| **Jorman Palacios Murillo** | Desarrollador Frontend / UI & Experiencia de Usuario |
+| **Fabián Eduardo Córdoba** | Desarrollador Frontend / Calidad y Gestión Ágil |
+| **Yerson Niño Guerrero** | Desarrollador Frontend / Modelado de Datos y Dominio |
 
 ---
 
-## 👥 Equipo de Desarrollo
-- **Estudiante / Desarrollador:** Juan Diego Peraza (`pony-svg`)
-- **Organización / Repositorio:** [cuentaclaras672-boop/Cuentas-Claras](https://github.com/cuentaclaras672-boop/Cuentas-Claras)
+## 📄 10. Licencia
+Proyecto desarrollado con fines académicos bajo licencia MIT.
