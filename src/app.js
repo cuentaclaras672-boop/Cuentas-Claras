@@ -9,7 +9,7 @@
 import { suscribirEstadoAuth } from "./services/auth.js";
 import { escucharTransacciones } from "./services/firestore.js";
 import { inicializarAuthUI } from "./ui/ui-auth.js";
-import { inicializarDashboardUI, actualizarDashboard } from "./ui/dashboard.js";
+import { inicializarDashboardUI, actualizarDashboard } from "./ui/dashboard.js?v=2";
 import { mostrarToast } from "./ui/notificaciones.js";
 
 let desuscribirTransacciones = null;

@@ -6,8 +6,8 @@
 
 import { registrarTransaccion, eliminarTransaccion, calcularTotales } from "../services/firestore.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
-import { formatearMoneda, formatearFecha, formatearTRM } from "../utils/formateo.js";
-import { consultarTRM } from "../services/indicadores.js";
+import { formatearMoneda, formatearFecha, formatearTRM } from "../utils/formateo.js?v=2";
+import { consultarTRM } from "../services/indicadores.js?v=2";
 import { mostrarToast } from "./notificaciones.js";
 
 let usuarioActual = null;
