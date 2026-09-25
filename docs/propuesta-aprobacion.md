@@ -39,7 +39,7 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 
 1. **Persistencia Real:** Integración con la base de datos NoSQL Cloud Firestore para almacenar de forma persistente y en tiempo real las transacciones, saldos y movimientos del hogar. Cero almacenamiento en memoria volátil o `localStorage`.
 2. **Sesión o Control de Acceso:** Implementación de Firebase Authentication para validar credenciales (correo/contraseña) y asegurar que cada persona solo acceda a la información de su respectivo hogar.
-3. **Integración Externa:** Consumo asíncrono mediante `fetch` de una API pública gratuita (TRM oficial del dólar en Colombia) para que el hogar consulte indicadores económicos relevantes al tomar decisiones de ahorro o compras.
+3. **Integración Externa:** Consumo asíncrono mediante `fetch` de una API pública gratuita (TRM oficial del dólar en Colombia en `src/services/indicadores.js`) para que el hogar consulte indicadores económicos relevantes al tomar decisiones de ahorro o compras.
 4. **Consulta con Filtrado o Búsqueda:** Vista dinámica de historial donde el usuario puede buscar y filtrar sus movimientos financieros por categoría, ámbito (Personal / Compartido) y tipo (Ingreso / Gasto).
 5. **Manejo de Errores Visible:** Implementación de alertas visuales en la interfaz (Toasts flotantes y modales) que notifican amigablemente al usuario ante fallos de red, validaciones de formulario o errores de autenticación, evitando pantallas en blanco.
 6. **Repositorio en GitHub:** Proyecto alojado en un repositorio oficial de GitHub con acceso concedido al docente, ramas por funcionalidad y commits distribuidos con autoría individual verificable.
@@ -47,7 +47,7 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 
 ---
 
-## 6. Integrantes del Equipo y Enlace al Repositorio
+## 6. Integrantes del Equipo y Enlaces de Evaluación
 
 | Nombre Completo | Correo Institucional / Usuario GitHub |
 |---|---|
@@ -57,5 +57,6 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 | **Fabián Eduardo Córdoba** | Integrante Equipo Cuentas Claras |
 | **Yerson Niño Guerrero** | Integrante Equipo Cuentas Claras |
 
-- **Enlace al Repositorio en GitHub:**  
-  [https://github.com/cuentaclaras672-boop/Cuentas-Claras.git](https://github.com/cuentaclaras672-boop/Cuentas-Claras.git)
+🔗 **Accesos del Proyecto:**
+- **Repositorio en GitHub:** [https://github.com/cuentaclaras672-boop/Cuentas-Claras.git](https://github.com/cuentaclaras672-boop/Cuentas-Claras.git)
+- **Tablero de Gestión (Miro):** [Tablero Scrum Cuentas Claras](https://miro.com/welcomeonboard/YVBLdkdFZm96Ujdjb2tKRFFuZVA2QUQrOVdFbDc2dzRHU0tZT0hvRG1lVVNiSVNISHJyNVJZbFJyeHBRZUYzaEFqcnFuQWhJZzlBeExhYTVhUTlpdjB4SGhFS2dFNjFZcjlwNHpIa3pXblhlbVRYam1ERGtKMnpDSzhINDFZWUtyVmtkMG5hNDA3dVlncnBvRVB2ZXBnPT0hdjE=?share_link_id=694372715874)

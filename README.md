@@ -1,7 +1,7 @@
 # Cuentas Claras 🏠💳
 **Plataforma Web para la Gestión de Finanzas Compartidas en el Hogar**
 
-Aplicación web desarrollada como proyecto de ingeniería bajo el marco de trabajo ágil (**Scrum**). Diseñada con una arquitectura modular por capas en Vanilla JavaScript (ES6+) y Tailwind CSS, respaldada por Firebase SDK v10 como Backend as a Service (BaaS).
+Aplicación web desarrollada como proyecto de ingeniería de sistemas bajo el marco de trabajo ágil (**Scrum**). Diseñada con una arquitectura modular por capas en Vanilla JavaScript (ES6+) y Tailwind CSS, respaldada por Firebase SDK v10 como Backend as a Service (BaaS).
 
 ---
 
@@ -42,7 +42,7 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 |---|---|---|---|
 | **1** | **Persistencia Real** | Almacenamiento persistente en base de datos NoSQL Cloud Firestore. Prohibido el uso de memoria volátil o `localStorage` para balances financieros. Operaciones CRUD y sincronización en tiempo real (`onSnapshot`). | [`src/services/firestore.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/firestore.js) |
 | **2** | **Sesión o Control de Acceso** | Autenticación basada en Firebase Authentication SDK v10 (email y contraseña), asegurando la privacidad y el aislamiento de datos por usuario y hogar. | [`src/services/auth.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/auth.js) |
-| **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar en tiempo real) para fundamentar decisiones de ahorro en el hogar. | `src/services/` *(Consumo API TRM)* |
+| **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar en tiempo real) para fundamentar decisiones de ahorro en el hogar. | [`src/services/indicadores.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/indicadores.js) |
 | **4** | **Consulta con Filtrado** | Historial dinámico e interactivo de movimientos con capacidad de filtrado por ámbito (Personal / Compartido), tipo (Ingreso / Gasto) y categoría. | [`src/ui/dashboard.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/dashboard.js) |
 | **5** | **Manejo de Errores Visible** | Captura defensiva de fallos de red, validaciones y base de datos con `try/catch`, proyectados en pantalla mediante notificaciones flotantes contextuales (Toasts). El usuario nunca experimenta pantallas en blanco. | [`src/ui/notificaciones.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/notificaciones.js) |
 | **6** | **Repositorio de Código** | Repositorio formal en GitHub con trazabilidad de commits semánticos, ramas por funcionalidad y contribuciones individuales del equipo. | Control de versiones Git / GitHub |
@@ -124,17 +124,24 @@ python -m http.server 8000
 ```
 Acceder a: `http://localhost:8000/public/index.html`
 
+> [!IMPORTANT]
+> **Condición de Entrada a la Sustentación (§7.1):** El software debe correr localmente y sin errores de consola. De lo contrario, de acuerdo con la normativa innegociable de la cátedra TIC42695, la sustentación no se califica.
+
 ---
 
-## 👥 9. Equipo de Desarrollo
+## 👥 9. Equipo de Desarrollo y Accesos de Evaluación
 
 | Integrante | Rol en el Proyecto |
 |---|---|
-| **Juan Diego Peraza Amado** | Desarrollador Frontend / Arquitectura de Software |
-| **Daniel Felipe Cortes** | Desarrollador Frontend / Integración de Servicios |
-| **Jorman Palacios Murillo** | Desarrollador Frontend / UI & Experiencia de Usuario |
-| **Fabián Eduardo Córdoba** | Desarrollador Frontend / Calidad y Gestión Ágil |
-| **Yerson Niño Guerrero** | Desarrollador Frontend / Modelado de Datos y Dominio |
+| **Juan Diego Peraza Amado** | Product Owner / Desarrollo Frontend |
+| **Fabián Eduardo Córdoba** | Scrum Master / Calidad y Gestión Ágil |
+| **Daniel Felipe Cortes** | Development Team / Integración de Servicios |
+| **Jorman Palacios Murillo** | Development Team / UI & Experiencia de Usuario |
+| **Yerson Niño Guerrero** | Development Team / Modelado de Datos y Dominio |
+
+🔗 **Accesos del Proyecto:**
+*   **Repositorio GitHub:** [Cuentas-Claras.git](https://github.com/cuentaclaras672-boop/Cuentas-Claras.git)
+*   **Tablero de Gestión (Scrum/Kanban):** [Tablero en Miro](https://miro.com/welcomeonboard/YVBLdkdFZm96Ujdjb2tKRFFuZVA2QUQrOVdFbDc2dzRHU0tZT0hvRG1lVVNiSVNISHJyNVJZbFJyeHBRZUYzaEFqcnFuQWhJZzlBeExhYTVhUTlpdjB4SGhFS2dFNjFZcjlwNHpIa3pXblhlbVRYam1ERGtKMnpDSzhINDFZWUtyVmtkMG5hNDA3dVlncnBvRVB2ZXBnPT0hdjE=?share_link_id=694372715874)
 
 ---
 
