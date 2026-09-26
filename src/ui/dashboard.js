@@ -13,6 +13,8 @@ import { mostrarToast } from "./notificaciones.js";
 let usuarioActual = null;
 let transaccionesEnMemoria = [];
 let filtroAmbitoActual = "TODOS";
+let divisaActiva = "COP";
+let tasaTRM = 3329.61;
 
 /**
  * Inicializa y enlaza todos los eventos del Dashboard.
@@ -28,6 +30,30 @@ export function inicializarDashboardUI(usuario) {
 
   // Cargar indicador externo de TRM (Condición Técnica #3)
   cargarIndicadorTRM();
+
+  // Selector Multidivisa COP / USD (Tarea 6.3 - Juan Diego Peraza)
+  const btnDivisaCOP = document.getElementById("btn-divisa-cop");
+  const btnDivisaUSD = document.getElementById("btn-divisa-usd");
+
+  if (btnDivisaCOP && btnDivisaUSD) {
+    btnDivisaCOP.addEventListener("click", () => {
+      if (divisaActiva === "COP") return;
+      divisaActiva = "COP";
+      actualizarEstilosBotonesDivisa(btnDivisaCOP, btnDivisaUSD);
+      renderizarTarjetasResumen();
+      renderizarListaTransacciones();
+      mostrarToast("Visualizando saldos en Pesos Colombianos (COP)", "info", 2000);
+    });
+
+    btnDivisaUSD.addEventListener("click", () => {
+      if (divisaActiva === "USD") return;
+      divisaActiva = "USD";
+      actualizarEstilosBotonesDivisa(btnDivisaUSD, btnDivisaCOP);
+      renderizarTarjetasResumen();
+      renderizarListaTransacciones();
+      mostrarToast(`Saldos convertidos a Dólares (USD) a tasa oficial TRM ($${tasaTRM.toLocaleString('es-CO')})`, "info", 3000);
+    });
+  }
 
   const selectTipo = document.getElementById("transaccion-tipo");
   const selectCategoria = document.getElementById("transaccion-categoria");
@@ -108,14 +134,19 @@ function renderizarTarjetasResumen() {
   const elGastos = document.getElementById("resumen-gastos");
   const elCompartido = document.getElementById("resumen-compartido");
 
+  const esUSD = divisaActiva === "USD";
+  const divisor = esUSD ? tasaTRM : 1;
+  const decimales = esUSD ? 2 : 0;
+  const divisaLabel = divisaActiva;
+
   if (elBalance) {
-    elBalance.textContent = formatearMoneda(balanceNeto);
+    elBalance.textContent = formatearMoneda(balanceNeto / divisor, divisaLabel, decimales);
     elBalance.className = `text-2xl font-bold ${balanceNeto >= 0 ? 'text-emerald-400' : 'text-rose-400'}`;
   }
 
-  if (elIngresos) elIngresos.textContent = formatearMoneda(totalIngresos);
-  if (elGastos) elGastos.textContent = formatearMoneda(totalGastos);
-  if (elCompartido) elCompartido.textContent = formatearMoneda(totalCompartido);
+  if (elIngresos) elIngresos.textContent = formatearMoneda(totalIngresos / divisor, divisaLabel, decimales);
+  if (elGastos) elGastos.textContent = formatearMoneda(totalGastos / divisor, divisaLabel, decimales);
+  if (elCompartido) elCompartido.textContent = formatearMoneda(totalCompartido / divisor, divisaLabel, decimales);
 }
 
 /**
@@ -148,6 +179,11 @@ function renderizarListaTransacciones() {
     return;
   }
 
+  const esUSD = divisaActiva === "USD";
+  const divisor = esUSD ? tasaTRM : 1;
+  const decimales = esUSD ? 2 : 0;
+  const divisaLabel = divisaActiva;
+
   contenedor.innerHTML = filtradas.map((t) => {
     const esIngreso = t.tipo === TIPO_TRANSACCION.INGRESO;
     const esCompartido = t.ambito === AMBITO_TRANSACCION.COMPARTIDO;
@@ -176,7 +212,7 @@ function renderizarListaTransacciones() {
 
         <div class="flex items-center gap-4">
           <span class="font-semibold text-sm ${esIngreso ? 'text-emerald-400' : 'text-rose-400'}">
-            ${esIngreso ? '+' : '-'} ${formatearMoneda(t.monto)}
+            ${esIngreso ? '+' : '-'} ${formatearMoneda(t.monto / divisor, divisaLabel, decimales)}
           </span>
           <button 
             type="button" 
@@ -243,6 +279,7 @@ async function cargarIndicadorTRM() {
 
   try {
     const { valor, fuente } = await consultarTRM();
+    tasaTRM = valor;
     elValorTRM.textContent = formatearTRM(valor);
     if (badgeTRM) {
       badgeTRM.title = `Fuente oficial: ${fuente}`;
@@ -254,4 +291,15 @@ async function cargarIndicadorTRM() {
     }
   }
 }
+
+/**
+ * Alterna visualmente el estado activo/inactivo entre los botones de divisa COP y USD.
+ * @param {HTMLButtonElement} btnActivo 
+ * @param {HTMLButtonElement} btnInactivo 
+ */
+function actualizarEstilosBotonesDivisa(btnActivo, btnInactivo) {
+  btnActivo.className = "px-2.5 py-1 rounded-lg bg-indigo-600 text-white shadow-sm transition-all";
+  btnInactivo.className = "px-2.5 py-1 rounded-lg text-slate-400 hover:text-white transition-all";
+}
+
 
