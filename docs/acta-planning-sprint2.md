@@ -1,124 +1,141 @@
 # Acta de Sprint Planning — Sprint 2
 **Proyecto:** Cuentas Claras — Gestión de Finanzas Compartidas en el Hogar  
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
-**Duración del Sprint:** 4 semanas (del 07 de septiembre al 10 de octubre de 2026)  
-**Fecha de Corte:** 26 de septiembre de 2026 (Semana 8 · Promedio del Sprint 2)  
-**Cierre Programado:** Sustentación 2 (entre el 5 y el 10 de octubre de 2026)  
+**Fecha del Planning:** 7 de septiembre de 2026  
+**Duración del Sprint:** 4 semanas (semanas 6 a 9, del 7 de septiembre al 3 de octubre de 2026)  
+**Cierre:** Sustentación 2 (10 de octubre de 2026, Grupo 2 - sábado). La semana 10 se usa para pruebas finales.  
 
 ---
 
 ## 1. Roles del Equipo Scrum
 
-| Rol | Integrante | Responsabilidad Principal en Sprint 2 |
+| Rol | Integrante | Responsabilidad en el Sprint 2 |
 |---|---|---|
-| **Product Owner** | Juan Diego Peraza Amado | Priorización del Backlog, validación de condiciones técnicas obligatorias y apoyo en UI. |
-| **Scrum Master** | Fabián Eduardo Córdoba | Monitoreo del flujo de trabajo en Miro, gestión de calidad, pruebas de resiliencia y verificación de Toasts. |
-| **Development Team** | Daniel Felipe Cortes | Persistencia en Firestore de bolsillos, integración externa con API TRM y control de excepciones. |
-| **Development Team** | Jorman Palacios Murillo | Diseño e integración visual en Tailwind de tarjetas de bolsillos, filtros dinámicos y modales. |
-| **Development Team** | Yerson Niño Guerrero | Modelado de entidades de dominio (`Bolsillo.js`), algoritmos de filtrado y conversión monetaria. |
+| **Product Owner** | Juan Diego Peraza Amado | Prioriza el backlog, valida criterios de aceptación y apoya la UI del selector de divisas. |
+| **Scrum Master** | Fabián Eduardo Córdoba | Facilita las ceremonias, cuida el límite WIP, lleva el burndown y coordina las pruebas. |
+| **Development Team** | Daniel Felipe Cortes | Servicios: Firestore para bolsillos, API de la TRM y detección de conexión. |
+| **Development Team** | Jorman Palacios Murillo | UI: barra de búsqueda, tarjetas de bolsillos y avisos visuales. |
+| **Development Team** | Yerson Niño Guerrero | Dominio: modelo `Bolsillo`, lógica de filtros y conversión de divisas. |
 
 ---
 
-## 2. Objetivo del Sprint 2 (Sprint Goal)
-> *"Incorporar la gestión de bolsillos de ahorro para metas del hogar, la integración externa con la API oficial de la TRM del dólar para conversión multidivisa, el historial con filtrado dinámico y la consolidación del manejo visible de errores, garantizando el cumplimiento verificable del 100% de las condiciones técnicas obligatorias de la asignatura para la Sustentación 2."*
+## 2. Objetivo del Sprint (Sprint Goal)
+> *"Que el hogar pueda separar su dinero en bolsillos con metas de ahorro, encontrar cualquier movimiento con búsqueda y filtros, y ver sus saldos en dólares con la TRM oficial, recibiendo avisos claros cuando algo falle."*
 
 ---
 
-## 3. Estado de Historias de Usuario en el Tablero de Miro / Planner (Al 26 de Septiembre de 2026)
-
-```
-+--------------------+--------------------------------+-----------------------+---------------------+
-|     POR HACER      |     WORK IN PROGRESS (WIP)     |      EN PRUEBAS       |   TERMINADO (DONE)  |
-+--------------------+--------------------------------+-----------------------+---------------------+
-|                    | • [HU-04] Bolsillos de Ahorro  | • [HU-05] Historial y | • [HU-01] Auth (S1) |
-|                    |                                |           Filtros     | • [HU-02] CRUD (S1) |
-|                    |                                | • [HU-06] Integración | • [HU-03] Saldo (S1)|
-|                    |                                |           Externa TRM |                     |
-|                    |                                | • [HU-07] Manejo de   |                     |
-|                    |                                |           Errores     |                     |
-+--------------------+--------------------------------+-----------------------+---------------------+
-```
+## 3. Velocidad de referencia y capacidad
+- **Velocidad del Sprint 1:** 3 historias terminadas, 15 SP, en un sprint de 2 semanas.
+- **Compromiso del Sprint 2:** 4 historias, **21 SP**, en un sprint de 4 semanas. Es menos del doble de la velocidad del Sprint 1, porque la HU-04 es la primera historia talla M y trae más incertidumbre.
+- **Escala de tallas usada:** S = 3 a 5 SP · M = 8 SP · L = 13 SP (Fibonacci).
+- **Límite WIP del tablero:** máximo 5 tareas en "En progreso" en todo el equipo y máximo 3 por persona.
 
 ---
 
-## 4. Descomposición y Cronograma de Tareas por Historia de Usuario (4 Semanas)
+## 4. Historias de Usuario seleccionadas (Sprint Backlog)
 
-El trabajo se distribuye a lo largo de las 4 semanas del sprint (Semanas 6, 7, 8 y 9) para garantizar un flujo continuo y sostenible:
+Orden de prioridad: primero lo que usan las demás historias (búsqueda sobre los movimientos que ya existen), luego la integración externa, después los bolsillos (la historia más grande) y por último la resiliencia, que se apoya en todo lo anterior.
 
-### [HU-05] Historial de Movimientos con Búsqueda y Filtros Dinámicos
-- **Talla y Estimación:** Talla S (5 Story Points).
-- **Prioridad:** **Alta** (Garantiza el cumplimiento obligatorio de la **Condición Técnica #4**).
-- **Estado Actual al 26 de septiembre:** **En Pruebas (Testing)**.
-- **Descripción:** Como usuario, quiero buscar transacciones por concepto y filtrarlas simultáneamente por categoría, fecha o ámbito (Personal/Compartido), para conciliar rápidamente cualquier movimiento sin revisar libretas ni múltiples extractos bancarios.
-- **Descomposición de Tareas:**
-  - **Tarea 5.1:** Diseñar barra de búsqueda y selectores en HTML/Tailwind.  
-    *Responsable:* Jorman Palacios (UI) | **09 sep - 12 sep** | *Estado:* Done.
-  - **Tarea 5.2:** Programar lógica de filtrado combinado en el array en `dashboard.js`.  
-    *Responsable:* Yerson Niño (Lógica) | **13 sep - 16 sep** | *Estado:* Done.
-  - **Tarea 5.3:** Adaptar la consulta `onSnapshot` en `firestore.js` para indexar datos.  
-    *Responsable:* Daniel Cortes (Servicios) | **16 sep - 20 sep** | *Estado:* Done.
-  - **Tarea 5.4:** Pruebas de renderizado de resultados y validación de estados vacíos.  
-    *Responsable:* Fabián Córdoba (Calidad) | **21 sep - 26 sep** | *Estado:* **En Pruebas**.
+### [HU-05] Búsqueda y filtros avanzados del historial
+- **Talla:** S · **Estimación:** 5 SP · **Prioridad:** 1
+- **Condición técnica:** #4 (Consulta con filtrado o búsqueda).
+- **Descripción:** Como miembro del hogar, quiero buscar movimientos por texto y filtrarlos por categoría, tipo y rango de fechas, para encontrar rápido un gasto sin revisar todo el historial.
+- **Qué cambia frente al Sprint 1:** en el Sprint 1 solo existía el filtro por ámbito (Personal / Compartido). Esta historia agrega búsqueda por texto, categoría, tipo y fechas.
+- **Criterios de aceptación:**
+  - El campo de búsqueda encuentra movimientos por su descripción, sin importar mayúsculas ni tildes ("cafe" encuentra "Café").
+  - Se puede filtrar por categoría, por tipo (Ingreso / Gasto) y por rango de fechas (desde / hasta).
+  - Todos los filtros se pueden combinar entre sí y con el filtro por ámbito que ya existía.
+  - Si la fecha "desde" es mayor que la fecha "hasta", se muestra un aviso y no se aplica el filtro.
+  - El contador muestra cuántos registros cumplen los filtros; si no hay ninguno, aparece el mensaje "No hay movimientos con esos filtros".
+  - Un botón "Limpiar filtros" deja la lista completa otra vez.
+  - Las tarjetas de saldo **no** cambian con la búsqueda: siempre muestran el total real.
+- **Tareas:**
 
----
-
-### [HU-06] Integración Externa de Indicadores Económicos y Conversión Multidivisa
-- **Talla y Estimación:** Talla S (5 Story Points).
-- **Prioridad:** **Alta** (Garantiza el cumplimiento obligatorio de la **Condición Técnica #3**).
-- **Estado Actual al 26 de septiembre:** **En Pruebas (Testing)**.
-- **Descripción:** Como miembro del hogar, quiero consultar en tiempo real la TRM oficial del dólar y visualizar la equivalencia de mis saldos y metas de ahorro en USD, para tomar decisiones financieras informadas frente a compras en moneda extranjera o inflación.
-- **Descomposición de Tareas:**
-  - **Tarea 6.1:** Spike técnico y servicio modular de consumo de API TRM con fallback offline (`indicadores.js`).  
-    *Responsable:* Daniel Cortes (Servicios) | **10 sep - 14 sep** | *Estado:* Done.
-  - **Tarea 6.2:** Función de conversión de divisa (COP a USD) y utilidades matemáticas en `formateo.js`.  
-    *Responsable:* Yerson Niño (Dominio / Utilidades) | **15 sep - 19 sep** | *Estado:* Done.
-  - **Tarea 6.3:** Componente visual de indicador y toggle multidivisa en el Dashboard (`index.html`).  
-    *Responsable:* Juan Diego Peraza / Jorman Palacios (PO / UI) | **20 sep - 24 sep** | *Estado:* Done.
-  - **Tarea 6.4:** Pruebas de latencia, excepciones de red y validación en vivo frente a evaluadores.  
-    *Responsable:* Fabián Córdoba (Calidad / Scrum Master) | **24 sep - 28 sep** | *Estado:* **En Pruebas**.
+| Tarea | Descripción | Responsable | Fechas planificadas |
+|---|---|---|:---:|
+| 5.1 | Barra de búsqueda y selectores de categoría, tipo y fechas en HTML/Tailwind | Jorman Palacios | 09 sep - 12 sep |
+| 5.2 | Función de filtrado combinado (texto, categoría, tipo, ámbito) en `dashboard.js` | Yerson Niño | 13 sep - 16 sep |
+| 5.3 | Filtro por rango de fechas con validación "desde ≤ hasta" | Daniel Cortes | 16 sep - 20 sep |
+| 5.4 | Pruebas de combinaciones de filtros, estado vacío y botón limpiar | Fabián Córdoba | 21 sep - 26 sep |
 
 ---
 
-### [HU-07] Manejo de Errores Visible y Notificaciones Contextuales
-- **Talla y Estimación:** Talla S (3 Story Points).
-- **Prioridad:** **Crítica** (Garantiza la **Condición Técnica #5**: *"El usuario se entera de forma útil. No pantallazos en blanco"*).
-- **Estado Actual al 26 de septiembre:** **En Pruebas (Testing)**.
-- **Descripción:** Como usuario, quiero recibir alertas visuales claras e instantáneas ante fallos de conexión o rechazos de base de datos, para entender qué ocurrió sin que la aplicación quede congelada.
-- **Descomposición de Tareas:**
-  - **Tarea 7.1:** Maquetar la alerta Toast en Tailwind CSS (Estados: Éxito, Error, Info, Advertencia).  
-    *Responsable:* Jorman Palacios (UI) | **12 sep - 16 sep** | *Estado:* Done.
-  - **Tarea 7.2:** Escribir el módulo independiente `notificaciones.js` para renderizar Toasts dinámicos.  
-    *Responsable:* Fabián Córdoba (Scrum Master / Calidad) | **16 sep - 20 sep** | *Estado:* Done.
-  - **Tarea 7.3:** Inyectar las llamadas de Toast dentro de todos los bloques `catch` de servicios.  
-    *Responsable:* Daniel Cortes (Servicios) | **21 sep - 24 sep** | *Estado:* Done.
-  - **Tarea 7.4:** Forzar caídas de red desde el navegador para probar la visibilidad de los errores en pantalla (Modo offline en F12).  
-    *Responsable:* Fabián Córdoba (Calidad) | **25 sep - 29 sep** | *Estado:* **En Pruebas**.
+### [HU-06] Integración externa de la TRM y vista en dólares
+- **Talla:** S · **Estimación:** 5 SP · **Prioridad:** 2
+- **Condición técnica:** #3 (Integración externa).
+- **Descripción:** Como miembro del hogar, quiero ver la TRM oficial del día y mis saldos convertidos a dólares, para decidir compras o ahorros en moneda extranjera.
+- **Criterios de aceptación:**
+  - Al entrar al dashboard se consulta la TRM en la API de Datos Abiertos (datos.gov.co, Superintendencia Financiera) y se muestra en el encabezado con dos decimales.
+  - Si la API principal falla, se intenta con las APIs de respaldo; si todas fallan, se usa un valor de referencia y el indicador dice que es referencial. La pantalla nunca queda en blanco.
+  - El usuario puede cambiar entre COP y USD; las tarjetas de saldo y la lista de movimientos se convierten al instante.
+  - La conversión es solo de presentación: en Firestore los montos se siguen guardando en COP.
+  - Al pasar el mouse sobre el indicador se ve la fuente del dato.
+- **Tareas:**
+
+| Tarea | Descripción | Responsable | Fechas planificadas |
+|---|---|---|:---:|
+| 6.1 | Servicio `indicadores.js`: consumo de la API de la TRM con respaldos | Daniel Cortes | 10 sep - 14 sep |
+| 6.2 | Conversión COP → USD y formato con decimales en `formateo.js` | Yerson Niño | 15 sep - 19 sep |
+| 6.3 | Indicador de TRM y selector COP / USD en el dashboard | Juan Diego Peraza / Jorman Palacios | 20 sep - 24 sep |
+| 6.4 | Pruebas con la API caída (bloqueo en F12) y verificación del valor referencial | Fabián Córdoba | 24 sep - 28 sep |
 
 ---
 
-### [HU-04] Bolsillos de Ahorro / Cajas con Propósitos Fijos
-- **Talla y Estimación:** Talla M (8 Story Points).
-- **Prioridad:** **Alta** (Núcleo funcional del Product Goal del Hogar).
-- **Estado Actual al 26 de septiembre:** **En Desarrollo (Work In Progress - WIP)**.
-- **Descripción:** Como miembro del hogar, quiero crear bolsillos específicos (ej. citas, bebé, viajes, emergencias) asignándoles una meta monetaria y fondos, para separar el dinero disponible para gastos inmediatos del dinero con un propósito específico.
-- **Descomposición de Tareas:**
-  - **Tarea 4.1:** Modelar la colección y estructura de datos de `Bolsillo.js` en dominio.  
-    *Responsable:* Yerson Niño (Capa de Dominio) | **18 sep - 22 sep** | *Estado:* Done.
-  - **Tarea 4.2:** Funciones asíncronas para transferir fondos en Firestore.  
-    *Responsable:* Daniel Cortes (Integración Firebase) | **23 sep - 27 sep** | *Estado:* **WIP (En Desarrollo)**.
-  - **Tarea 4.3:** Maquetar las tarjetas de bolsillos y barra de progreso en Tailwind.  
-    *Responsable:* Jorman Palacios (Capa UI/UX) | **27 sep - 30 sep** | *Estado:* Por Hacer.
-  - **Tarea 4.4:** Lógica matemática del porcentaje y pruebas de integración final.  
-    *Responsable:* Fabián Córdoba (Calidad / Scrum Master) | **30 sep - 03 oct** | *Estado:* Por Hacer.
+### [HU-04] Bolsillos de ahorro con metas
+- **Talla:** M · **Estimación:** 8 SP · **Prioridad:** 3
+- **Condición técnica:** #1 (Persistencia real) sobre una colección nueva.
+- **Descripción:** Como miembro del hogar, quiero crear bolsillos (por ejemplo citas, bebé, viajes o emergencias) con una meta y asignarles dinero, para separar lo que puedo gastar de lo que está reservado para algo.
+- **Criterios de aceptación:**
+  - Un bolsillo tiene nombre (mínimo 3 caracteres) y meta en pesos (mayor a 0); si falta algo, se muestra el error.
+  - Los bolsillos se guardan en Firestore, en la colección `bolsillos`, asociados al usuario (`creadoPor`), y siguen ahí al recargar la página.
+  - Se puede asignar dinero a un bolsillo, pero nunca más que el saldo disponible; si se intenta, aparece un aviso y no se guarda nada.
+  - Cada bolsillo muestra una barra de progreso con el porcentaje ahorrado frente a la meta (máximo 100 %).
+  - El saldo disponible del dashboard descuenta el dinero que está en bolsillos.
+  - Se puede eliminar un bolsillo; su dinero vuelve al saldo disponible.
+  - Las reglas de Firestore solo dejan leer y modificar los bolsillos propios.
+- **Tareas:**
+
+| Tarea | Descripción | Responsable | Fechas planificadas |
+|---|---|---|:---:|
+| 4.1 | Modelo `Bolsillo.js` con validaciones (nombre, meta, monto asignado) | Yerson Niño | 18 sep - 22 sep |
+| 4.2 | Servicio en Firestore: crear, asignar dinero y eliminar bolsillos, y reglas de seguridad | Daniel Cortes | 23 sep - 27 sep |
+| 4.3 | Tarjetas de bolsillos con barra de progreso y formulario de creación | Jorman Palacios | 27 sep - 30 sep |
+| 4.4 | Descuento del saldo disponible y pruebas de integración de toda la HU | Fabián Córdoba | 30 sep - 03 oct |
 
 ---
 
-## 5. Resumen de Capacidad y Ritmo del Sprint 2
-- **Historias Planificadas:** 4 Historias de Usuario (Todas Prioridad Alta o Crítica).
-- **Total Story Points:** **21 SP** ($5 + 5 + 3 + 8$).
-- **Ritmo Semanal:** ~5.25 SP por semana, distribuido equitativamente entre los 5 miembros del equipo.
-- **Cadencia hacia la Sustentación 2:**
-  - **Semana 6 (07 - 12 sep):** Planning, estimación, diseño y arranque de tareas visuales y de servicio.
-  - **Semana 7 (14 - 19 sep):** Construcción de filtros, TRM y toasts.
-  - **Semana 8 (21 - 26 sep - HOY):** Fase de QA/Testing en HU-05, HU-06 y HU-07; desarrollo activo de transferencias de bolsillos (HU-04 WIP).
-  - **Semana 9 (28 sep - 04 oct):** Integración completa, pruebas de regresión, verificación de consola en cero y preparación para la Sustentación 2 (05 - 10 oct).
+### [HU-07] Resiliencia: avisos de conexión y validaciones en los formularios
+- **Talla:** S · **Estimación:** 3 SP · **Prioridad:** 4
+- **Condición técnica:** #5 (Manejo de errores visible).
+- **Descripción:** Como usuario, quiero saber cuándo perdí la conexión y ver en cada campo qué dato está mal, para no perder lo que estoy registrando ni adivinar qué falló.
+- **Qué cambia frente al Sprint 1:** los Toasts de error ya existían desde el Sprint 1. Esta historia agrega el aviso de sin conexión y los mensajes de validación junto a cada campo.
+- **Criterios de aceptación:**
+  - Cuando el navegador pierde internet aparece un aviso fijo "Sin conexión"; al volver la conexión, el aviso desaparece y se muestra un Toast "Conexión restablecida".
+  - Mientras no hay conexión, los botones de guardar quedan deshabilitados.
+  - En los formularios de movimiento y de bolsillo, el campo con error se marca en rojo y muestra el mensaje debajo, además del Toast.
+  - Ningún error deja la pantalla en blanco ni el botón bloqueado en "Guardando...".
+- **Tareas:**
+
+| Tarea | Descripción | Responsable | Fechas planificadas |
+|---|---|---|:---:|
+| 7.1 | Diseño del aviso "Sin conexión" y del estilo de error por campo en Tailwind | Jorman Palacios | 12 sep - 16 sep |
+| 7.2 | Módulo `conexion.js` que escucha los eventos `online` / `offline` | Daniel Cortes | 16 sep - 20 sep |
+| 7.3 | Mensajes de validación debajo de cada campo en los formularios | Yerson Niño | 21 sep - 24 sep |
+| 7.4 | Pruebas en modo offline (F12 → Network → Offline) y con datos inválidos | Fabián Córdoba | 25 sep - 29 sep |
+
+---
+
+## 5. Cronograma por semana
+
+| Semana | Fechas | Foco |
+|:---:|---|---|
+| 6 | 07 - 12 sep | Planning, estimación, diseño de la búsqueda y arranque del servicio de la TRM. |
+| 7 | 14 - 19 sep | Filtros combinados, conversión de divisas, aviso de conexión y modelo `Bolsillo`. |
+| 8 | 21 - 26 sep | Pruebas de HU-05 y HU-06, validaciones por campo y servicio de bolsillos. |
+| 9 | 28 sep - 03 oct | Interfaz de bolsillos, integración, pruebas de regresión, Sprint Review y Retrospectiva. |
+| 10 | 05 - 10 oct | Verificación final (app corriendo sin errores de consola) y Sustentación 2. |
+
+---
+
+## 6. Definition of Done
+Se mantiene la [Definition of Done](definition-of-done.md) del proyecto. Para este sprint, además, una historia solo pasa a "Terminado" si todos sus criterios de aceptación se probaron en la app corriendo localmente.

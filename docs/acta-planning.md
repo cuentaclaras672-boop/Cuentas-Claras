@@ -74,6 +74,6 @@ Todas las historias del Sprint 1 están estimadas en **talla pequeña (S)** para
 
 ## 4. Definición de Estimaciones y Capacidad
 - **Capacidad del Sprint:** 3 Historias de Usuario (Todas talla S).
-- **Estimación en Story Points (referencial):** 18 SP.
+- **Estimación en Story Points (referencial):** 15 SP (5 SP por historia; escala S = 3 a 5 SP).
 - **Herramientas de seguimiento:** Tablero en Miro (autorizado por el docente en lugar de Planner, que requiere licencia) y Bitácora de Sprint.
-- **Límite WIP:** máximo 3 tareas en "En progreso" al mismo tiempo, y máximo 1 por persona.
+- **Límite WIP:** máximo 5 tareas en "En progreso" en todo el equipo y máximo 3 por persona.

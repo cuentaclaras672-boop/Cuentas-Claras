@@ -17,17 +17,18 @@
 
 ---
 
-## 🚀 Sprint 2: Bolsillos de Ahorro, Integración Externa TRM, Filtros y Resiliencia
-- **Periodo:** 07 de septiembre al 10 de octubre de 2026 (Semanas 6 a 9 · 4 semanas)
-- **Hito de Cierre:** **Sustentación 2 (Entre el 5 y 10 de octubre de 2026)**
-- **Estado:** **EN CURSO (Promediando Sprint a fecha 26 de septiembre de 2026)**
-- **Sprint Goal en Ejecución:**
-  > *"Incorporar la gestión de bolsillos de ahorro para metas del hogar, la integración externa con la API oficial de la TRM del dólar para conversión multidivisa, el historial con filtrado dinámico y la consolidación del manejo visible de errores, garantizando el cumplimiento verificable del 100% de las condiciones técnicas obligatorias de la asignatura para la Sustentación 2."*
-- **Historias de Usuario en Tránsito en el Tablero (Miro / Planner):**
-  - **HU-04: Bolsillos de Ahorro / Cajas Fijas** — Fondos con propósitos específicos (*En Desarrollo / WIP*).
-  - **HU-05: Historial con Filtros Avanzados y Búsqueda** — Búsqueda por texto, fechas y categoría (*En Pruebas · Cumple Condición #4*).
-  - **HU-06: Integración Externa de TRM y Conversión Multidivisa** — Consumo asíncrono API pública TRM (*En Pruebas · Cumple Condición #3*).
-  - **HU-07: Manejo de Errores Visible y Resiliencia** — Toasts contextuales y validación defensiva (*En Pruebas · Cumple Condición #5*).
+## 🚀 Sprint 2: Bolsillos de Ahorro, Integración Externa TRM, Búsqueda y Resiliencia
+- **Periodo:** 07 de septiembre al 03 de octubre de 2026 (Semanas 6 a 9 · 4 semanas). Semana 10: pruebas finales.
+- **Hito de Cierre:** **Sustentación 2 (10 de octubre de 2026, Grupo 2)**
+- **Estado:** En curso.
+- **Sprint Goal:**
+  > *"Que el hogar pueda separar su dinero en bolsillos con metas de ahorro, encontrar cualquier movimiento con búsqueda y filtros, y ver sus saldos en dólares con la TRM oficial, recibiendo avisos claros cuando algo falle."*
+- **Historias comprometidas (21 SP):**
+  - **HU-05: Búsqueda y filtros avanzados del historial** (S · 5 SP) — texto, categoría, tipo y fechas. *Condición #4*.
+  - **HU-06: Integración externa de la TRM y vista en dólares** (S · 5 SP) — API de datos.gov.co con respaldos. *Condición #3*.
+  - **HU-04: Bolsillos de ahorro con metas** (M · 8 SP) — nueva colección `bolsillos` en Firestore. *Condición #1*.
+  - **HU-07: Avisos de conexión y validaciones en formularios** (S · 3 SP). *Condición #5*.
+- Detalle de criterios y tareas en el [Acta de Planning del Sprint 2](acta-planning-sprint2.md).
 
 ---
 

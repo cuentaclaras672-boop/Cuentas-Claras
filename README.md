@@ -146,7 +146,7 @@ Acceder a: `http://localhost:8000/public/index.html`
 🔗 **Accesos del Proyecto:**
 *   **Repositorio GitHub:** [Cuentas-Claras.git](https://github.com/cuentaclaras672-boop/Cuentas-Claras.git)
 *   **Tablero de Gestión (Scrum/Kanban):** [Tablero en Miro](https://miro.com/welcomeonboard/YVBLdkdFZm96Ujdjb2tKRFFuZVA2QUQrOVdFbDc2dzRHU0tZT0hvRG1lVVNiSVNISHJyNVJZbFJyeHBRZUYzaEFqcnFuQWhJZzlBeExhYTVhUTlpdjB4SGhFS2dFNjFZcjlwNHpIa3pXblhlbVRYam1ERGtKMnpDSzhINDFZWUtyVmtkMG5hNDA3dVlncnBvRVB2ZXBnPT0hdjE=?share_link_id=694372715874)
-*   **Nota sobre el tablero:** usamos Miro porque Planner requiere licencia premium; el docente lo autorizó. Límite WIP: máximo 3 tareas en progreso al mismo tiempo y máximo 1 por persona.
+*   **Nota sobre el tablero:** usamos Miro porque Planner requiere licencia premium; el docente lo autorizó. Límite WIP: máximo 5 tareas en "En progreso" en todo el equipo y máximo 3 por persona.
 
 ---
 

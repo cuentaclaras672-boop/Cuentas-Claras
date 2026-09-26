@@ -35,25 +35,25 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 #### • Tarea 1.1: Configurar credenciales y SDK Firebase
 - **Responsable:** Juan Diego Peraza (18 ago - 21 ago).
 - **¿Qué se hizo?**: Se configuró el objeto `firebaseConfig` con las credenciales del proyecto de Google Cloud (`bdcuentasclaras-b1814`) y se importó el SDK modular v10 oficial mediante CDN sin necesidad de empaquetadores pesados.
-- **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (Líneas 25 a 40).
+- **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (busca `firebaseConfig` y `getApps()`).
 - **Cómo defenderlo:** *"Se implementó un patrón Singleton usando `getApps().length` para garantizar que la conexión con Firebase se instancie una sola vez en toda la aplicación"*.
 
 #### • Tarea 1.2: Diseñar formulario visual de Login en HTML/Tailwind
 - **Responsable:** Juan Diego Peraza (20 ago - 23 ago).
 - **¿Qué se hizo?**: Se maquetó la vista `#auth-view` con diseño moderno en modo oscuro (Dark Slate), inputs con validaciones HTML5 (`required`, `type="email"`, `minlength="6"`) y botones para alternar dinámicamente entre la vista de Login y Registro.
-- **¿Dónde está?**: En [`public/index.html`](../public/index.html) (Líneas 45 a 145).
+- **¿Dónde está?**: En [`public/index.html`](../public/index.html) (busca `id="auth-view"`; ahí están `form-login` y `form-registro`).
 - **Cómo defenderlo:** *"Los formularios no recargan la página porque sus eventos `submit` son interceptados de forma asíncrona mediante JavaScript modular"*.
 
 #### • Tarea 1.3: Lógica de autenticación con Firebase Auth
 - **Responsable:** Juan Diego Peraza (23 ago - 27 ago).
 - **¿Qué se hizo?**: Se construyeron las funciones asíncronas `iniciarSesion(email, password)` y `registrarUsuario(email, password, nombre)`. Incluyen validación defensiva con expresiones regulares (Regex) y mapeo de errores para traducir códigos crudos de Google (como `auth/wrong-password`) a mensajes amigables en español.
-- **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (Líneas 95 a 160).
+- **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (funciones `registrarUsuario`, `iniciarSesion` y `traducirErrorAuth`).
 - **Cómo defenderlo:** *"El servicio de autenticación no toca el DOM; si ocurre un error, lanza una excepción tipificada que la capa visual captura y muestra en un Toast"*.
 
 #### • Tarea 1.4: Persistencia de sesión y logout
 - **Responsable:** Juan Diego Peraza (27 ago - 30 ago).
 - **¿Qué se hizo?**: Se implementó el observador reactivo `suscribirEstadoAuth(callback)` envolviendo `onAuthStateChanged()`. Cuando el usuario inicia sesión o recarga la página, Firebase recupera su token y el orquestador conmuta la pantalla de Login al Dashboard. Al dar clic en "Salir", ejecuta `cerrarSesion()` y regresa al Login de forma instantánea.
-- **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (Líneas 180 a 210) y orquestado en [`src/app.js`](../src/app.js) (Líneas 30 a 65).
+- **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (función `suscribirEstadoAuth`) y orquestado en [`src/app.js`](../src/app.js) (función `iniciarAplicacion`).
 
 ---
 
@@ -68,12 +68,12 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 #### • Tarea 2.2: Modal y formulario para captura de montos y categorías
 - **Responsable:** Jorman Palacios Murillo (24 ago - 27 ago).
 - **¿Qué se hizo?**: Se construyó la sección `#form-transaccion` en el Dashboard. Cuando el usuario cambia el tipo entre "Gasto" e "Ingreso", el selector de categorías cambia dinámicamente mediante JavaScript para mostrar las categorías correspondientes (ej. Alimentación, Vivienda, Transporte para gastos; Salario, Honorarios para ingresos).
-- **¿Dónde está?**: HTML en [`public/index.html`](../public/index.html) (Líneas 230 a 305) y lógica de selección en [`src/ui/dashboard.js`](../src/ui/dashboard.js) (función `poblarCategorias`).
+- **¿Dónde está?**: HTML en [`public/index.html`](../public/index.html) (busca `id="form-transaccion"`) y lógica de selección en [`src/ui/dashboard.js`](../src/ui/dashboard.js) (función `poblarCategorias`).
 
 #### • Tarea 2.3: Función de inserción `addDoc` a Firestore
 - **Responsable:** Juan Diego Peraza (27 ago - 31 ago).
 - **¿Qué se hizo?**: Se creó la función asíncrona `registrarTransaccion(transaccion)`. Recibe la instancia validada del modelo, la serializa mediante `.aFirestore()` y la envía a Cloud Firestore usando `addDoc(collection(db, "transacciones"), payload)`.
-- **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (Líneas 65 a 95).
+- **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (función `registrarTransaccion`).
 - **Cómo defenderlo:** *"No se almacena nada en arreglos temporales ni en `localStorage`. La inserción viaja de forma asíncrona a los servidores de Firestore y el listener reactivo actualiza la pantalla automáticamente"*.
 
 #### • Tarea 2.4: Pruebas de persistencia ante recarga
@@ -88,22 +88,35 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 #### • Tarea 3.1: Diseñar tarjeta hero de Saldo Disponible y métricas
 - **Responsable:** Jorman Palacios Murillo (26 ago - 29 ago).
 - **¿Qué se hizo?**: Se construyó el grid superior con 4 tarjetas de métricas: **Balance Neto** (Ingresos - Gastos), **Ingresos Totales**, **Gastos Totales** y **Gastos del Hogar (Compartidos)**. Cada una cuenta con tipografía destacada y código de colores semántico (verde para positivo/ingreso, rojo para negativo/gasto, índigo para compartido).
-- **¿Dónde está?**: En [`public/index.html`](../public/index.html) (Líneas 205 a 240).
+- **¿Dónde está?**: En [`public/index.html`](../public/index.html) (busca `id="resumen-balance"`; las 4 tarjetas están juntas).
 
 #### • Tarea 3.2: Consulta reactiva `onSnapshot` a Firestore
 - **Responsable:** Daniel Felipe Cortes (29 ago - 01 sep).
 - **¿Qué se hizo?**: Se implementó `escucharTransacciones(usuarioId, onActualizacion, onError)`. Utiliza la tecnología WebSocket de Firebase (`onSnapshot`) filtrando por el UID del usuario (`where("creadoPor", "==", usuarioId)`). Cualquier cambio en la base de datos (registro nuevo o borrado) se refleja en milisegundos en la pantalla sin recargar.
-- **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (Líneas 120 a 165).
+- **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (función `escucharTransacciones`). Los movimientos se ordenan por fecha en el navegador con `sort()`, así no hace falta crear un índice compuesto en Firebase.
 
 #### • Tarea 3.3: Algoritmo de cálculo de saldos en JavaScript
 - **Responsable:** Yerson Niño Guerrero (01 sep - 03 sep).
 - **¿Qué se hizo?**: Función pura `calcularTotales(listaTransacciones)`. Itera la lista una sola vez ($O(n)$) sumando ingresos, egresos y acumulando por separado aquellos cuyo ámbito sea `COMPARTIDO`. Calcula el balance neto (`totalIngresos - totalGastos`).
-- **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (Líneas 170 a 195).
+- **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (función `calcularTotales`).
 - **Cómo defenderlo:** *"Es una función matemática pura: no muta datos externos, no depende del DOM y es 100% testeable de forma unitaria"*.
 
 #### • Tarea 3.4: Pruebas de actualización de balance en vivo
 - **Responsable:** Fabián Eduardo Córdoba / Juan Diego Peraza (03 sep - 05 sep).
 - **¿Qué se hizo?**: Validación del renderizado condicional: si el Balance Neto es mayor o igual a 0 se tiñe de verde (`text-emerald-400`); si los gastos superan a los ingresos se tiñe de rojo (`text-rose-400`).
+
+---
+
+### 🔧 Correcciones hechas después de la revisión del Sprint 1
+Estas no son historias nuevas, son arreglos a lo que ya existía. Conviene saber explicarlas porque el docente puede preguntar.
+
+| Qué fallaba | Cómo se arregló | Dónde está |
+|---|---|---|
+| Si alguien cerraba sesión y volvía a entrar sin recargar, cada movimiento se guardaba dos veces (el formulario quedaba con dos listeners). | Una bandera `listenersInicializados` hace que los eventos del dashboard se registren una sola vez. | [`src/ui/dashboard.js`](../src/ui/dashboard.js), función `inicializarDashboardUI` |
+| Si alguien escribía HTML en la descripción (por ejemplo `<img onerror=...>`), se ejecutaba en la página (XSS). | Antes de pintar la lista, el texto pasa por `escaparHTML`, que cambia `<`, `>`, `"` y `'` por sus entidades. | [`src/utils/formateo.js`](../src/utils/formateo.js), función `escaparHTML` |
+| El filtro por usuario solo estaba en el navegador; desde la base de datos cualquiera podía leer o borrar datos ajenos. | Reglas de seguridad en el servidor: cada usuario solo lee, edita y borra lo que él creó, y no puede cambiar el campo `creadoPor`. | [`firestore.rules`](../firestore.rules) (hay que publicarlas en Firebase Console → Firestore → Reglas) |
+| Al cerrar sesión, los movimientos del usuario anterior seguían en memoria. | En el logout se llama `actualizarDashboard([])`. | [`src/app.js`](../src/app.js), rama `else` de `suscribirEstadoAuth` |
+| La consulta pedía un índice compuesto en Firebase y fallaba si no existía. | Se quitó `orderBy` de la consulta y se ordena con `sort()` en el navegador. | [`src/services/firestore.js`](../src/services/firestore.js), función `escucharTransacciones` |
 
 ---
 
@@ -114,7 +127,7 @@ En la sustentación, el docente te dará **15 a 20 minutos** para modificar algo
 ### Simulacro 1: *"Cambien el diseño o color de una tarjeta o botón"*
 - **Qué te piden:** Cambiar por ejemplo el botón "Guardar Movimiento" para que sea de color violeta o naranja en lugar de índigo, o agrandar una tarjeta.
 - **Dónde ir:** Abre [`public/index.html`](../public/index.html).
-- **Qué hacer:** Busca la línea del botón (aprox. línea 295):
+- **Qué hacer:** Busca con Ctrl+F el texto `Guardar Movimiento`:
   - Cambia `bg-indigo-600 hover:bg-indigo-500` por `bg-amber-600 hover:bg-amber-500` (naranja) o `bg-purple-600 hover:bg-purple-500` (violeta).
 - **Tiempo que te tomará:** 30 segundos.
 
@@ -123,7 +136,7 @@ En la sustentación, el docente te dará **15 a 20 minutos** para modificar algo
 ### Simulacro 2: *"Exijan una nueva regla de validación en el formulario"*
 - **Qué te piden:** *"Exijan que el monto mínimo de una transacción sea de al menos $2.000 COP"*.
 - **Dónde ir:** Abre [`src/models/Transaccion.js`](../src/models/Transaccion.js).
-- **Qué hacer:** Ve al método `validar()` (alrededor de la línea 85).
+- **Qué hacer:** Busca el método `validar()`.
   - Verás: `if (typeof this.monto !== 'number' || isNaN(this.monto) || this.monto <= 0)`
   - Cámbialo por:
     ```javascript
@@ -139,7 +152,7 @@ En la sustentación, el docente te dará **15 a 20 minutos** para modificar algo
 ### Simulacro 3: *"Agreguen una nueva categoría de gasto"*
 - **Qué te piden:** *"Añadan la categoría 'Gimnasio y Deporte' a las opciones de gasto"*.
 - **Dónde ir:** Abre [`src/models/Transaccion.js`](../src/models/Transaccion.js).
-- **Qué hacer:** En las primeras líneas (aprox. línea 30), busca el arreglo `CATEGORIAS_GASTO` y agrega `'Gimnasio y Deporte'`:
+- **Qué hacer:** Al inicio del archivo, busca el arreglo `CATEGORIAS_GASTO` y agrega `'Gimnasio y Deporte'`:
   ```javascript
   export const CATEGORIAS_GASTO = Object.freeze([
     'Vivienda y Alquiler',
@@ -156,20 +169,19 @@ En la sustentación, el docente te dará **15 a 20 minutos** para modificar algo
 ### Simulacro 4: *"Cambien las reglas de contraseña en el registro"*
 - **Qué te piden:** *"Exijan que la contraseña tenga mínimo 8 caracteres en vez de 6"*.
 - **Dónde ir:** Abre [`src/services/auth.js`](../src/services/auth.js).
-- **Qué hacer:** Ve a la función `validarCredenciales` (alrededor de la línea 50):
+- **Qué hacer:** Busca la función `validarCredenciales`:
   - Cambia `password.length < 6` por `password.length < 8`.
   - Cambia el mensaje: `"La contraseña debe tener al menos 8 caracteres."`
 - **Tiempo que te tomará:** 45 segundos.
 
 ---
 
-### Simulacro 5: *"Cambien el formato de la moneda o muestren centavos"*
-- **Qué te piden:** *"Muestren centavos (decimales) en los valores monetarios"* o *"Cambien el símbolo a USD"*.
-- **Dónde ir:** Abre [`src/utils/formateo.js`](../src/utils/formateo.js).
-- **Qué hacer:** En `formatearMoneda()`:
-  - Cambia `minimumFractionDigits: 0` a `minimumFractionDigits: 2`.
-  - O cambia `currency: moneda` por `'USD'`.
-- **Resultado:** Todas las tarjetas de saldo y registros de la tabla cambiarán de formato al instante en toda la aplicación.
+### Simulacro 5: *"Muestren centavos en los valores en pesos"*
+- **Qué te piden:** que los valores en COP muestren decimales (hoy salen sin centavos).
+- **Dónde ir:** Abre [`src/ui/dashboard.js`](../src/ui/dashboard.js).
+- **Qué hacer:** Busca `const decimales = esUSD ? 2 : 0;` (aparece dos veces: en `renderizarTarjetasResumen` y en `renderizarListaTransacciones`) y cambia el `0` por `2` en las dos.
+- **Por qué ahí y no en `formateo.js`:** `formatearMoneda(valor, moneda, decimales)` recibe los decimales como parámetro; quien decide cuántos mostrar es el dashboard, según la divisa elegida en el selector COP / USD.
+- **Resultado:** las tarjetas y la lista muestran centavos en pesos; en dólares ya se mostraban.
 
 ---
 

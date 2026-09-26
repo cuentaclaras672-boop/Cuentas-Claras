@@ -1,46 +1,66 @@
 # Bitácora de Sprint 2 — Cuentas Claras
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
-**Marco de Trabajo:** Scrum · **Sprint:** 2 (Semanas 6 a 9: 07 de septiembre al 10 de octubre de 2026)  
+**Marco de Trabajo:** Scrum · **Sprint:** 2 (Semanas 6 a 9: 07 de septiembre al 03 de octubre de 2026 · Sustentación 2: 10 de octubre)  
 **Fecha de Corte:** 26 de septiembre de 2026 (Semana 8 · Promedio del Sprint)  
 
 ---
 
-## 1. Estado del Tablero de Miro / Planner
+## 1. Estado del Tablero (Miro)
 
 A fecha del **26 de septiembre de 2026**, el equipo se encuentra promediando el Sprint 2. Las historias aprobadas corresponden al Sprint 1, mientras que las del Sprint 2 abordan directamente las condiciones técnicas obligatorias pendientes para la Sustentación 2:
 
 | Historia de Usuario | Condición Técnica Vinculada | Story Points | Responsable Principal | Columna en Tablero |
 |---|---|:---:|---|:---:|
 | **HU-01: Autenticación (Firebase Auth)** | Condición #2 (Control de Acceso) | 5 SP | Juan Diego Peraza | **Terminado (Done - S1)** |
-| **HU-02: Registro Transacciones (Firestore)** | Condición #1 (Persistencia Real) | 8 SP | Daniel Cortes / Yerson Niño | **Terminado (Done - S1)** |
+| **HU-02: Registro Transacciones (Firestore)** | Condición #1 (Persistencia Real) | 5 SP | Daniel Cortes / Yerson Niño | **Terminado (Done - S1)** |
 | **HU-03: Dashboard Saldo Líquido** | Entrega Principal de Valor | 5 SP | Jorman Palacios | **Terminado (Done - S1)** |
 | **HU-04: Bolsillos de Ahorro / Metas** | Núcleo del Product Goal | 8 SP | Yerson Niño / Daniel Cortes | **Work in Progress (WIP)** |
 | **HU-05: Historial y Búsqueda Avanzada** | **Condición #4 (Filtrado y Búsqueda)** | 5 SP | Jorman Palacios | **En Pruebas (Testing)** |
 | **HU-06: Integración Externa TRM y Divisas** | **Condición #3 (Integración Externa API)**| 5 SP | Daniel Cortes / Juan Diego Peraza | **En Pruebas (Testing)** |
-| **HU-07: Manejo Visible de Errores** | **Condición #5 (Manejo de Errores)** | 3 SP | Fabián Córdoba | **En Pruebas (Testing)** |
+| **HU-07: Avisos de Conexión y Validaciones** | **Condición #5 (Manejo de Errores)** | 3 SP | Fabián Córdoba | **En Pruebas (Testing)** |
 
 ---
 
-### 1.1 Desglose y Cronograma de Tareas en el Tablero de Miro (4 Semanas)
+### 1.1 Tareas del Sprint Backlog (detalle y criterios en el [Acta de Planning](acta-planning-sprint2.md))
 
 | ID Tarea | Descripción | Responsable | Periodo | Estado en Miro |
 |---|---|---|:---:|:---:|
 | **Tarea 5.1** | Diseñar barra de búsqueda y selectores en HTML/Tailwind | Jorman Palacios | 09 sep - 12 sep | **Done** |
-| **Tarea 5.2** | Lógica de filtrado combinado en array en `dashboard.js` | Yerson Niño | 13 sep - 16 sep | **Done** |
-| **Tarea 5.3** | Adaptar consulta `onSnapshot` en `firestore.js` | Daniel Cortes | 16 sep - 20 sep | **Done** |
-| **Tarea 5.4** | Pruebas de renderizado de resultados y estados vacíos | Fabián Córdoba | 21 sep - 26 sep | **En Pruebas** |
-| **Tarea 6.1** | Spike técnico y servicio modular API TRM (`indicadores.js`) | Daniel Cortes | 10 sep - 14 sep | **Done** |
+| **Tarea 5.2** | Filtrado combinado (texto, categoría, tipo, ámbito) en `dashboard.js` | Yerson Niño | 13 sep - 16 sep | **Done** |
+| **Tarea 5.3** | Filtro por rango de fechas con validación "desde ≤ hasta" | Daniel Cortes | 16 sep - 20 sep | *Actualizar según Miro* |
+| **Tarea 5.4** | Pruebas de combinaciones de filtros, estado vacío y botón limpiar | Fabián Córdoba | 21 sep - 26 sep | **En Pruebas** |
+| **Tarea 6.1** | Servicio `indicadores.js`: API de la TRM con respaldos | Daniel Cortes | 10 sep - 14 sep | **Done** |
 | **Tarea 6.2** | Función de conversión de divisa (COP a USD) y utilidades | Yerson Niño | 15 sep - 19 sep | **Done** |
 | **Tarea 6.3** | Componente visual de indicador y toggle multidivisa | Juan Diego Peraza / Jorman Palacios | 20 sep - 24 sep | **Done** |
-| **Tarea 6.4** | Pruebas de latencia, excepciones de red y validación en vivo | Fabián Córdoba | 24 sep - 28 sep | **En Pruebas** |
-| **Tarea 7.1** | Maquetar alerta Toast en Tailwind (Éxito, Error, Info) | Jorman Palacios | 12 sep - 16 sep | **Done** |
-| **Tarea 7.2** | Escribir módulo independiente `notificaciones.js` | Fabián Córdoba | 16 sep - 20 sep | **Done** |
-| **Tarea 7.3** | Inyectar llamadas Toast en bloques `catch` de servicios | Daniel Cortes | 21 sep - 24 sep | **Done** |
-| **Tarea 7.4** | Pruebas forzando caídas de red (Modo offline en F12) | Fabián Córdoba | 25 sep - 29 sep | **En Pruebas** |
-| **Tarea 4.1** | Modelar colección y estructura de `Bolsillo.js` en dominio | Yerson Niño | 18 sep - 22 sep | **Done** |
-| **Tarea 4.2** | Funciones asíncronas para transferir fondos en Firestore | Daniel Cortes | 23 sep - 27 sep | **WIP (En Progreso)** |
-| **Tarea 4.3** | Maquetar tarjetas de bolsillos y barras de progreso (Tailwind) | Jorman Palacios | 27 sep - 30 sep | **Por Hacer** |
-| **Tarea 4.4** | Lógica matemática del porcentaje y pruebas de UI integradas | Fabián Córdoba | 30 sep - 03 oct | **Por Hacer** |
+| **Tarea 6.4** | Pruebas con la API caída y verificación del valor referencial | Fabián Córdoba | 24 sep - 28 sep | **En Pruebas** |
+| **Tarea 7.1** | Diseño del aviso "Sin conexión" y estilo de error por campo | Jorman Palacios | 12 sep - 16 sep | *Actualizar según Miro* |
+| **Tarea 7.2** | Módulo `conexion.js` con eventos `online` / `offline` | Daniel Cortes | 16 sep - 20 sep | *Actualizar según Miro* |
+| **Tarea 7.3** | Mensajes de validación debajo de cada campo | Yerson Niño | 21 sep - 24 sep | *Actualizar según Miro* |
+| **Tarea 7.4** | Pruebas en modo offline (F12) y con datos inválidos | Fabián Córdoba | 25 sep - 29 sep | **En Pruebas** |
+| **Tarea 4.1** | Modelo `Bolsillo.js` con validaciones | Yerson Niño | 18 sep - 22 sep | **Done** |
+| **Tarea 4.2** | Servicio de bolsillos en Firestore y reglas de seguridad | Daniel Cortes | 23 sep - 27 sep | **WIP (En Progreso)** |
+| **Tarea 4.3** | Tarjetas de bolsillos con barra de progreso y formulario | Jorman Palacios | 27 sep - 30 sep | **Por Hacer** |
+| **Tarea 4.4** | Descuento del saldo disponible y pruebas de integración | Fabián Córdoba | 30 sep - 03 oct | **Por Hacer** |
+
+
+### 1.2 Burndown del Sprint 2 (medido en tareas)
+Total de tareas del sprint: **16**. Se mide al cierre de cada semana (sábado). La columna "Ideal" baja 4 tareas por semana; "Planificado" sale de las fechas de fin de cada tarea; "Real" se llena con lo que esté en "Terminado" en Miro ese día.
+
+| Semana | Corte | Ideal (restantes) | Planificado (restantes) | Real (restantes) |
+|:---:|:---:|:---:|:---:|:---:|
+| Inicio | 07 sep | 16 | 16 | 16 |
+| 6 | 12 sep | 12 | 15 | |
+| 7 | 19 sep | 8 | 11 | |
+| 8 | 26 sep | 4 | 5 | |
+| 9 | 03 oct | 0 | 0 | |
+
+> El plan va por encima de la línea ideal en las semanas 6 y 7 porque las primeras tareas de cada historia son de diseño y tardan más en cerrarse; el grueso se termina en la semana 8.
+
+### 1.3 Velocidad
+| Sprint | Duración | Historias terminadas | SP terminados |
+|:---:|:---:|:---:|:---:|
+| 1 | 2 semanas | 3 | 15 |
+| 2 | 4 semanas | *(llenar al cierre)* | *(de 21 comprometidos)* |
 
 ---
 
@@ -85,3 +105,15 @@ A fecha del **26 de septiembre de 2026**, el equipo se encuentra promediando el 
    *Motivo:* En Scrum, un sprint de 4 semanas debe evidenciar trabajo continuo desde la primera semana (Semana 6). Concentrar las tareas solo al final distorsiona la velocidad del equipo y viola la exigencia de la guía docente (*"el historial debe mostrar trabajo distribuido en el tiempo y autoría individual identificable"*).
 2. **Rechazamos priorizar funcionalidades secundarias (deudas a terceros) sobre las condiciones técnicas obligatorias:**  
    *Motivo:* El equipo trasladó el Control de Deudas al Sprint 3 para asegurar que en la Sustentación 2 el 100% de la rúbrica técnica innegociable esté cumplido y certificado con historias de Prioridad Alta.
+
+---
+
+## 4. Retrospectiva del Sprint 2 (llenar en la semana 9, antes de la Sustentación 2)
+
+| ¿Qué funcionó? | ¿Qué no funcionó? | Acción de mejora para el Sprint 3 | Responsable |
+|---|---|---|---|
+| | | | |
+| | | | |
+| | | | |
+
+> Cada acción de mejora debe ser concreta y verificable en el Sprint 3 (por ejemplo: "actualizar el burndown todos los sábados", no "comunicarnos mejor").
