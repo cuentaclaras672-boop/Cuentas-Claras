@@ -62,6 +62,9 @@ function iniciarAplicacion() {
         desuscribirTransacciones = null;
       }
 
+      // Limpiar los datos del usuario anterior para que no se vean en el próximo login
+      actualizarDashboard([]);
+
       if (vistaDashboard) vistaDashboard.classList.add("hidden");
       if (vistaAuth) vistaAuth.classList.remove("hidden");
     }

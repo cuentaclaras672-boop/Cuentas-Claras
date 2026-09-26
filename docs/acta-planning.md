@@ -2,8 +2,8 @@
 **Proyecto:** Cuentas Claras — Gestión de Finanzas Compartidas en el Hogar  
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
 **Metodología:** Scrum / Ágil  
-**Duración del Sprint:** 2 semanas (del 17 de agosto al 5 de septiembre de 2026)  
-**Cierre y Aprobación:** Sustentación 1 (5 de septiembre de 2026)  
+**Duración del Sprint:** 2 semanas (semanas 3 y 4, del 17 al 29 de agosto de 2026). La semana 5 (31 ago - 5 sep) se usó para pruebas finales antes de la sustentación.  
+**Cierre y Aprobación:** Sustentación 1 (5 de septiembre de 2026, Grupo 2 - sábado)  
 
 ---
 
@@ -26,7 +26,7 @@
 
 ## 3. Historias de Usuario Seleccionadas (Sprint Backlog)
 
-Todas las historias del Sprint 1 están estimadas en **talla pequeña (S)** para dar cumplimiento estricto a las reglas de alcance de la asignatura (§5.1: máximo 3 historias, todas de talla pequeña y al menos una con persistencia).
+Todas las historias del Sprint 1 están estimadas en **talla pequeña (S)** para dar cumplimiento estricto a las reglas de alcance de la asignatura (máximo 3 historias, todas de talla pequeña y al menos una con persistencia real).
 
 ### [HU-01] Autenticación y Control de Acceso
 - **Talla:** S
@@ -75,4 +75,5 @@ Todas las historias del Sprint 1 están estimadas en **talla pequeña (S)** para
 ## 4. Definición de Estimaciones y Capacidad
 - **Capacidad del Sprint:** 3 Historias de Usuario (Todas talla S).
 - **Estimación en Story Points (referencial):** 18 SP.
-- **Herramientas de seguimiento:** Tablero de Miro / Planner y Bitácora de Sprint.
+- **Herramientas de seguimiento:** Tablero en Miro (autorizado por el docente en lugar de Planner, que requiere licencia) y Bitácora de Sprint.
+- **Límite WIP:** máximo 3 tareas en "En progreso" al mismo tiempo, y máximo 1 por persona.

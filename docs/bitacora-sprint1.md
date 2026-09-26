@@ -1,6 +1,6 @@
 # Bitácora de Sprint 1 — Cuentas Claras
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
-**Marco de Trabajo:** Scrum · **Sprint:** 1 (Semanas 3 y 4)  
+**Marco de Trabajo:** Scrum · **Sprint:** 1 (Semanas 3 y 4, 17 - 29 ago · Sustentación 1: 5 sep)  
 
 ---
 
@@ -42,9 +42,9 @@
 
 ---
 
-## 3. Registro Obligatorio del Uso de Inteligencia Artificial (§8)
+## 3. Registro Obligatorio del Uso de Inteligencia Artificial (Lineamientos de la Materia)
 
-En cumplimiento de la Sección 8 del programa de la asignatura (*"El uso de IA no está prohibido, está sujeto a registro"*), se detalla la bitácora de interacción con herramientas de IA:
+En cumplimiento de las directrices académicas de la asignatura (*"El uso de IA no está prohibido, está sujeto a registro"*), se detalla la bitácora de interacción con herramientas de IA:
 
 ### 3.1 ¿Qué le pedimos a la IA?
 1. Asistencia para estructurar una arquitectura limpia por capas (separando presentación, dominio, servicios e infraestructura) que cumpliera con las 7 condiciones técnicas de la rúbrica.
@@ -60,7 +60,7 @@ En cumplimiento de la Sección 8 del programa de la asignatura (*"El uso de IA n
 
 ### 3.3 ¿Qué rechazamos y por qué? (Criterio de Evaluación de Ingeniería)
 1. **Rechazamos el uso de frameworks pesados (React / Next.js / Angular / Vite bundlers):**
-   - *Motivo:* Aunque la IA frecuentemente sugiere librerías complejas, el equipo decidió usar **Vanilla JavaScript con ES6 Modules nativos**. Esto elimina la sobrecarga de dependencias (`node_modules`), acelera la ejecución y asegura que durante la **modificación en vivo (§7.2)** cualquier integrante del equipo pueda rastrear el flujo del código sin abstraerse en el Virtual DOM o configuraciones de empaquetado.
+   - *Motivo:* Aunque la IA frecuentemente sugiere librerías complejas, el equipo decidió usar **Vanilla JavaScript con ES6 Modules nativos**. Esto elimina la sobrecarga de dependencias (`node_modules`), acelera la ejecución y asegura que durante la **prueba de modificación en vivo** cualquier integrante del equipo pueda rastrear el flujo del código sin abstraerse en el Virtual DOM o configuraciones de empaquetado.
 2. **Rechazamos guardar balances o transacciones en `localStorage`:**
    - *Motivo:* Algunas sugerencias iniciales proponían guardar datos localmente para acelerar la carga ("optimistic UI"). Se rechazó de forma estricta porque violaba la **Condición Técnica Obligatoria #1 (Persistencia Real)**, que exige que los datos sobrevivan al cierre de la aplicación y se compartan entre convivientes mediante la base de datos Firestore.
 3. **Rechazamos consolidar la lógica en un único script `app.js` monolítico:**

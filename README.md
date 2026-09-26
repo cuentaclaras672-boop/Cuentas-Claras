@@ -29,10 +29,14 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 
 ## 📋 4. Product Backlog Inicial
 
-1. **Módulo de "Cajas / Bolsillos":** Separación y visualización de fondos con propósitos fijos (ej. citas, bebé, viajes, emergencias).
-2. **Registro y Seguimiento de Préstamos Informales:** Control de estado de deudas y préstamos a amigos o familiares.
-3. **Dashboard Centralizado:** Visualización en tiempo real del saldo consolidado del hogar, balance neto e ingresos vs. gastos.
-4. **Control de Acceso Seguro:** Sistema de autenticación para que solo los miembros autorizados visualicen y gestionen la información financiera.
+Ordenado por prioridad. Lo primero es lo que bloquea a lo demás: sin login no se pueden separar los datos de cada persona, y sin movimientos registrados no hay saldo que mostrar.
+
+| Prioridad | Feature | Por qué va en ese lugar | Sprint |
+|:---:|---|---|:---:|
+| 1 | **Control de acceso seguro:** autenticación para que solo los miembros autorizados vean y gestionen la información. | Bloquea todo lo demás; cada dato depende de quién lo creó. | 1 |
+| 2 | **Dashboard centralizado:** registro de ingresos y gastos, saldo consolidado del hogar, balance neto e ingresos vs. gastos. | Es lo mínimo que resuelve el problema de "cuánto dinero tenemos". | 1 |
+| 3 | **Cajas / Bolsillos:** separar fondos con propósito fijo (citas, bebé, viajes, emergencias). | Es la necesidad principal que vimos en las parejas, pero necesita el registro de movimientos. | 2 |
+| 4 | **Préstamos informales:** control del estado de deudas y préstamos a amigos o familiares. | Aporta valor, pero es un caso menos frecuente que los gastos del día a día. | 3 |
 
 ---
 
@@ -125,7 +129,7 @@ python -m http.server 8000
 Acceder a: `http://localhost:8000/public/index.html`
 
 > [!IMPORTANT]
-> **Condición de Entrada a la Sustentación (§7.1):** El software debe correr localmente y sin errores de consola. De lo contrario, de acuerdo con la normativa innegociable de la cátedra TIC42695, la sustentación no se califica.
+> **Condición de Entrada a la Sustentación (Lineamientos de la Asignatura):** El software debe correr localmente y sin errores de consola. De lo contrario, de acuerdo con la normativa innegociable de la cátedra TIC42695, la sustentación no se califica.
 
 ---
 
@@ -142,6 +146,7 @@ Acceder a: `http://localhost:8000/public/index.html`
 🔗 **Accesos del Proyecto:**
 *   **Repositorio GitHub:** [Cuentas-Claras.git](https://github.com/cuentaclaras672-boop/Cuentas-Claras.git)
 *   **Tablero de Gestión (Scrum/Kanban):** [Tablero en Miro](https://miro.com/welcomeonboard/YVBLdkdFZm96Ujdjb2tKRFFuZVA2QUQrOVdFbDc2dzRHU0tZT0hvRG1lVVNiSVNISHJyNVJZbFJyeHBRZUYzaEFqcnFuQWhJZzlBeExhYTVhUTlpdjB4SGhFS2dFNjFZcjlwNHpIa3pXblhlbVRYam1ERGtKMnpDSzhINDFZWUtyVmtkMG5hNDA3dVlncnBvRVB2ZXBnPT0hdjE=?share_link_id=694372715874)
+*   **Nota sobre el tablero:** usamos Miro porque Planner requiere licencia premium; el docente lo autorizó. Límite WIP: máximo 3 tareas en progreso al mismo tiempo y máximo 1 por persona.
 
 ---
 

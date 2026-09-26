@@ -35,7 +35,7 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 
 ---
 
-## 5. Cómo se cumplirán las Siete Condiciones Técnicas (§2.1)
+## 5. Cómo se cumplirán las Siete Condiciones Técnicas Obligatorias
 
 1. **Persistencia Real:** Integración con la base de datos NoSQL Cloud Firestore para almacenar de forma persistente y en tiempo real las transacciones, saldos y movimientos del hogar. Cero almacenamiento en memoria volátil o `localStorage`.
 2. **Sesión o Control de Acceso:** Implementación de Firebase Authentication para validar credenciales (correo/contraseña) y asegurar que cada persona solo acceda a la información de su respectivo hogar.

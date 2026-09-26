@@ -5,12 +5,12 @@
 ---
 
 ## ✅ Sprint 1: Arquitectura Base, Autenticación y Saldo Líquido
-- **Periodo:** 17 de agosto al 5 de septiembre de 2026 (Semanas 3 y 4 · 2 semanas)
+- **Periodo:** 17 al 29 de agosto de 2026 (Semanas 3 y 4 · 2 semanas). Semana 5: pruebas finales y sustentación.
 - **Hito de Cierre:** **Sustentación 1 (Aprobada con éxito el 5 de septiembre)**
 - **Estado:** **100% FINALIZADO Y FUNCIONAL (DONE)**
 - **Sprint Goal Alcanzado:**
   > *"Construir e integrar la arquitectura base por capas de Cuentas Claras, implementando el flujo completo de autenticación de usuarios con Firebase Auth y la persistencia en tiempo real de transacciones (ingresos/gastos personales y compartidos) en Cloud Firestore, con cálculo consolidado de saldo líquido."*
-- **Historias de Usuario Entregadas (Tope de 3 historias según §5.1):**
+- **Historias de Usuario Entregadas (Tope de 3 historias según lineamientos del Sprint 1):**
   - **HU-01: Autenticación y Control de Acceso** — Implementado con Firebase Auth v10 en [`src/services/auth.js`](../src/services/auth.js) y [`src/ui/ui-auth.js`](../src/ui/ui-auth.js). *(Cumple Condición #2)*.
   - **HU-02: Registro de Transacciones con Persistencia Real** — Implementado con Cloud Firestore NoSQL en [`src/services/firestore.js`](../src/services/firestore.js) y [`src/models/Transaccion.js`](../src/models/Transaccion.js). *(Cumple Condición #1)*.
   - **HU-03: Dashboard de Saldo Líquido y Métricas en Tiempo Real** — Implementado con reactividad `onSnapshot` y balance consolidado en [`src/ui/dashboard.js`](../src/ui/dashboard.js).

@@ -1,7 +1,7 @@
 # Guía Maestra de Sustentación — Sprint 1
 **Proyecto:** Cuentas Claras — Finanzas Compartidas en el Hogar  
 **Asignatura:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas  
-**Objetivo de este documento:** Explicar con precisión qué se hizo en cada Historia de Usuario y Tarea, qué archivo es responsable de cada parte del sistema, y cómo responder con éxito ante las pruebas de **Modificación de Código en Vivo (§7.2)** frente al docente evaluador.
+**Objetivo de este documento:** Explicar con precisión qué se hizo en cada Historia de Usuario y Tarea, qué archivo es responsable de cada parte del sistema, y cómo responder con éxito ante las pruebas de **Modificación de Código en Vivo** frente al docente evaluador.
 
 ---
 
@@ -107,7 +107,7 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 
 ---
 
-## ⚡ 3. Simulacros de Modificación en Vivo (§7.2)
+## ⚡ 3. Simulacros de Modificación de Código en Vivo
 
 En la sustentación, el docente te dará **15 a 20 minutos** para modificar algo en vivo. Aquí tienes las soluciones exactas a las peticiones más habituales:
 

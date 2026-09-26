@@ -68,7 +68,7 @@ A fecha del **26 de septiembre de 2026**, el equipo se encuentra promediando el 
 
 ---
 
-## 3. Registro de Uso de Inteligencia Artificial en Sprint 2 (§8)
+## 3. Registro de Uso de Inteligencia Artificial en Sprint 2 (Lineamientos de la Materia)
 
 ### 3.1 ¿Qué le pedimos a la IA?
 1. Asistencia para estructurar un cronograma realista de 4 semanas en Scrum que muestre flujo de trabajo continuo desde el 7 de septiembre.
@@ -77,11 +77,11 @@ A fecha del **26 de septiembre de 2026**, el equipo se encuentra promediando el 
 
 ### 3.2 ¿Qué aceptamos?
 - La inclusión del módulo `indicadores.js` como una historia formal de sprint (HU-06), cubriendo la Condición Técnica #3.
-- La distribución equitativa de tareas a lo largo de las 4 semanas para evidenciar autoría distribuida en el tiempo (§2.3).
+- La distribución equitativa de tareas a lo largo de las 4 semanas para evidenciar autoría distribuida en el tiempo según los lineamientos de la materia.
 - La conversión referencial de divisas en cliente para fundamentar decisiones de compras o ahorros en moneda extranjera.
 
 ### 3.3 ¿Qué rechazamos y por qué? (Criterio de Evaluación de Ingeniería)
 1. **Rechazamos concentrar todas las tareas únicamente en las últimas dos semanas del sprint:**  
-   *Motivo:* En Scrum, un sprint de 4 semanas debe evidenciar trabajo continuo desde la primera semana (Semana 6). Concentrar las tareas solo al final distorsiona la velocidad del equipo y viola la exigencia de la guía (§2.3: *"el historial debe mostrar trabajo distribuido en el tiempo y autoría individual identificable"*).
+   *Motivo:* En Scrum, un sprint de 4 semanas debe evidenciar trabajo continuo desde la primera semana (Semana 6). Concentrar las tareas solo al final distorsiona la velocidad del equipo y viola la exigencia de la guía docente (*"el historial debe mostrar trabajo distribuido en el tiempo y autoría individual identificable"*).
 2. **Rechazamos priorizar funcionalidades secundarias (deudas a terceros) sobre las condiciones técnicas obligatorias:**  
    *Motivo:* El equipo trasladó el Control de Deudas al Sprint 3 para asegurar que en la Sustentación 2 el 100% de la rúbrica técnica innegociable esté cumplido y certificado con historias de Prioridad Alta.
