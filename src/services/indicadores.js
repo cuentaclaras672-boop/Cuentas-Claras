@@ -38,10 +38,11 @@ export async function consultarTRM() {
         const item = datos[0];
         const valorNumerico = parseFloat(item.valor);
         if (!isNaN(valorNumerico) && valorNumerico > 0) {
+          console.log("%c🌐 [Condición Técnica #3] TRM consumida en vivo desde la API de Datos Abiertos del Estado Colombiano: $" + valorNumerico + " COP (Vigencia: " + item.vigenciadesde + ")", "color: #10b981; font-weight: bold; font-size: 11px;");
           return {
             valor: valorNumerico,
             fecha: item.vigenciadesde ? item.vigenciadesde.split("T")[0] : new Date().toISOString().split("T")[0],
-            fuente: "Superintendencia Financiera de Colombia (Datos Abiertos)"
+            fuente: "Superintendencia Financiera de Colombia (API datos.gov.co en vivo)"
           };
         }
       }

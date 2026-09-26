@@ -238,13 +238,20 @@ function cambiarEstadoBoton(boton, cargando, texto) {
  */
 async function cargarIndicadorTRM() {
   const elValorTRM = document.getElementById("valor-trm");
+  const badgeTRM = document.getElementById("badge-trm");
   if (!elValorTRM) return;
 
   try {
-    const { valor } = await consultarTRM();
+    const { valor, fuente } = await consultarTRM();
     elValorTRM.textContent = formatearTRM(valor);
+    if (badgeTRM) {
+      badgeTRM.title = `Fuente oficial: ${fuente}`;
+    }
   } catch (error) {
     elValorTRM.textContent = "$ 3.329,61";
+    if (badgeTRM) {
+      badgeTRM.title = "Fuente: Modo contingencia local";
+    }
   }
 }
 
