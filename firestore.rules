@@ -39,6 +39,35 @@ service cloud.firestore {
         resource.data.creadoPor == request.auth.uid;
     }
 
+    // Reglas para la colección de bolsillos de ahorro (HU-04 - CA-4.7)
+    match /bolsillos/{bolsilloId} {
+      // LECTURA: Aislamiento estricto por usuario
+      allow read: if request.auth != null &&
+        resource.data.creadoPor == request.auth.uid;
+
+      // CREACIÓN: Solo el usuario autenticado puede crear su propio bolsillo
+      allow create: if request.auth != null &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.nombre is string &&
+        request.resource.data.meta is number &&
+        request.resource.data.meta > 0 &&
+        request.resource.data.montoAcumulado is number &&
+        request.resource.data.montoAcumulado >= 0;
+
+      // ACTUALIZACIÓN: Inmutabilidad de creadoPor y validación de tipos
+      allow update: if request.auth != null &&
+        resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.creadoPor == resource.data.creadoPor &&
+        request.resource.data.meta is number &&
+        request.resource.data.meta > 0 &&
+        request.resource.data.montoAcumulado is number &&
+        request.resource.data.montoAcumulado >= 0;
+
+      // ELIMINACIÓN: Solo el propietario puede eliminar su bolsillo
+      allow delete: if request.auth != null &&
+        resource.data.creadoPor == request.auth.uid;
+    }
+
     // Por defecto, denegar cualquier acceso no especificado a la base de datos
     match /{document=**} {
       allow read, write: if false;

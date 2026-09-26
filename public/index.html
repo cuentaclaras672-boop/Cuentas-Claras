@@ -230,16 +230,39 @@
       </div>
     </header>
 
+    <!-- Banner de Resiliencia: Sin Conexión (Tarea 7.1 - Jorman Palacios / HU-07) -->
+    <div id="banner-offline" class="hidden sticky top-16 z-50 bg-rose-600/95 backdrop-blur-md text-white py-2 px-4 shadow-lg border-b border-rose-700 transition-all">
+      <div class="max-w-7xl mx-auto flex items-center justify-between text-xs sm:text-sm font-medium">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 shrink-0 animate-pulse text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636a9 9 0 010 12.728m0 0l-2.829-2.829m2.829 2.829L21 21M15.536 8.464a5 5 0 010 7.072m0 0l-2.829-2.829m-4.243 4.243a9 9 0 01-12.728 0m0 0l2.829-2.829m-2.829 2.829L3 21m2.828-12.536a5 5 0 017.072 0m0 0l-2.829 2.829"/>
+          </svg>
+          <span><strong>Sin conexión a Internet:</strong> Modo solo lectura activo. Las acciones se inhabilitan para proteger la integridad de tus datos.</span>
+        </div>
+        <span class="text-[11px] opacity-80 hidden md:inline">Reconectando automáticamente...</span>
+      </div>
+    </div>
+
     <!-- Contenido Principal -->
     <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 space-y-8">
       
       <!-- TARJETAS DE MÉTRICAS / RESUMEN -->
-      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Balance Neto -->
         <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
           <p class="text-xs font-medium text-slate-400 uppercase tracking-wider">Balance Neto</p>
           <p id="resumen-balance" class="text-2xl font-bold text-slate-200 mt-2">$ 0</p>
           <p class="text-[11px] text-slate-500 mt-1">Ingresos menos Gastos</p>
+        </div>
+
+        <!-- Saldo Disponible Real (CA-4.5) -->
+        <div class="p-5 rounded-2xl bg-slate-900/60 border border-indigo-500/30 bg-indigo-950/20">
+          <p class="text-xs font-medium text-indigo-300 uppercase tracking-wider flex items-center justify-between">
+            <span>Disponible Real</span>
+            <span class="text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-300">Líquido</span>
+          </p>
+          <p id="resumen-disponible" class="text-2xl font-bold text-indigo-300 mt-2">$ 0</p>
+          <p class="text-[11px] text-indigo-400/80 mt-1">Saldo libre tras bolsillos</p>
         </div>
 
         <!-- Total Ingresos -->
@@ -256,11 +279,92 @@
           <p class="text-[11px] text-slate-500 mt-1">Egresos registrados</p>
         </div>
 
-        <!-- Gastos Compartidos Hogar -->
+        <!-- Fondos en Bolsillos (HU-04) -->
         <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800">
-          <p class="text-xs font-medium text-indigo-400 uppercase tracking-wider">Gastos del Hogar</p>
-          <p id="resumen-compartido" class="text-2xl font-bold text-indigo-400 mt-2">$ 0</p>
-          <p class="text-[11px] text-slate-500 mt-1">Ámbito compartido</p>
+          <p class="text-xs font-medium text-amber-400 uppercase tracking-wider">En Bolsillos</p>
+          <p id="resumen-bolsillos" class="text-2xl font-bold text-amber-400 mt-2">$ 0</p>
+          <p class="text-[11px] text-slate-500 mt-1">Comprometido en metas</p>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
+      <!-- SECCIÓN: BOLSILLOS DE AHORRO CON METAS (Tarea 4.3 - Jorman Palacios / HU-04) -->
+      <!-- ========================================================================= -->
+      <section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center justify-center">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+              </svg>
+            </div>
+            <div>
+              <h2 class="text-base font-semibold text-white">Bolsillos de Ahorro y Metas</h2>
+              <p class="text-xs text-slate-400 mt-0.5">Separa fondos específicos para viajes, citas, emergencias o metas del hogar</p>
+            </div>
+          </div>
+
+          <button 
+            id="btn-toggle-form-bolsillo"
+            type="button" 
+            class="px-3.5 py-2 bg-amber-500/10 hover:bg-amber-500/20 text-amber-300 border border-amber-500/30 text-xs font-semibold rounded-xl flex items-center gap-1.5 self-start sm:self-auto transition-all"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            <span>Nuevo Bolsillo</span>
+          </button>
+        </div>
+
+        <!-- FORMULARIO DESPLEGABLE PARA CREACIÓN DE BOLSILLO (CA-4.1) -->
+        <div id="contenedor-form-bolsillo" class="hidden mt-4 p-4 rounded-xl bg-slate-800/50 border border-amber-500/20">
+          <form id="form-bolsillo" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1" for="bolsillo-nombre">Nombre del Bolsillo</label>
+              <input 
+                id="bolsillo-nombre" 
+                type="text" 
+                required 
+                minlength="3"
+                placeholder="Ej: Viaje de vacaciones"
+                class="w-full px-3 py-2 rounded-xl bg-slate-800/90 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1" for="bolsillo-meta">Meta de Ahorro ($ COP)</label>
+              <input 
+                id="bolsillo-meta" 
+                type="number" 
+                required 
+                min="1" 
+                step="any"
+                placeholder="Ej: 1000000"
+                class="w-full px-3 py-2 rounded-xl bg-slate-800/90 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+            </div>
+
+            <div class="flex items-center gap-2">
+              <button 
+                type="submit" 
+                class="flex-1 py-2 px-3 bg-amber-600 hover:bg-amber-500 text-white text-xs font-semibold rounded-xl shadow-md shadow-amber-600/20 transition-all"
+              >
+                Crear Bolsillo
+              </button>
+              <button 
+                id="btn-cancelar-bolsillo"
+                type="button" 
+                class="py-2 px-3 bg-slate-700/80 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-xl transition-all"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- GRID DE TARJETAS DE BOLSILLOS (CA-4.4 - Tarea 4.3) -->
+        <div id="lista-bolsillos" class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Renderizado dinámico desde dashboard.js -->
         </div>
       </section>
 
@@ -452,6 +556,6 @@
   </div>
 
   <!-- Orquestador Principal de la Aplicación (con cache-buster) -->
-  <script type="module" src="../src/app.js?v=3"></script>
+  <script type="module" src="../src/app.js?v=4"></script>
 </body>
 </html>

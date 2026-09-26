@@ -17,6 +17,7 @@ import {
   deleteDoc,
   doc,
   getDoc,
+  updateDoc,
   query,
   where,
   onSnapshot,
@@ -24,6 +25,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "./auth.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION } from "../models/Transaccion.js";
+import { Bolsillo } from "../models/Bolsillo.js";
 
 // ============================================================================
 // INICIALIZACIÓN SINGLETON DE FIRESTORE
@@ -33,6 +35,7 @@ const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 export const db = getFirestore(app);
 
 const COLECCION_TRANSACCIONES = "transacciones";
+const COLECCION_BOLSILLOS = "bolsillos";
 
 /**
  * Mapea códigos de error de Cloud Firestore a mensajes claros en español.
@@ -217,3 +220,167 @@ export function calcularTotales(listaTransacciones = []) {
     totalCompartido
   };
 }
+
+// ============================================================================
+// OPERACIONES CRUD PARA BOLSILLOS DE AHORRO (HU-04 - Condición #1)
+// ============================================================================
+
+/**
+ * Registra un nuevo bolsillo de ahorro con meta en Cloud Firestore.
+ * @async
+ * @param {Bolsillo} bolsillo - Instancia del modelo Bolsillo.
+ * @returns {Promise<string>} ID generado por Firestore para el nuevo bolsillo.
+ */
+export async function registrarBolsillo(bolsillo) {
+  try {
+    if (!(bolsillo instanceof Bolsillo)) {
+      throw new TypeError("El objeto a registrar debe ser una instancia válida de Bolsillo.");
+    }
+
+    bolsillo.validar();
+
+    const payload = {
+      ...bolsillo.aFirestore(),
+      fecha: Timestamp.fromDate(bolsillo.fecha)
+    };
+
+    const docRef = await addDoc(collection(db, COLECCION_BOLSILLOS), payload);
+    return docRef.id;
+  } catch (error) {
+    const mensaje = traducirErrorFirestore(error);
+    console.error("[FirestoreService.registrarBolsillo] Error:", error.message);
+    throw new Error(mensaje);
+  }
+}
+
+/**
+ * Elimina un bolsillo de ahorro de Firestore previa validación de permisos.
+ * @async
+ * @param {string} idBolsillo - ID del documento en Firestore.
+ * @param {string} [usuarioId=null] - UID del usuario que ejecuta la acción.
+ * @returns {Promise<void>}
+ */
+export async function eliminarBolsillo(idBolsillo, usuarioId = null) {
+  try {
+    if (!idBolsillo || typeof idBolsillo !== 'string') {
+      throw new Error("Identificador de bolsillo inválido para eliminación.");
+    }
+
+    const docRef = doc(db, COLECCION_BOLSILLOS, idBolsillo);
+
+    if (usuarioId) {
+      const snap = await getDoc(docRef);
+      if (snap.exists() && snap.data().creadoPor !== usuarioId) {
+        throw new Error("No tienes autorización para eliminar este bolsillo.");
+      }
+    }
+
+    await deleteDoc(docRef);
+  } catch (error) {
+    const mensaje = traducirErrorFirestore(error);
+    console.error("[FirestoreService.eliminarBolsillo] Error:", error.message);
+    throw new Error(mensaje);
+  }
+}
+
+/**
+ * Abona dinero adicional a un bolsillo existente en Firestore.
+ * @async
+ * @param {string} idBolsillo - ID del documento en Firestore.
+ * @param {number} montoAbono - Cantidad positiva a transferir al bolsillo.
+ * @param {string} [usuarioId=null] - UID del usuario para verificación.
+ * @returns {Promise<void>}
+ */
+export async function abonarFondosBolsillo(idBolsillo, montoAbono, usuarioId = null) {
+  try {
+    if (!idBolsillo || typeof idBolsillo !== 'string') {
+      throw new Error("Identificador de bolsillo inválido.");
+    }
+
+    if (isNaN(montoAbono) || montoAbono <= 0) {
+      throw new Error("El monto a transferir debe ser un número mayor a cero.");
+    }
+
+    const docRef = doc(db, COLECCION_BOLSILLOS, idBolsillo);
+    const snap = await getDoc(docRef);
+
+    if (!snap.exists()) {
+      throw new Error("El bolsillo especificado no existe en la base de datos.");
+    }
+
+    const data = snap.data();
+    if (usuarioId && data.creadoPor !== usuarioId) {
+      throw new Error("No tienes autorización para modificar este bolsillo.");
+    }
+
+    const nuevoMonto = (data.montoAcumulado || 0) + Number(montoAbono);
+    await updateDoc(docRef, { montoAcumulado: nuevoMonto });
+  } catch (error) {
+    const mensaje = traducirErrorFirestore(error);
+    console.error("[FirestoreService.abonarFondosBolsillo] Error:", error.message);
+    throw new Error(mensaje);
+  }
+}
+
+/**
+ * Suscribe un listener en tiempo real a los bolsillos del usuario autenticado.
+ * @param {string} usuarioId - UID del usuario autenticado.
+ * @param {function(Bolsillo[]): void} onActualizacion - Callback con los bolsillos actualizados.
+ * @param {function(Error): void} onError - Callback en caso de fallo.
+ * @returns {function(): void} Función para cancelar la suscripción.
+ */
+export function escucharBolsillos(usuarioId, onActualizacion, onError) {
+  if (!usuarioId || typeof usuarioId !== 'string') {
+    throw new Error("Se requiere el UID del usuario para consultar los bolsillos.");
+  }
+
+  if (typeof onActualizacion !== 'function') {
+    throw new TypeError("Se debe suministrar un callback de actualización válido.");
+  }
+
+  const q = query(
+    collection(db, COLECCION_BOLSILLOS),
+    where("creadoPor", "==", usuarioId)
+  );
+
+  return onSnapshot(
+    q,
+    (snapshot) => {
+      const bolsillos = [];
+      snapshot.forEach((docItem) => {
+        try {
+          const entidad = Bolsillo.desdeFirestore(docItem.id, docItem.data());
+          bolsillos.push(entidad);
+        } catch (errorParseo) {
+          console.warn(`[FirestoreService] Bolsillo omitido id=${docItem.id}:`, errorParseo.message);
+        }
+      });
+
+      // Ordenar por fecha descendente
+      bolsillos.sort((a, b) => {
+        const tA = a.fecha instanceof Date ? a.fecha.getTime() : new Date(a.fecha).getTime();
+        const tB = b.fecha instanceof Date ? b.fecha.getTime() : new Date(b.fecha).getTime();
+        return tB - tA;
+      });
+
+      onActualizacion(bolsillos);
+    },
+    (error) => {
+      const mensaje = traducirErrorFirestore(error);
+      console.error("[FirestoreService.escucharBolsillos] Error en tiempo real:", error);
+      if (typeof onError === 'function') {
+        onError(new Error(mensaje));
+      }
+    }
+  );
+}
+
+/**
+ * Calcula el monto acumulado total comprometido en todos los bolsillos de ahorro.
+ * @param {Bolsillo[]} listaBolsillos - Arreglo de bolsillos.
+ * @returns {number} Sumatoria de fondos en bolsillos.
+ */
+export function calcularTotalBolsillos(listaBolsillos = []) {
+  return listaBolsillos.reduce((total, b) => total + (b.montoAcumulado || 0), 0);
+}
+

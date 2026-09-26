@@ -33,14 +33,14 @@ A fecha del **26 de septiembre de 2026**, el equipo se encuentra promediando el 
 | **Tarea 6.2** | Función de conversión de divisa (COP a USD) y utilidades | Yerson Niño | 15 sep - 19 sep | **Done** |
 | **Tarea 6.3** | Componente visual de indicador y toggle multidivisa | Juan Diego Peraza / Jorman Palacios | 20 sep - 24 sep | **Done** |
 | **Tarea 6.4** | Pruebas con la API caída y verificación del valor referencial | Fabián Córdoba | 24 sep - 28 sep | **En Pruebas** |
-| **Tarea 7.1** | Diseño del aviso "Sin conexión" y estilo de error por campo | Jorman Palacios | 12 sep - 16 sep | *Actualizar según Miro* |
-| **Tarea 7.2** | Módulo `conexion.js` con eventos `online` / `offline` | Daniel Cortes | 16 sep - 20 sep | *Actualizar según Miro* |
+| **Tarea 7.1** | Diseño del aviso "Sin conexión" y estilo de error por campo | Jorman Palacios | 12 sep - 16 sep | **Done** |
+| **Tarea 7.2** | Módulo `conexion.js` con eventos `online` / `offline` | Daniel Cortes | 16 sep - 20 sep | **Done** |
 | **Tarea 7.3** | Mensajes de validación debajo de cada campo | Yerson Niño | 21 sep - 24 sep | *Actualizar según Miro* |
 | **Tarea 7.4** | Pruebas en modo offline (F12) y con datos inválidos | Fabián Córdoba | 25 sep - 29 sep | **En Pruebas** |
 | **Tarea 4.1** | Modelo `Bolsillo.js` con validaciones | Yerson Niño | 18 sep - 22 sep | **Done** |
-| **Tarea 4.2** | Servicio de bolsillos en Firestore y reglas de seguridad | Daniel Cortes | 23 sep - 27 sep | **WIP (En Progreso)** |
-| **Tarea 4.3** | Tarjetas de bolsillos con barra de progreso y formulario | Jorman Palacios | 27 sep - 30 sep | **Por Hacer** |
-| **Tarea 4.4** | Descuento del saldo disponible y pruebas de integración | Fabián Córdoba | 30 sep - 03 oct | **Por Hacer** |
+| **Tarea 4.2** | Servicio de bolsillos en Firestore y reglas de seguridad | Daniel Cortes | 23 sep - 27 sep | **Done** |
+| **Tarea 4.3** | Tarjetas de bolsillos con barra de progreso y formulario | Jorman Palacios | 27 sep - 30 sep | **Done** |
+| **Tarea 4.4** | Descuento del saldo disponible y pruebas de integración | Fabián Córdoba | 30 sep - 03 oct | **En Pruebas** |
 
 
 ### 1.2 Burndown del Sprint 2 (medido en tareas)

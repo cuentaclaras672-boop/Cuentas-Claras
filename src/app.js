@@ -7,12 +7,13 @@
  */
 
 import { suscribirEstadoAuth } from "./services/auth.js";
-import { escucharTransacciones } from "./services/firestore.js";
+import { escucharTransacciones, escucharBolsillos } from "./services/firestore.js";
 import { inicializarAuthUI } from "./ui/ui-auth.js";
-import { inicializarDashboardUI, actualizarDashboard } from "./ui/dashboard.js?v=3";
+import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI } from "./ui/dashboard.js?v=4";
 import { mostrarToast } from "./ui/notificaciones.js";
 
 let desuscribirTransacciones = null;
+let desuscribirBolsillos = null;
 
 /**
  * Punto de entrada principal que inicializa los controladores y listeners cuando el DOM está listo.
@@ -40,12 +41,15 @@ function iniciarAplicacion() {
       // Inicializar eventos de Dashboard (protegido contra duplicación)
       inicializarDashboardUI(usuario);
 
-      // Cancelar suscripción anterior si existía para evitar fugas de memoria
+      // Cancelar suscripciones anteriores si existían para evitar fugas de memoria
       if (typeof desuscribirTransacciones === "function") {
         desuscribirTransacciones();
       }
+      if (typeof desuscribirBolsillos === "function") {
+        desuscribirBolsillos();
+      }
 
-      // Conectar listener de Firestore en tiempo real
+      // Conectar listener de Firestore en tiempo real para transacciones (HU-02)
       desuscribirTransacciones = escucharTransacciones(
         usuario.uid,
         (listaTransacciones) => {
@@ -55,15 +59,31 @@ function iniciarAplicacion() {
           mostrarToast(`Error de base de datos: ${error.message}`, "error");
         }
       );
+
+      // Conectar listener de Firestore en tiempo real para bolsillos de ahorro (HU-04)
+      desuscribirBolsillos = escucharBolsillos(
+        usuario.uid,
+        (listaBolsillos) => {
+          actualizarBolsillosUI(listaBolsillos);
+        },
+        (error) => {
+          mostrarToast(`Error en bolsillos de ahorro: ${error.message}`, "error");
+        }
+      );
     } else {
       // Estado: Sin sesión activa (Visitante / Logout)
       if (typeof desuscribirTransacciones === "function") {
         desuscribirTransacciones();
         desuscribirTransacciones = null;
       }
+      if (typeof desuscribirBolsillos === "function") {
+        desuscribirBolsillos();
+        desuscribirBolsillos = null;
+      }
 
       // Limpiar los datos del usuario anterior para que no se vean en el próximo login
       actualizarDashboard([]);
+      actualizarBolsillosUI([]);
 
       if (vistaDashboard) vistaDashboard.classList.add("hidden");
       if (vistaAuth) vistaAuth.classList.remove("hidden");
