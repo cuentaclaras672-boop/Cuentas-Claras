@@ -9,17 +9,16 @@
 import { suscribirEstadoAuth } from "./services/auth.js";
 import { escucharTransacciones } from "./services/firestore.js";
 import { inicializarAuthUI } from "./ui/ui-auth.js";
-import { inicializarDashboardUI, actualizarDashboard } from "./ui/dashboard.js?v=2";
+import { inicializarDashboardUI, actualizarDashboard } from "./ui/dashboard.js?v=3";
 import { mostrarToast } from "./ui/notificaciones.js";
 
 let desuscribirTransacciones = null;
 
 /**
- * Punto de entrada principal que arranca cuando el DOM está listo.
+ * Punto de entrada principal que inicializa los controladores y listeners cuando el DOM está listo.
+ * @returns {void}
  */
 function iniciarAplicacion() {
-  console.log("🚀 [Cuentas Claras] Inicializando arquitectura por capas...");
-
   // Inicializar listeners de la interfaz de autenticación
   inicializarAuthUI();
 
@@ -35,12 +34,10 @@ function iniciarAplicacion() {
 
     if (usuario) {
       // Estado: Usuario Autenticado
-      console.log(`✅ [App] Sesión activa: ${usuario.email} (${usuario.uid})`);
-
       if (vistaAuth) vistaAuth.classList.add("hidden");
       if (vistaDashboard) vistaDashboard.classList.remove("hidden");
 
-      // Inicializar eventos de Dashboard
+      // Inicializar eventos de Dashboard (protegido contra duplicación)
       inicializarDashboardUI(usuario);
 
       // Cancelar suscripción anterior si existía para evitar fugas de memoria
@@ -60,8 +57,6 @@ function iniciarAplicacion() {
       );
     } else {
       // Estado: Sin sesión activa (Visitante / Logout)
-      console.log("🔒 [App] Sin sesión activa. Mostrando pantalla de autenticación.");
-
       if (typeof desuscribirTransacciones === "function") {
         desuscribirTransacciones();
         desuscribirTransacciones = null;

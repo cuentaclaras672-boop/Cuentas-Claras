@@ -6,8 +6,8 @@
 
 import { registrarTransaccion, eliminarTransaccion, calcularTotales } from "../services/firestore.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
-import { formatearMoneda, formatearFecha, formatearTRM } from "../utils/formateo.js?v=2";
-import { consultarTRM } from "../services/indicadores.js?v=2";
+import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML } from "../utils/formateo.js?v=3";
+import { consultarTRM } from "../services/indicadores.js?v=3";
 import { mostrarToast } from "./notificaciones.js";
 
 let usuarioActual = null;
@@ -15,10 +15,15 @@ let transaccionesEnMemoria = [];
 let filtroAmbitoActual = "TODOS";
 let divisaActiva = "COP";
 let tasaTRM = 3329.61;
+let listenersInicializados = false;
 
 /**
  * Inicializa y enlaza todos los eventos del Dashboard.
+ * Emplea un flag de control para evitar la duplicación de manejadores de eventos (submit, filtros)
+ * ante inicios y cierres de sesión repetidos en la misma sesión de navegador.
+ * 
  * @param {object} usuario - Datos del usuario autenticado.
+ * @returns {void}
  */
 export function inicializarDashboardUI(usuario) {
   usuarioActual = usuario;
@@ -30,6 +35,12 @@ export function inicializarDashboardUI(usuario) {
 
   // Cargar indicador externo de TRM (Condición Técnica #3)
   cargarIndicadorTRM();
+
+  // Si los listeners del DOM ya fueron configurados previamente, evitar duplicación
+  if (listenersInicializados) {
+    return;
+  }
+  listenersInicializados = true;
 
   // Selector Multidivisa COP / USD (Tarea 6.3 - Juan Diego Peraza)
   const btnDivisaCOP = document.getElementById("btn-divisa-cop");
@@ -199,13 +210,13 @@ function renderizarListaTransacciones() {
           </div>
           <div>
             <div class="flex items-center gap-2">
-              <h4 class="font-medium text-white text-sm">${t.descripcion}</h4>
+              <h4 class="font-medium text-white text-sm">${escaparHTML(t.descripcion)}</h4>
               <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full ${esCompartido ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-700 text-slate-300'}">
-                ${t.ambito}
+                ${escaparHTML(t.ambito)}
               </span>
             </div>
             <p class="text-xs text-slate-400 mt-0.5">
-              <span class="text-slate-300 font-medium">${t.categoria}</span> • ${formatearFecha(t.fecha)}
+              <span class="text-slate-300 font-medium">${escaparHTML(t.categoria)}</span> • ${formatearFecha(t.fecha)}
             </p>
           </div>
         </div>
@@ -229,13 +240,13 @@ function renderizarListaTransacciones() {
     `;
   }).join("");
 
-  // Asignar listeners a los botones de eliminación
+  // Asignar listeners a los botones de eliminación verificando propiedad defensiva
   contenedor.querySelectorAll(".btn-eliminar-transaccion").forEach((btn) => {
     btn.addEventListener("click", async () => {
       const id = btn.getAttribute("data-id");
       if (confirm("¿Confirmas que deseas eliminar esta transacción de Firestore?")) {
         try {
-          await eliminarTransaccion(id);
+          await eliminarTransaccion(id, usuarioActual?.uid);
           mostrarToast("Transacción eliminada exitosamente.", "info");
         } catch (error) {
           mostrarToast(error.message, "error");
@@ -246,9 +257,10 @@ function renderizarListaTransacciones() {
 }
 
 /**
- * Carga las opciones de categorías según sea Ingreso o Gasto.
- * @param {'INGRESO'|'GASTO'} tipo 
- * @param {HTMLSelectElement} elementoSelect 
+ * Carga las opciones de categorías según sea Ingreso o Gasto en el elemento select correspondiente.
+ * @param {'INGRESO'|'GASTO'} tipo - Tipo de transacción actual.
+ * @param {HTMLSelectElement} elementoSelect - Elemento select del formulario a poblar.
+ * @returns {void}
  */
 function poblarCategorias(tipo, elementoSelect) {
   const lista = tipo === TIPO_TRANSACCION.INGRESO ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO;
@@ -256,7 +268,11 @@ function poblarCategorias(tipo, elementoSelect) {
 }
 
 /**
- * Controla el estado visual de los botones del formulario.
+ * Controla el estado visual y de interacción de los botones durante peticiones asíncronas.
+ * @param {HTMLButtonElement} boton - Elemento botón del DOM a manipular.
+ * @param {boolean} cargando - Indica si la petición se encuentra en progreso.
+ * @param {string} texto - Texto descriptivo a presentar en el botón.
+ * @returns {void}
  */
 function cambiarEstadoBoton(boton, cargando, texto) {
   if (!boton) return;
@@ -270,7 +286,9 @@ function cambiarEstadoBoton(boton, cargando, texto) {
 }
 
 /**
- * Consulta la TRM oficial externa y actualiza el indicador visual en el header.
+ * Consulta la TRM oficial externa y actualiza el indicador visual en el header de la aplicación.
+ * @async
+ * @returns {Promise<void>}
  */
 async function cargarIndicadorTRM() {
   const elValorTRM = document.getElementById("valor-trm");
@@ -294,8 +312,9 @@ async function cargarIndicadorTRM() {
 
 /**
  * Alterna visualmente el estado activo/inactivo entre los botones de divisa COP y USD.
- * @param {HTMLButtonElement} btnActivo 
- * @param {HTMLButtonElement} btnInactivo 
+ * @param {HTMLButtonElement} btnActivo - Botón que pasa a estado seleccionado.
+ * @param {HTMLButtonElement} btnInactivo - Botón que pasa a estado deseleccionado.
+ * @returns {void}
  */
 function actualizarEstilosBotonesDivisa(btnActivo, btnInactivo) {
   btnActivo.className = "px-2.5 py-1 rounded-lg bg-indigo-600 text-white shadow-sm transition-all";

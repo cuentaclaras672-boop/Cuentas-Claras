@@ -11,8 +11,8 @@
 - **¿Qué se va a hacer hoy?**: Diseñar la arquitectura por capas y definir el modelo de datos de la entidad `Transaccion`.
 - **Impedimentos detectados**: Conflicto de credenciales de Git Credential Manager en Windows (solucionado asignando permisos al usuario colaborador).
 
-### Daily 2 — Servicios de Backend e Integración Externa
-- **¿Qué se hizo?**: Implementación de `auth.js` (Firebase Auth v10), `firestore.js` (persistencia NoSQL y tiempo real) e integración externa con API pública de la TRM en `indicadores.js`.
+### Daily 2 — Servicios de Backend y Persistencia
+- **¿Qué se hizo?**: Implementación de `auth.js` (Firebase Auth v10), `firestore.js` (persistencia NoSQL y sincronización en tiempo real en Firestore) y definición de entidades de dominio en `Transaccion.js` con tipado defensivo.
 - **¿Qué se va a hacer hoy?**: Construir la capa de presentación (UI de autenticación, dashboard y notificaciones Toast).
 - **Impedimentos detectados**: Ninguno.
 

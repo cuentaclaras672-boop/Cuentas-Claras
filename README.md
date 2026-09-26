@@ -40,13 +40,13 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 
 | # | Condición Técnica | Implementación en Cuentas Claras | Módulo Responsable |
 |---|---|---|---|
-| **1** | **Persistencia Real** | Almacenamiento persistente en base de datos NoSQL Cloud Firestore. Prohibido el uso de memoria volátil o `localStorage` para balances financieros. Operaciones CRUD y sincronización en tiempo real (`onSnapshot`). | [`src/services/firestore.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/firestore.js) |
-| **2** | **Sesión o Control de Acceso** | Autenticación basada en Firebase Authentication SDK v10 (email y contraseña), asegurando la privacidad y el aislamiento de datos por usuario y hogar. | [`src/services/auth.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/auth.js) |
-| **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar en tiempo real) para fundamentar decisiones de ahorro en el hogar. | [`src/services/indicadores.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/indicadores.js) |
-| **4** | **Consulta con Filtrado** | Historial dinámico e interactivo de movimientos con capacidad de filtrado por ámbito (Personal / Compartido), tipo (Ingreso / Gasto) y categoría. | [`src/ui/dashboard.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/dashboard.js) |
-| **5** | **Manejo de Errores Visible** | Captura defensiva de fallos de red, validaciones y base de datos con `try/catch`, proyectados en pantalla mediante notificaciones flotantes contextuales (Toasts). El usuario nunca experimenta pantallas en blanco. | [`src/ui/notificaciones.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/notificaciones.js) |
+| **1** | **Persistencia Real** | Almacenamiento persistente en base de datos NoSQL Cloud Firestore. Prohibido el uso de memoria volátil o `localStorage` para balances financieros. Operaciones CRUD y sincronización en tiempo real (`onSnapshot`). | [`src/services/firestore.js`](src/services/firestore.js) |
+| **2** | **Sesión o Control de Acceso** | Autenticación basada en Firebase Authentication SDK v10 (email y contraseña), asegurando la privacidad y el aislamiento de datos por usuario y hogar. | [`src/services/auth.js`](src/services/auth.js) |
+| **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar en tiempo real) para fundamentar decisiones de ahorro en el hogar. | [`src/services/indicadores.js`](src/services/indicadores.js) |
+| **4** | **Consulta con Filtrado** | Historial dinámico e interactivo de movimientos con capacidad de filtrado por ámbito (Personal / Compartido), tipo (Ingreso / Gasto) y categoría. | [`src/ui/dashboard.js`](src/ui/dashboard.js) |
+| **5** | **Manejo de Errores Visible** | Captura defensiva de fallos de red, validaciones y base de datos con `try/catch`, proyectados en pantalla mediante notificaciones flotantes contextuales (Toasts). El usuario nunca experimenta pantallas en blanco. | [`src/ui/notificaciones.js`](src/ui/notificaciones.js) |
 | **6** | **Repositorio de Código** | Repositorio formal en GitHub con trazabilidad de commits semánticos, ramas por funcionalidad y contribuciones individuales del equipo. | Control de versiones Git / GitHub |
-| **7** | **Documentación Técnica** | Documentación exhaustiva en `README.md` junto con los artefactos de gestión ágil en la carpeta `docs/` (`acta-planning.md`, `definition-of-done.md`, `sprint-goals.md`). | [`README.md`](file:///c:/Users/jdperaza/Cuentas_Claras/README.md) y [`docs/`](file:///c:/Users/jdperaza/Cuentas_Claras/docs) |
+| **7** | **Documentación Técnica** | Documentación exhaustiva en `README.md` junto con los artefactos de gestión ágil en la carpeta `docs/` (`acta-planning.md`, `definition-of-done.md`, `sprint-goals.md`). | [`README.md`](README.md) y [`docs/`](docs/) |
 
 ---
 
@@ -89,7 +89,7 @@ La conexión con Firebase se realiza mediante el SDK modular v10. Para configura
 1. Crear un proyecto en la [Consola de Firebase](https://console.firebase.google.com/).
 2. Habilitar **Firebase Authentication** con el proveedor de **Correo electrónico / Contraseña**.
 3. Crear una base de datos **Cloud Firestore** en modo de producción o prueba con la colección `transacciones`.
-4. Registrar una aplicación web en Firebase y verificar que las credenciales en [`src/services/auth.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/auth.js) coincidan con el proyecto:
+4. Registrar una aplicación web en Firebase y verificar que las credenciales en [`src/services/auth.js`](src/services/auth.js) coincidan con el proyecto:
 
 ```javascript
 export const firebaseConfig = {
@@ -110,7 +110,7 @@ Dado que la aplicación emplea módulos nativos de JavaScript (`import`/`export`
 
 ### Usando Visual Studio Code
 - Instalar la extensión **Live Server**.
-- Hacer clic derecho sobre [`public/index.html`](file:///c:/Users/jdperaza/Cuentas_Claras/public/index.html) y seleccionar **"Open with Live Server"**.
+- Hacer clic derecho sobre [`public/index.html`](public/index.html) y seleccionar **"Open with Live Server"**.
 
 ### Usando Node.js
 ```bash

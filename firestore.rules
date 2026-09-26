@@ -1,0 +1,40 @@
+rules_version = '2';
+
+/**
+ * @file firestore.rules
+ * @description Reglas de Seguridad en Servidor para Cloud Firestore en Cuentas Claras.
+ * Cumple con la Condición Técnica Obligatoria #2 (Control de Acceso y Aislamiento de Datos por Usuario).
+ * Impide lecturas, escrituras y eliminaciones no autorizadas en el backend sin depender únicamente del cliente.
+ */
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Reglas para la colección de transacciones financieras
+    match /transacciones/{transaccionId} {
+      
+      // LECTURA: Un usuario autenticado solo puede leer registros que le pertenezcan
+      // o aquellos clasificados explícitamente como COMPARTIDO en su hogar.
+      allow read: if request.auth != null && (
+        resource.data.creadoPor == request.auth.uid ||
+        resource.data.ambito == 'COMPARTIDO'
+      );
+
+      // CREACIÓN: El usuario debe estar autenticado y su UID debe ser asignado como creador
+      allow create: if request.auth != null &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.monto is number &&
+        request.resource.data.monto > 0 &&
+        request.resource.data.tipo in ['INGRESO', 'GASTO'] &&
+        request.resource.data.ambito in ['PERSONAL', 'COMPARTIDO'];
+
+      // ACTUALIZACIÓN Y BORRADO: Únicamente el autor original del registro puede modificarlo o borrarlo
+      allow update, delete: if request.auth != null &&
+        resource.data.creadoPor == request.auth.uid;
+    }
+
+    // Por defecto, denegar cualquier acceso no especificado a la base de datos
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

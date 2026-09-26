@@ -97,3 +97,20 @@ export function parsearMonto(entrada) {
 
   return Math.round(numero * 100) / 100;
 }
+
+/**
+ * Sanitiza y escapa caracteres especiales HTML para prevenir vulnerabilidades de Cross-Site Scripting (XSS).
+ * Transforma los caracteres &, <, >, ", ' en sus entidades HTML equivalentes.
+ * 
+ * @param {string|any} str - Cadena de texto a sanitizar.
+ * @returns {string} Cadena segura apta para interpolación en el DOM mediante innerHTML.
+ */
+export function escaparHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}

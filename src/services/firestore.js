@@ -16,9 +16,9 @@ import {
   addDoc,
   deleteDoc,
   doc,
+  getDoc,
   query,
   where,
-  orderBy,
   onSnapshot,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
@@ -94,18 +94,33 @@ export async function registrarTransaccion(transaccion) {
 
 /**
  * Elimina una transacción existente en Firestore por su identificador de documento.
+ * Valida de forma defensiva que el documento pertenezca al usuario antes de ejecutar el borrado.
+ * 
  * @async
  * @param {string} idTransaccion - Identificador único del documento en Firestore.
+ * @param {string} [usuarioId=null] - UID del usuario autenticado que solicita la eliminación.
  * @returns {Promise<void>}
- * @throws {Error} Si no se especifica el ID o falla la operación.
+ * @throws {Error} Si no se especifica el ID, el usuario no tiene permisos o falla la operación.
  */
-export async function eliminarTransaccion(idTransaccion) {
+export async function eliminarTransaccion(idTransaccion, usuarioId = null) {
   try {
     if (!idTransaccion || typeof idTransaccion !== 'string') {
       throw new Error("Identificador de transacción inválido para eliminación.");
     }
 
     const docRef = doc(db, COLECCION_TRANSACCIONES, idTransaccion);
+
+    // Verificación defensiva previa de propiedad en cliente
+    if (usuarioId) {
+      const snapshot = await getDoc(docRef);
+      if (snapshot.exists()) {
+        const data = snapshot.data();
+        if (data.creadoPor && data.creadoPor !== usuarioId) {
+          throw new Error("No tienes autorización para eliminar una transacción registrada por otro usuario.");
+        }
+      }
+    }
+
     await deleteDoc(docRef);
   } catch (error) {
     const mensaje = traducirErrorFirestore(error);
@@ -117,6 +132,7 @@ export async function eliminarTransaccion(idTransaccion) {
 /**
  * Suscribe un listener en tiempo real a las transacciones del usuario o compartidas del hogar.
  * Actualiza automáticamente la capa de presentación cuando ocurren cambios en la base de datos.
+ * Evita la necesidad de índices compuestos en Firestore ordenando cronológicamente en memoria.
  * 
  * @param {string} usuarioId - UID del usuario autenticado.
  * @param {function(Transaccion[]): void} onActualizacion - Callback ejecutado con la lista de transacciones.
@@ -132,11 +148,11 @@ export function escucharTransacciones(usuarioId, onActualizacion, onError) {
     throw new TypeError("Se debe suministrar un callback de actualización válido.");
   }
 
-  // Consulta por movimientos del usuario ordenados por fecha descendente
+  // Consulta filtrada por usuario. Se prescinde de orderBy en servidor para evitar
+  // la exigencia de índices compuestos en Firebase Console; la lista se ordena en memoria.
   const q = query(
     collection(db, COLECCION_TRANSACCIONES),
-    where("creadoPor", "==", usuarioId),
-    orderBy("fecha", "desc")
+    where("creadoPor", "==", usuarioId)
   );
 
   return onSnapshot(
@@ -151,6 +167,14 @@ export function escucharTransacciones(usuarioId, onActualizacion, onError) {
           console.warn(`[FirestoreService] Registro omitido id=${docItem.id} por datos inválidos:`, errorParseo.message);
         }
       });
+
+      // Ordenamiento cronológico descendente en memoria del cliente
+      transacciones.sort((a, b) => {
+        const tiempoA = a.fecha instanceof Date ? a.fecha.getTime() : new Date(a.fecha).getTime();
+        const tiempoB = b.fecha instanceof Date ? b.fecha.getTime() : new Date(b.fecha).getTime();
+        return tiempoB - tiempoA;
+      });
+
       onActualizacion(transacciones);
     },
     (error) => {

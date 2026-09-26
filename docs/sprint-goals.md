@@ -11,9 +11,9 @@
 - **Sprint Goal Alcanzado:**
   > *"Construir e integrar la arquitectura base por capas de Cuentas Claras, implementando el flujo completo de autenticación de usuarios con Firebase Auth y la persistencia en tiempo real de transacciones (ingresos/gastos personales y compartidos) en Cloud Firestore, con cálculo consolidado de saldo líquido."*
 - **Historias de Usuario Entregadas (Tope de 3 historias según §5.1):**
-  - **HU-01: Autenticación y Control de Acceso** — Implementado con Firebase Auth v10 en [`src/services/auth.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/auth.js) y [`src/ui/ui-auth.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/ui-auth.js). *(Cumple Condición #2)*.
-  - **HU-02: Registro de Transacciones con Persistencia Real** — Implementado con Cloud Firestore NoSQL en [`src/services/firestore.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/services/firestore.js) y [`src/models/Transaccion.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/models/Transaccion.js). *(Cumple Condición #1)*.
-  - **HU-03: Dashboard de Saldo Líquido y Métricas en Tiempo Real** — Implementado con reactividad `onSnapshot` y balance consolidado en [`src/ui/dashboard.js`](file:///c:/Users/jdperaza/Cuentas_Claras/src/ui/dashboard.js).
+  - **HU-01: Autenticación y Control de Acceso** — Implementado con Firebase Auth v10 en [`src/services/auth.js`](../src/services/auth.js) y [`src/ui/ui-auth.js`](../src/ui/ui-auth.js). *(Cumple Condición #2)*.
+  - **HU-02: Registro de Transacciones con Persistencia Real** — Implementado con Cloud Firestore NoSQL en [`src/services/firestore.js`](../src/services/firestore.js) y [`src/models/Transaccion.js`](../src/models/Transaccion.js). *(Cumple Condición #1)*.
+  - **HU-03: Dashboard de Saldo Líquido y Métricas en Tiempo Real** — Implementado con reactividad `onSnapshot` y balance consolidado en [`src/ui/dashboard.js`](../src/ui/dashboard.js).
 
 ---
 
