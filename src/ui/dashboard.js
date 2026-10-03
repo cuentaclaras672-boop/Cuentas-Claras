@@ -765,11 +765,17 @@ function renderizarListaBolsillos() {
         return;
       }
 
+      // Bloquea el botón mientras la transferencia está en curso para evitar abonos duplicados por doble clic
+      btn.disabled = true;
+      btn.classList.add("opacity-50", "cursor-not-allowed");
       try {
         await abonarFondosBolsillo(id, montoAbono, usuarioActual?.uid);
         mostrarToast(`Se transfirieron exitosamente $ ${montoAbono.toLocaleString("es-CO")} al bolsillo "${nombre}".`, "exito");
       } catch (error) {
         mostrarToast(error.message, "error");
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove("opacity-50", "cursor-not-allowed");
       }
     });
   });
