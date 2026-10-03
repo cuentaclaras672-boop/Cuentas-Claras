@@ -21,6 +21,7 @@ import {
   query,
   where,
   onSnapshot,
+  runTransaction,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { firebaseConfig } from "./auth.js";
@@ -285,11 +286,14 @@ export async function eliminarBolsillo(idBolsillo, usuarioId = null) {
 
 /**
  * Abona dinero adicional a un bolsillo existente en Firestore.
+ * La lectura del saldo acumulado y la escritura del nuevo valor se ejecutan dentro de
+ * una transacción atómica (runTransaction): si otro abono modifica el bolsillo en paralelo,
+ * Firestore reintenta la operación con el valor actualizado y ningún abono se pierde.
  * @async
  * @param {string} idBolsillo - ID del documento en Firestore.
  * @param {number} montoAbono - Cantidad positiva a transferir al bolsillo.
  * @param {string} [usuarioId=null] - UID del usuario para verificación.
- * @returns {Promise<void>}
+ * @returns {Promise<number>} Nuevo monto acumulado del bolsillo.
  */
 export async function abonarFondosBolsillo(idBolsillo, montoAbono, usuarioId = null) {
   try {
@@ -297,24 +301,29 @@ export async function abonarFondosBolsillo(idBolsillo, montoAbono, usuarioId = n
       throw new Error("Identificador de bolsillo inválido.");
     }
 
-    if (isNaN(montoAbono) || montoAbono <= 0) {
+    const monto = Number(montoAbono);
+    if (!Number.isFinite(monto) || monto <= 0) {
       throw new Error("El monto a transferir debe ser un número mayor a cero.");
     }
 
     const docRef = doc(db, COLECCION_BOLSILLOS, idBolsillo);
-    const snap = await getDoc(docRef);
 
-    if (!snap.exists()) {
-      throw new Error("El bolsillo especificado no existe en la base de datos.");
-    }
+    return await runTransaction(db, async (transaccion) => {
+      const snap = await transaccion.get(docRef);
 
-    const data = snap.data();
-    if (usuarioId && data.creadoPor !== usuarioId) {
-      throw new Error("No tienes autorización para modificar este bolsillo.");
-    }
+      if (!snap.exists()) {
+        throw new Error("El bolsillo especificado no existe en la base de datos.");
+      }
 
-    const nuevoMonto = (data.montoAcumulado || 0) + Number(montoAbono);
-    await updateDoc(docRef, { montoAcumulado: nuevoMonto });
+      const data = snap.data();
+      if (usuarioId && data.creadoPor !== usuarioId) {
+        throw new Error("No tienes autorización para modificar este bolsillo.");
+      }
+
+      const nuevoMonto = (data.montoAcumulado || 0) + monto;
+      transaccion.update(docRef, { montoAcumulado: nuevoMonto });
+      return nuevoMonto;
+    });
   } catch (error) {
     const mensaje = traducirErrorFirestore(error);
     console.error("[FirestoreService.abonarFondosBolsillo] Error:", error.message);
