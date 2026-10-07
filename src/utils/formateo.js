@@ -99,6 +99,48 @@ export function parsearMonto(entrada) {
 }
 
 /**
+ * Convierte un monto escrito por el usuario en formato colombiano a número.
+ * Acepta punto como separador de miles y coma como separador decimal.
+ * Ejemplos: "50.000" → 50000 · "$ 1.250.000" → 1250000 · "1500,50" → 1500.5
+ * @param {string} texto - Monto tal como lo escribió el usuario.
+ * @returns {number} Monto mayor a cero, redondeado a 2 decimales.
+ * @throws {Error} Si el texto no representa un monto válido mayor a cero.
+ */
+export function parsearMontoCOP(texto) {
+  if (typeof texto !== 'string') {
+    throw new Error('Formato de monto inválido.');
+  }
+
+  const sinSimbolos = texto.replace(/[$\s]/g, '');
+
+  if (!/^\d{1,3}(\.\d{3})*(,\d{1,2})?$|^\d+(,\d{1,2})?$/.test(sinSimbolos)) {
+    throw new Error('Escribe el monto solo con números, por ejemplo 50000 o 50.000.');
+  }
+
+  const numero = parseFloat(sinSimbolos.replace(/\./g, '').replace(',', '.'));
+
+  if (isNaN(numero) || numero <= 0) {
+    throw new Error('El monto debe ser mayor a $0.');
+  }
+
+  return Math.round(numero * 100) / 100;
+}
+
+/**
+ * Devuelve la fecha en formato "AAAA-MM-DD" según la hora local del navegador.
+ * Se usa en vez de toISOString(), que convierte a UTC y en Colombia (UTC-5)
+ * cambia el día de los movimientos registrados después de las 7 p. m.
+ * @param {Date} fecha - Fecha a convertir.
+ * @returns {string} Fecha local, por ejemplo "2026-10-07".
+ */
+export function fechaLocalISO(fecha) {
+  const anio = fecha.getFullYear();
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${anio}-${mes}-${dia}`;
+}
+
+/**
  * Sanitiza y escapa caracteres especiales HTML para prevenir vulnerabilidades de Cross-Site Scripting (XSS).
  * Transforma los caracteres &, <, >, ", ' en sus entidades HTML equivalentes.
  * 

@@ -18,6 +18,7 @@ import {
   doc,
   getDoc,
   updateDoc,
+  increment,
   query,
   where,
   onSnapshot,
@@ -313,8 +314,8 @@ export async function abonarFondosBolsillo(idBolsillo, montoAbono, usuarioId = n
       throw new Error("No tienes autorización para modificar este bolsillo.");
     }
 
-    const nuevoMonto = (data.montoAcumulado || 0) + Number(montoAbono);
-    await updateDoc(docRef, { montoAcumulado: nuevoMonto });
+    // increment() suma en el servidor: si dos abonos llegan al mismo tiempo, no se pierde ninguno
+    await updateDoc(docRef, { montoAcumulado: increment(Number(montoAbono)) });
   } catch (error) {
     const mensaje = traducirErrorFirestore(error);
     console.error("[FirestoreService.abonarFondosBolsillo] Error:", error.message);

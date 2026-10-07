@@ -24,7 +24,9 @@ export class Bolsillo {
     this.id = id;
     this.nombre = typeof nombre === "string" ? nombre.trim() : "";
     this.meta = parsearMonto(meta);
-    this.montoAcumulado = parsearMonto(montoAcumulado);
+    // No se usa parsearMonto porque rechaza el 0, y un bolsillo nuevo empieza con $0 ahorrados.
+    // Si el valor no es numérico queda NaN y validar() lo rechaza.
+    this.montoAcumulado = Number(montoAcumulado);
     this.creadoPor = creadoPor;
     this.fecha = fecha instanceof Date ? fecha : new Date(fecha);
   }
@@ -44,7 +46,7 @@ export class Bolsillo {
     }
 
     if (isNaN(this.montoAcumulado) || this.montoAcumulado < 0) {
-      throw new Error("El monto acumulado no puede ser un valor negativo.");
+      throw new Error("El monto acumulado debe ser un número mayor o igual a cero.");
     }
 
     if (!this.creadoPor || typeof this.creadoPor !== "string") {

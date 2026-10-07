@@ -65,12 +65,15 @@ export function mostrarToast(mensaje, tipo = "info", duracion = 4000) {
     ${configuracion.icono}
     <div class="flex-1 text-sm leading-snug">
       <p class="font-semibold capitalize">${configuracion.titulo}</p>
-      <p class="mt-0.5 text-xs opacity-90">${mensaje}</p>
+      <p class="mt-0.5 text-xs opacity-90" data-mensaje></p>
     </div>
     <button type="button" class="text-white/60 hover:text-white transition-colors" aria-label="Cerrar notificación">
       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
     </button>
   `;
+
+  // El mensaje se inserta como texto: puede traer datos del usuario (nombres de bolsillos, descripciones)
+  elementoToast.querySelector("[data-mensaje]").textContent = mensaje;
 
   const botonCerrar = elementoToast.querySelector("button");
   const cerrarToast = () => {
