@@ -78,9 +78,14 @@ cuentas-claras/
 │   │   └── formateo.js     # Formato de divisa (COP), fechas y parseo seguro
 │   └── app.js              # Orquestador del ciclo de vida de la aplicación
 ├── docs/                   # Documentación de Gestión Ágil (Scrum)
-│   ├── acta-planning.md    # Acta de Sprint Planning y Backlog priorizado
-│   ├── definition-of-done.md # Criterios de calidad Definition of Done (DoD)
-│   └── sprint-goals.md     # Metas de los Sprints del semestre
+│   ├── acta-planning.md    # Acta de Planning y Backlog Sprint 1
+│   ├── acta-planning-sprint2.md # Acta de Planning y Backlog Sprint 2
+│   ├── acta-planning-sprint3.md # Acta de Planning y Backlog Sprint 3
+│   ├── bitacora-sprint1.md # Bitácora de seguimiento y Dailies Sprint 1
+│   ├── bitacora-sprint2.md # Bitácora de seguimiento y Dailies Sprint 2
+│   ├── bitacora-sprint3.md # Bitácora de seguimiento y Dailies Sprint 3
+│   ├── definition-of-done.md # Criterios de calidad Definition of Done (DoD) y DoR
+│   └── sprint-goals.md     # Metas consolidadas de los Sprints
 └── README.md               # Documentación general del proyecto
 ```
 

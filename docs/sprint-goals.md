@@ -32,14 +32,17 @@
 
 ---
 
-## ⏳ Sprint 3: Liquidación entre Convivientes y Control de Deudas a Terceros
+## ⏳ Sprint 3: Préstamos a Terceros, Hogar Compartido y Visualización de Gastos
 - **Periodo:** 12 de octubre al 31 de octubre de 2026 (Semanas 11 a 13 · 3 semanas)
-- **Hito de Cierre:** Sprint Review y Retrospectiva Internos (Sesión 9)
-- **Estado:** Planificado
-- **Alcance Planificado:**
-  - Registro y conciliación de préstamos informales a amigos o familiares (Cuentas por cobrar).
-  - Liquidación automática de deudas cruzadas en gastos compartidos del hogar.
-  - Visualización gráfica de gastos por categoría (Chart.js / SVG nativo).
+- **Hito de Cierre:** Sprint Review y Retrospectiva Internos (31 de octubre de 2026)
+- **Estado:** Planificado (Sprint Backlog y Bitácora listos)
+- **Sprint Goal:**
+  > *"Que el usuario pueda registrar lo que le presta a amigos o familiares y seguir sus abonos hasta saldarlo, que dos convivientes compartan un mismo hogar para ver juntos los gastos comunes, y que el hogar vea en una gráfica en qué se le va el dinero."*
+- **Historias comprometidas (16 SP):**
+  - **HU-08: Préstamos a terceros con abonos parciales** (M · 8 SP · Prioridad 1) — colección `prestamos`, amortización de saldo y tarjeta "Por cobrar". *Refuerza Condiciones #1 y #4*.
+  - **HU-09: Hogar compartido entre convivientes** (S · 5 SP · Prioridad 2) — colección `hogares`, código de invitación y privacidad de gastos compartidos vs personales. *Refuerza Condición #2*.
+  - **HU-10: Gráfica de gastos por categoría** (S · 3 SP · Prioridad 3) — barras horizontales reactivas con Tailwind CSS nativo sin librerías externas. *Refuerza Condición #4*.
+- Detalle completo de criterios de aceptación, DoR, DoD y tareas en el [Acta de Planning del Sprint 3](acta-planning-sprint3.md) y la [Bitácora del Sprint 3](bitacora-sprint3.md).
 
 ---
 
