@@ -56,7 +56,7 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 - **Talla:** M · **Estimación:** 8 SP · **Prioridad:** 1 (Alta / Núcleo del Product Goal)
 - **Condiciones técnicas que refuerza:** #1 (Persistencia real en una colección nueva) y #4 (Filtrado por estado).
 - **Descripción:** Como usuario, quiero registrar el dinero que le presto a un amigo o familiar y anotar cada abono que me hace, para saber cuánto me falta por cobrar sin depender de mi memoria ni de chats.
-- **Por qué ahora:** esta historia se sacó del Sprint 2 para priorizar las condiciones técnicas obligatorias (ver Bitácora del Sprint 2, sección de uso de IA).
+- **Por qué ahora:** esta historia se sacó del Sprint 2 para priorizar las condiciones técnicas obligatorias (ver Product Backlog en el README y el Acta del Sprint 2).
 
 #### • Definición de Preparado (Definition of Ready — DoR)
 - [ ] Historia redactada en formato de usuario con rol, acción y beneficio.
@@ -170,7 +170,22 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 
 ---
 
-## 5. Lo que queda en el Product Backlog (no entra en este sprint)
+## 5. Gestión de riesgos del Sprint 3
+
+Probabilidad e impacto en escala Baja / Media / Alta. Se revisa en cada daily del lunes; si se cumple el disparador, el riesgo se trata como impedimento.
+
+| ID | Riesgo | Prob. | Impacto | Mitigación | Disparador | Responsable |
+|---|---|:---:|:---:|---|---|---|
+| R1 | Las reglas del hogar compartido quedan mal: o un usuario ve movimientos de otro hogar, o los convivientes no ven nada (`permission-denied`). | Alta | Alta | Probar las reglas en el simulador de Firebase Console antes de publicarlas; prueba negativa con una tercera cuenta (Tarea 9.4). | Cualquier `permission-denied` inesperado o un dato ajeno visible en las pruebas. | Daniel Cortes |
+| R2 | Los pendientes del Sprint 2 (sección 3.1) ocupan más de la semana 11 y retrasan las historias nuevas. | Alta | Media | Límite de 2 días para la deuda técnica; si no se cierra, se pasa al Sprint 4 y se informa en el Review. | El 14 de octubre sigue abierto algún pendiente de la sección 3.1. | Fabián Córdoba |
+| R3 | Los movimientos registrados antes de la HU-09 no tienen `hogarId` y el conviviente no los ve. | Media | Media | Decisión del DoR: solo se comparten los movimientos nuevos; se explica en la pantalla "Mi hogar". | Un usuario reporta que no ve gastos compartidos anteriores. | Yerson Niño |
+| R4 | La Tarea 9.3 (pantalla "Mi hogar") depende de la 9.2 (servicio); si la 9.2 se atrasa, se bloquea la 9.3. | Media | Alta | La 9.3 empieza por la maqueta en HTML con datos de prueba mientras termina la 9.2. | La 9.2 no está en "Terminado" el 23 de octubre. | Jorman Palacios |
+| R5 | La HU-09 está subestimada (5 SP) porque toca reglas de seguridad de dos colecciones. | Media | Media | Si el 24 de octubre la HU-09 lleva menos de la mitad de sus tareas, se recorta la CA-9.7 (salir del hogar) y pasa al Sprint 4. | Burndown real por encima del planificado el 24 de octubre. | Juan Diego Peraza |
+| R6 | La API de la TRM cambia de formato o deja de responder y la gráfica en USD muestra valores errados. | Baja | Media | Ya existen dos APIs de respaldo y un valor referencial (HU-06); la Tarea 10.3 prueba la gráfica con la API bloqueada. | El indicador muestra "referencial" más de un día seguido. | Daniel Cortes |
+
+---
+
+## 6. Lo que queda en el Product Backlog (no entra en este sprint)
 
 | Historia candidata | Motivo para no incluirla ahora | Sprint candidato |
 |---|---|---|
@@ -179,7 +194,7 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 
 ---
 
-## 6. Cronograma por semana
+## 7. Cronograma por semana
 
 | Semana | Fechas | Foco |
 |:---:|---|---|
@@ -189,7 +204,7 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 
 ---
 
-## 7. Definition of Done y Cierre del Sprint
+## 8. Definition of Done y Cierre del Sprint
 Se mantiene la [Definition of Done](definition-of-done.md) oficial del proyecto. Para este sprint, además:
 - Una historia solo pasa a "Terminado" si todos sus criterios de aceptación se probaron en la app corriendo localmente sin errores en la consola.
 - Toda historia que cambie `firestore.rules` solo se cierra cuando las reglas están **publicadas** en Firebase Console (no basta con el archivo en GitHub).
