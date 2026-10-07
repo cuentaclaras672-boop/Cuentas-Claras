@@ -15,8 +15,9 @@ import {
 } from "../services/firestore.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
-import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML } from "../utils/formateo.js?v=4";
+import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMontoCOP, fechaLocalISO } from "../utils/formateo.js?v=5";
 import { consultarTRM } from "../services/indicadores.js?v=4";
+import { agruparGastosPorCategoria } from "../utils/estadisticas.js";
 import { mostrarToast } from "./notificaciones.js";
 
 let usuarioActual = null;
@@ -288,22 +289,88 @@ export function inicializarDashboardUI(usuario) {
   // =========================================================================
   const bannerOffline = document.getElementById("banner-offline");
 
+  // Si la app se abre ya sin conexión, mostrar el aviso desde el inicio
+  if (!navigator.onLine && bannerOffline) bannerOffline.classList.remove("hidden");
+  aplicarEstadoConexion();
+
   window.addEventListener("offline", () => {
     if (bannerOffline) bannerOffline.classList.remove("hidden");
-    document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo").forEach((btn) => {
-      btn.disabled = true;
-      btn.classList.add("opacity-50", "cursor-not-allowed");
-    });
+    aplicarEstadoConexion();
     mostrarToast("Sin conexión a Internet. Las acciones se inhabilitan para proteger tus datos.", "error", 4000);
   });
 
   window.addEventListener("online", () => {
     if (bannerOffline) bannerOffline.classList.add("hidden");
-    document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo").forEach((btn) => {
-      btn.disabled = false;
-      btn.classList.remove("opacity-50", "cursor-not-allowed");
-    });
+    aplicarEstadoConexion();
     mostrarToast("Conexión a Internet restablecida con éxito.", "exito", 2500);
+  });
+}
+
+/**
+ * Pinta la gráfica de barras horizontales de gastos por categoría (Tarea 10.2 / HU-10).
+ * Usa las transacciones ya filtradas del historial y respeta el selector COP / USD.
+ * @param {Transaccion[]} transaccionesFiltradas - Movimientos que pasaron los filtros del historial.
+ * @returns {void}
+ */
+function renderizarGraficaCategorias(transaccionesFiltradas) {
+  const contenedor = document.getElementById("grafica-categorias");
+  const elTotal = document.getElementById("grafica-total-gastos");
+  if (!contenedor) return;
+
+  const { totalGastos, categorias } = agruparGastosPorCategoria(transaccionesFiltradas);
+
+  const esUSD = divisaActiva === "USD";
+  const divisor = esUSD ? tasaTRM : 1;
+  const decimales = esUSD ? 2 : 0;
+
+  if (elTotal) {
+    elTotal.textContent = `Total: ${formatearMoneda(totalGastos / divisor, divisaActiva, decimales)}`;
+  }
+
+  // CA-10.4: estado vacío en lugar de una gráfica sin barras
+  if (categorias.length === 0) {
+    contenedor.innerHTML = `
+      <p class="text-center py-8 text-sm text-slate-400">No hay gastos para mostrar con los filtros elegidos.</p>
+    `;
+    return;
+  }
+
+  // La barra más larga ocupa todo el ancho; las demás son proporcionales a ella
+  const mayorTotal = categorias[0].total;
+
+  contenedor.innerHTML = categorias.map((c) => {
+    const anchoBarra = Math.max(2, Math.round((c.total / mayorTotal) * 100));
+    return `
+      <div>
+        <div class="flex justify-between items-baseline text-xs mb-1">
+          <span class="font-medium text-slate-200">${escaparHTML(c.categoria)}</span>
+          <span class="text-slate-400">
+            ${formatearMoneda(c.total / divisor, divisaActiva, decimales)}
+            <span class="font-semibold text-rose-300 ml-1">${c.porcentaje.toLocaleString("es-CO")}%</span>
+          </span>
+        </div>
+        <div class="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+          <div class="h-full bg-rose-500/80 rounded-full transition-all duration-500" style="width: ${anchoBarra}%"></div>
+        </div>
+      </div>
+    `;
+  }).join("");
+}
+
+/**
+ * Deshabilita los botones de acción si no hay conexión y los habilita si la hay.
+ * Se llama al cambiar la conexión y después de pintar las listas, porque los botones
+ * de eliminar y transferir se vuelven a crear en cada renderizado.
+ * @returns {void}
+ */
+function aplicarEstadoConexion() {
+  const sinConexion = !navigator.onLine;
+  document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo").forEach((btn) => {
+    // No reactivar un botón que está ocupado guardando ("Registrando...", "Creando...")
+    if (!sinConexion && btn.dataset.ocupado === "true") return;
+    btn.disabled = sinConexion;
+    btn.classList.toggle("opacity-50", sinConexion);
+    btn.classList.toggle("cursor-not-allowed", sinConexion);
   });
 }
 
@@ -364,38 +431,12 @@ function renderizarTarjetasResumen() {
 }
 
 /**
- * Renderiza el listado visual de transacciones aplicando los filtros combinados de búsqueda, tipo, categoría, ámbito y fechas.
- * Preserva la inmutabilidad del arreglo original en memoria (DoD HU-05 y Condición #4).
- * @returns {void}
+ * Aplica los filtros activos del historial (búsqueda, tipo, ámbito, categoría y fechas).
+ * La usan el historial y la gráfica de categorías para mostrar siempre los mismos datos.
+ * @returns {Transaccion[]} Nueva lista con las transacciones que cumplen todos los filtros.
  */
-function renderizarListaTransacciones() {
-  const contenedor = document.getElementById("lista-transacciones");
-  const contador = document.getElementById("contador-transacciones");
-  const btnLimpiar = document.getElementById("btn-limpiar-filtros");
-  if (!contenedor) return;
-
-  const hayFiltrosActivos = Boolean(
-    filtroBusquedaTexto ||
-    filtroTipoActual !== "TODOS" ||
-    filtroAmbitoActual !== "TODOS" ||
-    filtroCategoriaActual !== "TODAS" ||
-    filtroFechaDesdeActual ||
-    filtroFechaHastaActual
-  );
-
-  // Mostrar u ocultar el botón de limpiar filtros (CA-5.5)
-  if (btnLimpiar) {
-    if (hayFiltrosActivos) {
-      btnLimpiar.classList.remove("hidden");
-      btnLimpiar.classList.add("flex");
-    } else {
-      btnLimpiar.classList.add("hidden");
-      btnLimpiar.classList.remove("flex");
-    }
-  }
-
-  // Filtrado como función pura sin mutar transaccionesEnMemoria (CA-5.1, CA-5.2, CA-5.3)
-  const filtradas = transaccionesEnMemoria.filter((t) => {
+function obtenerTransaccionesFiltradas() {
+  return transaccionesEnMemoria.filter((t) => {
     // CA-5.1: Búsqueda textual insensible a mayúsculas y acentos en descripción o categoría
     if (filtroBusquedaTexto) {
       const descNorm = normalizarTexto(t.descripcion);
@@ -432,7 +473,7 @@ function renderizarListaTransacciones() {
       }
 
       if (!isNaN(fechaObj.getTime())) {
-        const fechaIso = fechaObj.toISOString().split("T")[0];
+        const fechaIso = fechaLocalISO(fechaObj);
         if (filtroFechaDesdeActual && fechaIso < filtroFechaDesdeActual) return false;
         if (filtroFechaHastaActual && fechaIso > filtroFechaHastaActual) return false;
       }
@@ -440,6 +481,44 @@ function renderizarListaTransacciones() {
 
     return true;
   });
+}
+
+/**
+ * Renderiza el listado visual de transacciones aplicando los filtros combinados de búsqueda, tipo, categoría, ámbito y fechas.
+ * Preserva la inmutabilidad del arreglo original en memoria (DoD HU-05 y Condición #4).
+ * @returns {void}
+ */
+function renderizarListaTransacciones() {
+  const contenedor = document.getElementById("lista-transacciones");
+  const contador = document.getElementById("contador-transacciones");
+  const btnLimpiar = document.getElementById("btn-limpiar-filtros");
+  if (!contenedor) return;
+
+  const hayFiltrosActivos = Boolean(
+    filtroBusquedaTexto ||
+    filtroTipoActual !== "TODOS" ||
+    filtroAmbitoActual !== "TODOS" ||
+    filtroCategoriaActual !== "TODAS" ||
+    filtroFechaDesdeActual ||
+    filtroFechaHastaActual
+  );
+
+  // Mostrar u ocultar el botón de limpiar filtros (CA-5.5)
+  if (btnLimpiar) {
+    if (hayFiltrosActivos) {
+      btnLimpiar.classList.remove("hidden");
+      btnLimpiar.classList.add("flex");
+    } else {
+      btnLimpiar.classList.add("hidden");
+      btnLimpiar.classList.remove("flex");
+    }
+  }
+
+  // Filtrado sin mutar transaccionesEnMemoria (CA-5.1, CA-5.2, CA-5.3)
+  const filtradas = obtenerTransaccionesFiltradas();
+
+  // La gráfica usa los mismos filtros del historial (CA-10.2)
+  renderizarGraficaCategorias(filtradas);
 
   // CA-5.4: Contador visual interactivo
   if (contador) {
@@ -541,6 +620,8 @@ function renderizarListaTransacciones() {
       }
     });
   });
+
+  aplicarEstadoConexion();
 }
 
 /**
@@ -563,7 +644,9 @@ function poblarCategorias(tipo, elementoSelect) {
  */
 function cambiarEstadoBoton(boton, cargando, texto) {
   if (!boton) return;
-  boton.disabled = cargando;
+  boton.dataset.ocupado = String(cargando);
+  // Al terminar de guardar, el botón sigue deshabilitado si mientras tanto se perdió la conexión
+  boton.disabled = cargando || !navigator.onLine;
   boton.textContent = texto;
   if (cargando) {
     boton.classList.add("opacity-60", "cursor-not-allowed");
@@ -749,10 +832,13 @@ function renderizarListaBolsillos() {
       );
 
       if (!inputUsuario) return;
-      const montoAbono = Number(inputUsuario.trim());
 
-      if (isNaN(montoAbono) || montoAbono <= 0) {
-        mostrarToast("Por favor ingresa un monto válido mayor a cero.", "error");
+      // parsearMontoCOP entiende "50.000" como cincuenta mil (Number("50.000") daba 50)
+      let montoAbono;
+      try {
+        montoAbono = parsearMontoCOP(inputUsuario);
+      } catch (error) {
+        mostrarToast(error.message, "error");
         return;
       }
 
@@ -773,6 +859,8 @@ function renderizarListaBolsillos() {
       }
     });
   });
+
+  aplicarEstadoConexion();
 }
 
 
