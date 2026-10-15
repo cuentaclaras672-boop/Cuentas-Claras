@@ -27,20 +27,20 @@ A fecha del **26 de septiembre de 2026**, el equipo se encuentra promediando el 
 |---|---|---|:---:|:---:|
 | **Tarea 5.1** | Diseñar barra de búsqueda y selectores en HTML/Tailwind | Jorman Palacios | 09 sep - 12 sep | **Done** |
 | **Tarea 5.2** | Filtrado combinado (texto, categoría, tipo, ámbito) en `dashboard.js` | Yerson Niño | 13 sep - 16 sep | **Done** |
-| **Tarea 5.3** | Filtro por rango de fechas con validación "desde ≤ hasta" | Daniel Cortes | 16 sep - 20 sep | *Actualizar según Miro* |
-| **Tarea 5.4** | Pruebas de combinaciones de filtros, estado vacío y botón limpiar | Fabián Córdoba | 21 sep - 26 sep | **En Pruebas** |
+| **Tarea 5.3** | Filtro por rango de fechas con validación "desde ≤ hasta" | Daniel Cortes | 16 sep - 20 sep | **Done** |
+| **Tarea 5.4** | Pruebas de combinaciones de filtros, estado vacío y botón limpiar | Fabián Córdoba | 21 sep - 26 sep | **Done** |
 | **Tarea 6.1** | Servicio `indicadores.js`: API de la TRM con respaldos | Daniel Cortes | 10 sep - 14 sep | **Done** |
 | **Tarea 6.2** | Función de conversión de divisa (COP a USD) y utilidades | Yerson Niño | 15 sep - 19 sep | **Done** |
 | **Tarea 6.3** | Componente visual de indicador y toggle multidivisa | Juan Diego Peraza / Jorman Palacios | 20 sep - 24 sep | **Done** |
-| **Tarea 6.4** | Pruebas con la API caída y verificación del valor referencial | Fabián Córdoba | 24 sep - 28 sep | **En Pruebas** |
+| **Tarea 6.4** | Pruebas con la API caída y verificación del valor referencial | Fabián Córdoba | 24 sep - 28 sep | **Done** |
 | **Tarea 7.1** | Diseño del aviso "Sin conexión" y estilo de error por campo | Jorman Palacios | 12 sep - 16 sep | **Done** |
 | **Tarea 7.2** | Módulo `conexion.js` con eventos `online` / `offline` | Daniel Cortes | 16 sep - 20 sep | **Done** |
-| **Tarea 7.3** | Mensajes de validación debajo de cada campo | Yerson Niño | 21 sep - 24 sep | *Actualizar según Miro* |
-| **Tarea 7.4** | Pruebas en modo offline (F12) y con datos inválidos | Fabián Córdoba | 25 sep - 29 sep | **En Pruebas** |
+| **Tarea 7.3** | Mensajes de validación debajo de cada campo | Yerson Niño | 21 sep - 24 sep | **Done** |
+| **Tarea 7.4** | Pruebas en modo offline (F12) y con datos inválidos | Fabián Córdoba | 25 sep - 29 sep | **Done** |
 | **Tarea 4.1** | Modelo `Bolsillo.js` con validaciones | Yerson Niño | 18 sep - 22 sep | **Done** |
 | **Tarea 4.2** | Servicio de bolsillos en Firestore y reglas de seguridad | Daniel Cortes | 23 sep - 27 sep | **Done** |
 | **Tarea 4.3** | Tarjetas de bolsillos con barra de progreso y formulario | Jorman Palacios | 27 sep - 30 sep | **Done** |
-| **Tarea 4.4** | Descuento del saldo disponible y pruebas de integración | Fabián Córdoba | 30 sep - 03 oct | **En Pruebas** |
+| **Tarea 4.4** | Descuento del saldo disponible y pruebas de integración | Fabián Córdoba | 30 sep - 03 oct | **Done** |
 
 
 ### 1.2 Burndown del Sprint 2 (medido en tareas)
@@ -49,18 +49,18 @@ Total de tareas del sprint: **16**. Se mide al cierre de cada semana (sábado). 
 | Semana | Corte | Ideal (restantes) | Planificado (restantes) | Real (restantes) |
 |:---:|:---:|:---:|:---:|:---:|
 | Inicio | 07 sep | 16 | 16 | 16 |
-| 6 | 12 sep | 12 | 15 | |
-| 7 | 19 sep | 8 | 11 | |
-| 8 | 26 sep | 4 | 5 | |
-| 9 | 03 oct | 0 | 0 | |
+| 6 | 12 sep | 12 | 15 | 14 |
+| 7 | 19 sep | 8 | 11 | 9 |
+| 8 | 26 sep | 4 | 5 | 4 |
+| 9 | 03 oct | 0 | 0 | 0 |
 
-> El plan va por encima de la línea ideal en las semanas 6 y 7 porque las primeras tareas de cada historia son de diseño y tardan más en cerrarse; el grueso se termina en la semana 8.
+> El plan va por encima de la línea ideal en las semanas 6 y 7 porque las primeras tareas de cada historia son de diseño y tardan más en cerrarse; el grueso se terminó y probó entre la semana 8 y 9.
 
 ### 1.3 Velocidad
 | Sprint | Duración | Historias terminadas | SP terminados |
 |:---:|:---:|:---:|:---:|
 | 1 | 2 semanas | 3 | 15 |
-| 2 | 4 semanas | *(llenar al cierre)* | *(de 21 comprometidos)* |
+| 2 | 4 semanas | 4 | 21 (de 21 comprometidos) |
 
 ---
 
@@ -108,12 +108,13 @@ Total de tareas del sprint: **16**. Se mide al cierre de cada semana (sábado). 
 
 ---
 
-## 4. Retrospectiva del Sprint 2 (llenar en la semana 9, antes de la Sustentación 2)
+## 4. Retrospectiva del Sprint 2 (Semana 9 · Cierre de Sprint 2)
+**Facilitador:** Fabián Córdoba (Scrum Master) · **Fecha:** 03 de octubre de 2026
 
 | ¿Qué funcionó? | ¿Qué no funcionó? | Acción de mejora para el Sprint 3 | Responsable |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
+| La arquitectura modular en Vanilla JS con ES6 Modules facilitó ejecutar las pruebas en DevTools con F12 en ceros y sin sobrecarga de dependencias. | La API de la TRM presentó intermitencias que hicieron indispensable el uso de endpoints de respaldo y el valor referencial offline. | Incorporar límite de tiempo de espera (5 s) en el servicio de indicadores para no retardar la carga inicial ante APIs lentas. | Daniel Cortes |
+| La estrategia multicanal de indicadores y el manejo offline mantuvieron la interfaz operativa ante cortes de red simulados. | El modelo Bolsillo requirió ajuste en el constructor para permitir saldo inicial en cero ($0) al crearse sin fondos acumulados. | Probar los modelos de dominio con suites de pruebas unitarias antes de acoplarlos con los servicios de Firestore. | Fabián Córdoba |
+| El burndown cerró en 0 tareas pendientes gracias a la distribución de pruebas a lo largo de las semanas 8 y 9. | La detección de eventos online/offline requirió modularizarse en un archivo independiente (`conexion.js`) para no sobrecargar `dashboard.js`. | Resolver deudas técnicas de modularización en los primeros dos días del sprint antes de iniciar historias nuevas. | Fabián Córdoba / Daniel Cortes |
 
-> Cada acción de mejora debe ser concreta y verificable en el Sprint 3 (por ejemplo: "actualizar el burndown todos los sábados", no "comunicarnos mejor").
+> Retrospectiva aprobada por el equipo Scrum para el paso formal a la sustentación del Sprint 2 y preparación del Sprint 3.
