@@ -19,6 +19,7 @@ import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMont
 import { consultarTRM } from "../services/indicadores.js?v=4";
 import { agruparGastosPorCategoria } from "../utils/estadisticas.js";
 import { mostrarToast } from "./notificaciones.js";
+import { escucharConexion, hayConexion } from "../services/conexion.js";
 
 let usuarioActual = null;
 let transaccionesEnMemoria = [];
@@ -290,19 +291,18 @@ export function inicializarDashboardUI(usuario) {
   const bannerOffline = document.getElementById("banner-offline");
 
   // Si la app se abre ya sin conexión, mostrar el aviso desde el inicio
-  if (!navigator.onLine && bannerOffline) bannerOffline.classList.remove("hidden");
+  if (!hayConexion() && bannerOffline) bannerOffline.classList.remove("hidden");
   aplicarEstadoConexion();
 
-  window.addEventListener("offline", () => {
-    if (bannerOffline) bannerOffline.classList.remove("hidden");
+  // Tarea 7.2: la detección vive en services/conexion.js; aquí solo se pinta el aviso
+  escucharConexion((conectado) => {
+    if (bannerOffline) bannerOffline.classList.toggle("hidden", conectado);
     aplicarEstadoConexion();
-    mostrarToast("Sin conexión a Internet. Las acciones se inhabilitan para proteger tus datos.", "error", 4000);
-  });
-
-  window.addEventListener("online", () => {
-    if (bannerOffline) bannerOffline.classList.add("hidden");
-    aplicarEstadoConexion();
-    mostrarToast("Conexión a Internet restablecida con éxito.", "exito", 2500);
+    if (conectado) {
+      mostrarToast("Conexión a Internet restablecida con éxito.", "exito", 2500);
+    } else {
+      mostrarToast("Sin conexión a Internet. Las acciones se inhabilitan para proteger tus datos.", "error", 4000);
+    }
   });
 }
 
@@ -364,7 +364,7 @@ function renderizarGraficaCategorias(transaccionesFiltradas) {
  * @returns {void}
  */
 function aplicarEstadoConexion() {
-  const sinConexion = !navigator.onLine;
+  const sinConexion = !hayConexion();
   document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo").forEach((btn) => {
     // No reactivar un botón que está ocupado guardando ("Registrando...", "Creando...")
     if (!sinConexion && btn.dataset.ocupado === "true") return;
