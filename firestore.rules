@@ -15,6 +15,26 @@ service cloud.firestore {
       return request.auth.uid in get(/databases/$(database)/documents/hogares/$(hogarId)).data.miembros;
     }
 
+    // Estructura válida de un documento de /transacciones (espejo de src/models/Transaccion.js).
+    // Rechaza campos de más, tipos incorrectos y descripciones fuera de 3 a 120 caracteres.
+    // hogarId es opcional (HU-09): null o el ID del hogar del autor.
+    function esTransaccionValida(d) {
+      return d.keys().hasOnly(['descripcion', 'monto', 'tipo', 'ambito', 'categoria',
+                               'creadoPor', 'nombreUsuario', 'fecha', 'hogarId']) &&
+        d.keys().hasAll(['descripcion', 'monto', 'tipo', 'ambito', 'categoria',
+                         'creadoPor', 'fecha']) &&
+        d.descripcion is string &&
+        d.descripcion.size() >= 3 && d.descripcion.size() <= 120 &&
+        d.monto is number && d.monto > 0 &&
+        d.tipo in ['INGRESO', 'GASTO'] &&
+        d.ambito in ['PERSONAL', 'COMPARTIDO'] &&
+        d.categoria is string && d.categoria.size() > 0 &&
+        d.creadoPor is string &&
+        (!('nombreUsuario' in d) || d.nombreUsuario is string) &&
+        d.fecha is timestamp &&
+        (d.get('hogarId', null) == null || d.hogarId is string);
+    }
+
     // Reglas para la colección de transacciones financieras
     match /transacciones/{transaccionId} {
       
@@ -33,10 +53,7 @@ service cloud.firestore {
       // CREACIÓN: El usuario debe estar autenticado y su UID debe asignarse obligatoriamente como autor
       allow create: if request.auth != null &&
         request.resource.data.creadoPor == request.auth.uid &&
-        request.resource.data.monto is number &&
-        request.resource.data.monto > 0 &&
-        request.resource.data.tipo in ['INGRESO', 'GASTO'] &&
-        request.resource.data.ambito in ['PERSONAL', 'COMPARTIDO'] &&
+        esTransaccionValida(request.resource.data) &&
         // Si el movimiento trae hogarId (CA-9.4), el autor debe pertenecer a ese hogar
         (
           request.resource.data.get('hogarId', null) == null ||
@@ -48,10 +65,7 @@ service cloud.firestore {
         resource.data.creadoPor == request.auth.uid &&
         request.resource.data.creadoPor == resource.data.creadoPor &&
         request.resource.data.get('hogarId', null) == resource.data.get('hogarId', null) &&
-        request.resource.data.monto is number &&
-        request.resource.data.monto > 0 &&
-        request.resource.data.tipo in ['INGRESO', 'GASTO'] &&
-        request.resource.data.ambito in ['PERSONAL', 'COMPARTIDO'];
+        esTransaccionValida(request.resource.data);
 
       // ELIMINACIÓN: Únicamente el autor original del registro puede borrarlo
       allow delete: if request.auth != null &&
