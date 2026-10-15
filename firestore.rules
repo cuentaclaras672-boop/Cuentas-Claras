@@ -68,6 +68,49 @@ service cloud.firestore {
         resource.data.creadoPor == request.auth.uid;
     }
 
+    // Reglas para la colección de préstamos a terceros (Tarea 8.2 / HU-08 - CA-8.8)
+    match /prestamos/{prestamoId} {
+      // LECTURA: Solo el usuario que prestó el dinero ve sus préstamos
+      allow read: if request.auth != null &&
+        resource.data.creadoPor == request.auth.uid;
+
+      // CREACIÓN: Préstamo propio, con deudor y monto válidos, sin abonos y en estado PENDIENTE
+      allow create: if request.auth != null &&
+        request.resource.data.keys().hasOnly(['deudor', 'monto', 'fecha', 'nota', 'abonos', 'totalAbonado', 'estado', 'creadoPor']) &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.deudor is string &&
+        request.resource.data.deudor.size() >= 3 &&
+        request.resource.data.deudor.size() <= 60 &&
+        request.resource.data.monto is number &&
+        request.resource.data.monto > 0 &&
+        request.resource.data.fecha is timestamp &&
+        request.resource.data.nota is string &&
+        request.resource.data.nota.size() <= 200 &&
+        request.resource.data.abonos == [] &&
+        request.resource.data.totalAbonado == 0 &&
+        request.resource.data.estado == 'PENDIENTE';
+
+      // ACTUALIZACIÓN (registrar un abono): solo cambian abonos, totalAbonado y estado.
+      // Se agrega exactamente un abono, el total abonado nunca baja ni supera el monto prestado (CA-8.4)
+      // y el estado debe coincidir con el saldo: SALDADO solo cuando el pendiente llega a 0 (CA-8.5).
+      allow update: if request.auth != null &&
+        resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['abonos', 'totalAbonado', 'estado']) &&
+        request.resource.data.abonos is list &&
+        request.resource.data.abonos.size() == resource.data.abonos.size() + 1 &&
+        request.resource.data.totalAbonado is number &&
+        request.resource.data.totalAbonado > resource.data.totalAbonado &&
+        request.resource.data.totalAbonado <= resource.data.monto &&
+        (
+          (request.resource.data.totalAbonado == resource.data.monto && request.resource.data.estado == 'SALDADO') ||
+          (request.resource.data.totalAbonado < resource.data.monto && request.resource.data.estado == 'PENDIENTE')
+        );
+
+      // ELIMINACIÓN: Solo el propietario puede eliminar su préstamo
+      allow delete: if request.auth != null &&
+        resource.data.creadoPor == request.auth.uid;
+    }
+
     // Por defecto, denegar cualquier acceso no especificado a la base de datos
     match /{document=**} {
       allow read, write: if false;

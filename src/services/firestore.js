@@ -43,7 +43,7 @@ const COLECCION_BOLSILLOS = "bolsillos";
  * @param {object} error - Objeto de error generado por Firestore.
  * @returns {string} Mensaje traducido.
  */
-function traducirErrorFirestore(error) {
+export function traducirErrorFirestore(error) {
   const codigo = error?.code || '';
 
   switch (codigo) {
