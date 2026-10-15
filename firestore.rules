@@ -9,13 +9,26 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ¿El usuario autenticado es miembro del hogar indicado? (HU-09)
+    // Si el hogar no existe, get() falla y la regla niega el acceso.
+    function esMiembroDelHogar(hogarId) {
+      return request.auth.uid in get(/databases/$(database)/documents/hogares/$(hogarId)).data.miembros;
+    }
+
     // Reglas para la colección de transacciones financieras
     match /transacciones/{transaccionId} {
       
-      // LECTURA: Un usuario autenticado solo puede leer exclusivamente los registros que él mismo creó.
-      // Aislamiento estricto por usuario en cumplimiento de la Condición Técnica #2 (sin fugas entre cuentas).
-      allow read: if request.auth != null &&
-        resource.data.creadoPor == request.auth.uid;
+      // LECTURA: Cada usuario lee sus propios registros. Además, un miembro de un hogar lee los movimientos
+      // COMPARTIDOS de los demás miembros de ese mismo hogar (HU-09, CA-9.5 y CA-9.6).
+      // Los movimientos PERSONALES ajenos nunca se pueden leer.
+      allow read: if request.auth != null && (
+        resource.data.creadoPor == request.auth.uid ||
+        (
+          resource.data.ambito == 'COMPARTIDO' &&
+          resource.data.get('hogarId', null) is string &&
+          esMiembroDelHogar(resource.data.hogarId)
+        )
+      );
 
       // CREACIÓN: El usuario debe estar autenticado y su UID debe asignarse obligatoriamente como autor
       allow create: if request.auth != null &&
@@ -23,12 +36,18 @@ service cloud.firestore {
         request.resource.data.monto is number &&
         request.resource.data.monto > 0 &&
         request.resource.data.tipo in ['INGRESO', 'GASTO'] &&
-        request.resource.data.ambito in ['PERSONAL', 'COMPARTIDO'];
+        request.resource.data.ambito in ['PERSONAL', 'COMPARTIDO'] &&
+        // Si el movimiento trae hogarId (CA-9.4), el autor debe pertenecer a ese hogar
+        (
+          request.resource.data.get('hogarId', null) == null ||
+          (request.resource.data.hogarId is string && esMiembroDelHogar(request.resource.data.hogarId))
+        );
 
       // ACTUALIZACIÓN: Únicamente el autor original puede editar su registro y se prohíbe reasignar 'creadoPor'
       allow update: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid &&
         request.resource.data.creadoPor == resource.data.creadoPor &&
+        request.resource.data.get('hogarId', null) == resource.data.get('hogarId', null) &&
         request.resource.data.monto is number &&
         request.resource.data.monto > 0 &&
         request.resource.data.tipo in ['INGRESO', 'GASTO'] &&
@@ -109,6 +128,54 @@ service cloud.firestore {
       // ELIMINACIÓN: Solo el propietario puede eliminar su préstamo
       allow delete: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid;
+    }
+
+    // Reglas para la colección de hogares compartidos (Tarea 9.2 / HU-09)
+    // El ID del documento es el código de invitación de 6 caracteres.
+    match /hogares/{codigo} {
+      // CONSULTA POR CÓDIGO: cualquier usuario autenticado que conozca el código puede leer ese hogar
+      // para unirse (CA-9.2). Sin el código no puede listar hogares ajenos.
+      allow get: if request.auth != null;
+
+      // LISTADO: solo los hogares de los que el usuario es miembro (consulta array-contains por su UID)
+      allow list: if request.auth != null &&
+        request.auth.uid in resource.data.miembros;
+
+      // CREACIÓN (CA-9.1): el creador es el único miembro inicial y el ID coincide con el código
+      allow create: if request.auth != null &&
+        request.resource.data.keys().hasOnly(['nombre', 'codigo', 'miembros', 'nombres', 'creadoPor', 'fecha']) &&
+        codigo.matches('^[A-Z0-9]{6}$') &&
+        request.resource.data.codigo == codigo &&
+        request.resource.data.creadoPor == request.auth.uid &&
+        request.resource.data.miembros == [request.auth.uid] &&
+        request.resource.data.nombres is map &&
+        request.resource.data.nombres.keys().hasOnly([request.auth.uid]) &&
+        request.resource.data.nombre is string &&
+        request.resource.data.nombre.size() >= 3 &&
+        request.resource.data.nombre.size() <= 40 &&
+        request.resource.data.fecha is timestamp;
+
+      // ACTUALIZACIÓN: cada usuario solo puede agregarse o quitarse a sí mismo.
+      // Unirse (CA-9.2): no era miembro, queda al final de la lista y no se supera el máximo de 6.
+      // Salir (CA-9.7): era miembro y se quita solo a sí mismo.
+      allow update: if request.auth != null &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['miembros', 'nombres']) &&
+        request.resource.data.nombres.diff(resource.data.nombres).affectedKeys().hasOnly([request.auth.uid]) &&
+        (
+          (
+            !(request.auth.uid in resource.data.miembros) &&
+            request.resource.data.miembros == resource.data.miembros.concat([request.auth.uid]) &&
+            request.resource.data.miembros.size() <= 6
+          ) ||
+          (
+            request.auth.uid in resource.data.miembros &&
+            request.resource.data.miembros == resource.data.miembros.removeAll([request.auth.uid])
+          )
+        );
+
+      // ELIMINACIÓN: solo cuando el último miembro sale del hogar
+      allow delete: if request.auth != null &&
+        resource.data.miembros == [request.auth.uid];
     }
 
     // Por defecto, denegar cualquier acceso no especificado a la base de datos

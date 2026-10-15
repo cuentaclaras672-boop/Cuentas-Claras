@@ -70,10 +70,12 @@ export function traducirErrorFirestore(error) {
  * Guarda una nueva transacción en Firestore de forma asíncrona.
  * @async
  * @param {Transaccion} transaccion - Instancia del modelo de dominio Transaccion.
+ * @param {string|null} [hogarId=null] - Hogar del usuario (HU-09, CA-9.4). Si lo tiene, el movimiento
+ *   queda asociado al hogar y, si es COMPARTIDO, lo ven los demás miembros.
  * @returns {Promise<string>} ID generado por Firestore para el nuevo documento.
  * @throws {Error} Si la validación falla o la base de datos rechaza la inserción.
  */
-export async function registrarTransaccion(transaccion) {
+export async function registrarTransaccion(transaccion, hogarId = null) {
   try {
     if (!(transaccion instanceof Transaccion)) {
       throw new TypeError("El objeto a registrar debe ser una instancia válida de Transaccion.");
@@ -86,6 +88,10 @@ export async function registrarTransaccion(transaccion) {
       ...transaccion.aFirestore(),
       fecha: Timestamp.fromDate(transaccion.fecha)
     };
+
+    if (hogarId) {
+      datosPayload.hogarId = hogarId;
+    }
 
     const docRef = await addDoc(collection(db, COLECCION_TRANSACCIONES), datosPayload);
     return docRef.id;
@@ -134,16 +140,18 @@ export async function eliminarTransaccion(idTransaccion, usuarioId = null) {
 }
 
 /**
- * Suscribe un listener en tiempo real a las transacciones del usuario o compartidas del hogar.
- * Actualiza automáticamente la capa de presentación cuando ocurren cambios en la base de datos.
+ * Suscribe un listener en tiempo real a las transacciones del usuario y, si pertenece a un hogar,
+ * a los movimientos COMPARTIDOS de los demás miembros (HU-09, CA-9.5).
+ * Los personales de los otros miembros nunca se consultan, y las reglas de Firestore tampoco los dejan leer.
  * Evita la necesidad de índices compuestos en Firestore ordenando cronológicamente en memoria.
  * 
  * @param {string} usuarioId - UID del usuario autenticado.
  * @param {function(Transaccion[]): void} onActualizacion - Callback ejecutado con la lista de transacciones.
  * @param {function(Error): void} onError - Callback ejecutado en caso de fallo.
+ * @param {string|null} [hogarId=null] - Hogar del usuario; sin hogar solo se escuchan sus propios movimientos.
  * @returns {function(): void} Función para cancelar la suscripción (Unsubscribe).
  */
-export function escucharTransacciones(usuarioId, onActualizacion, onError) {
+export function escucharTransacciones(usuarioId, onActualizacion, onError, hogarId = null) {
   if (!usuarioId || typeof usuarioId !== 'string') {
     throw new Error("Se requiere el UID del usuario para consultar las transacciones.");
   }
@@ -154,32 +162,55 @@ export function escucharTransacciones(usuarioId, onActualizacion, onError) {
 
   // Consulta filtrada por usuario. Se prescinde de orderBy en servidor para evitar
   // la exigencia de índices compuestos en Firebase Console; la lista se ordena en memoria.
-  const q = query(
-    collection(db, COLECCION_TRANSACCIONES),
-    where("creadoPor", "==", usuarioId)
-  );
+  const consultas = [
+    query(collection(db, COLECCION_TRANSACCIONES), where("creadoPor", "==", usuarioId))
+  ];
 
-  return onSnapshot(
+  // Movimientos compartidos del hogar. Los filtros por hogarId y ambito son obligatorios:
+  // las reglas solo permiten leer movimientos ajenos si son COMPARTIDOS y del hogar del lector.
+  if (hogarId) {
+    consultas.push(query(
+      collection(db, COLECCION_TRANSACCIONES),
+      where("hogarId", "==", hogarId),
+      where("ambito", "==", AMBITO_TRANSACCION.COMPARTIDO)
+    ));
+  }
+
+  // Último resultado de cada consulta, por id de documento. Se unen para no duplicar
+  // los compartidos propios, que aparecen en las dos consultas. Empiezan en null para no pintar
+  // una lista a medias mientras alguna consulta aún no responde.
+  const resultados = consultas.map(() => null);
+
+  const emitir = () => {
+    if (resultados.some((mapa) => mapa === null)) return;
+    const unidas = new Map();
+    for (const mapa of resultados) {
+      for (const [id, entidad] of mapa) unidas.set(id, entidad);
+    }
+
+    // Ordenamiento cronológico descendente en memoria del cliente
+    const transacciones = [...unidas.values()].sort((a, b) => {
+      const tiempoA = a.fecha instanceof Date ? a.fecha.getTime() : new Date(a.fecha).getTime();
+      const tiempoB = b.fecha instanceof Date ? b.fecha.getTime() : new Date(b.fecha).getTime();
+      return tiempoB - tiempoA;
+    });
+
+    onActualizacion(transacciones);
+  };
+
+  const desuscripciones = consultas.map((q, indice) => onSnapshot(
     q,
     (snapshot) => {
-      const transacciones = [];
+      const mapa = new Map();
       snapshot.forEach((docItem) => {
         try {
-          const entidad = Transaccion.desdeFirestore(docItem.id, docItem.data());
-          transacciones.push(entidad);
+          mapa.set(docItem.id, Transaccion.desdeFirestore(docItem.id, docItem.data()));
         } catch (errorParseo) {
           console.warn(`[FirestoreService] Registro omitido id=${docItem.id} por datos inválidos:`, errorParseo.message);
         }
       });
-
-      // Ordenamiento cronológico descendente en memoria del cliente
-      transacciones.sort((a, b) => {
-        const tiempoA = a.fecha instanceof Date ? a.fecha.getTime() : new Date(a.fecha).getTime();
-        const tiempoB = b.fecha instanceof Date ? b.fecha.getTime() : new Date(b.fecha).getTime();
-        return tiempoB - tiempoA;
-      });
-
-      onActualizacion(transacciones);
+      resultados[indice] = mapa;
+      emitir();
     },
     (error) => {
       const mensaje = traducirErrorFirestore(error);
@@ -187,8 +218,15 @@ export function escucharTransacciones(usuarioId, onActualizacion, onError) {
       if (typeof onError === 'function') {
         onError(new Error(mensaje));
       }
+      // Si falla la consulta del hogar, el usuario igual debe ver sus propios movimientos
+      if (resultados[indice] === null) {
+        resultados[indice] = new Map();
+        emitir();
+      }
     }
-  );
+  ));
+
+  return () => desuscripciones.forEach((desuscribir) => desuscribir());
 }
 
 /**
