@@ -69,7 +69,11 @@ cuentas-claras/
 │   │   └── Transaccion.js  # Entidad Transaccion, categorías y validación defensiva
 │   ├── services/           # CAPA DE INFRAESTRUCTURA (Conexión Externa)
 │   │   ├── auth.js         # Firebase Auth (Registro, Login, Logout, Observer)
-│   │   └── firestore.js    # Firebase Firestore (Persistencia y Real-time)
+│   │   ├── firestore.js    # Firebase Firestore (Transacciones, bolsillos y Real-time)
+│   │   ├── prestamos.js    # Préstamos a terceros y abonos parciales (HU-08)
+│   │   ├── hogares.js      # Hogar compartido: crear, unirse con código y salir (HU-09)
+│   │   ├── indicadores.js  # API externa de la TRM con respaldos y tiempo límite
+│   │   └── conexion.js     # Detección de conexión online / offline (HU-07)
 │   ├── ui/                 # CAPA DE PRESENTACIÓN (Manipulación del DOM)
 │   │   ├── ui-auth.js      # Formularios de acceso y alternancia de vistas
 │   │   ├── dashboard.js    # Renderizado reactivo de tarjetas y tabla con filtros
@@ -97,7 +101,7 @@ La conexión con Firebase se realiza mediante el SDK modular v10. Para configura
 
 1. Crear un proyecto en la [Consola de Firebase](https://console.firebase.google.com/).
 2. Habilitar **Firebase Authentication** con el proveedor de **Correo electrónico / Contraseña**.
-3. Crear una base de datos **Cloud Firestore** en modo de producción o prueba con la colección `transacciones`.
+3. Crear una base de datos **Cloud Firestore** en modo de producción. Las colecciones `transacciones`, `bolsillos`, `prestamos` y `hogares` se crean solas al guardar el primer documento.
 4. Registrar una aplicación web en Firebase y verificar que las credenciales en [`src/services/auth.js`](src/services/auth.js) coincidan con el proyecto:
 
 ```javascript
@@ -110,6 +114,8 @@ export const firebaseConfig = {
   appId: "TU_APP_ID"
 };
 ```
+
+5. Publicar las reglas de seguridad: en la consola, **Firestore Database → Reglas**, pegar el contenido de [`firestore.rules`](firestore.rules) y pulsar **Publicar**. Mientras no se publiquen, la consola sigue usando las reglas anteriores y las colecciones nuevas responden `permission-denied`.
 
 ---
 
