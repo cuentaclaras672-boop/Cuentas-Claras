@@ -16,7 +16,7 @@ import {
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
 import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMontoCOP, fechaLocalISO } from "../utils/formateo.js?v=5";
-import { consultarTRM } from "../services/indicadores.js?v=4";
+import { consultarTRM } from "../services/indicadores.js?v=5";
 import { agruparGastosPorCategoria } from "../utils/estadisticas.js";
 import { mostrarToast } from "./notificaciones.js";
 import { escucharConexion, hayConexion } from "../services/conexion.js";
