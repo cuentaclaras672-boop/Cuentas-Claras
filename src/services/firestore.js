@@ -9,9 +9,7 @@
  * 3. Mapeo de Excepciones: Los errores de Firestore se traducen a mensajes comprensibles para Toasts.
  */
 
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {
-  getFirestore,
   collection,
   addDoc,
   deleteDoc,
@@ -24,16 +22,15 @@ import {
   onSnapshot,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { firebaseConfig } from "./auth.js";
+import { db, firebaseConfig } from "./firebase.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
 
 // ============================================================================
-// INICIALIZACIÓN SINGLETON DE FIRESTORE
+// RE-EXPORTACIÓN PARA COMPATIBILIDAD
 // ============================================================================
 
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const db = getFirestore(app);
+export { db, firebaseConfig };
 
 const COLECCION_TRANSACCIONES = "transacciones";
 const COLECCION_BOLSILLOS = "bolsillos";

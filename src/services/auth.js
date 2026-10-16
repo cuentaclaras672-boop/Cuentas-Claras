@@ -9,32 +9,20 @@
  * 3. Mapeo de Excepciones: Conversión de códigos técnicos de Firebase a mensajes amigables para Toast UI.
  */
 
-import { initializeApp, getApps, getApp } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-app.js";
 import {
-  getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
+import { auth, firebaseConfig } from "./firebase.js";
 
 // ============================================================================
-// CONFIGURACIÓN E INICIALIZACIÓN (Patrón Singleton)
+// RE-EXPORTACIÓN PARA COMPATIBILIDAD
 // ============================================================================
 
-export const firebaseConfig = {
-  apiKey: "AIzaSyDLVw72vEnRmrm_CRFLKlZoxsHxHtxLzk0",
-  authDomain: "bdcuentasclaras-b1814.firebaseapp.com",
-  projectId: "bdcuentasclaras-b1814",
-  storageBucket: "bdcuentasclaras-b1814.firebasestorage.app",
-  messagingSenderId: "632619284326",
-  appId: "1:632619284326:web:b08f98785f80aff4b8baa7"
-};
-
-// Garantiza una única instancia activa de Firebase App en toda la aplicación
-const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+export { auth, firebaseConfig };
 
 // ============================================================================
 // VALIDACIONES DEFENSIVAS (Reglas de Negocio Previas)
