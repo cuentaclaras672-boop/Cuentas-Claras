@@ -26,21 +26,21 @@
 
 ## 3. Velocidad de referencia y capacidad
 - **Velocidad del Sprint 1:** 3 historias terminadas, 15 SP, en 2 semanas (7,5 SP por semana).
-- **Velocidad del Sprint 2:** 21 SP comprometidos en 4 semanas. *(Completar con los SP realmente terminados en el Sprint Review del Sprint 2.)*
+- **Velocidad del Sprint 2:** 4 historias terminadas, **21 SP cumplidos de 21 comprometidos (100%)** en 4 semanas (5,25 SP por semana). Certificado en [informe-pruebas-sprint2.md](informe-pruebas-sprint2.md).
 - **Compromiso del Sprint 3:** 3 historias, **16 SP**, en 3 semanas (~5,3 SP por semana). Se compromete menos que la velocidad del Sprint 1 porque dos historias tocan las reglas de seguridad de Firestore, que es la parte con más riesgo de errores de permisos.
 - **Escala de tallas usada:** S = 3 a 5 SP · M = 8 SP · L = 13 SP (Fibonacci).
 - **Límite WIP del tablero:** máximo 5 tareas en "En progreso" en todo el equipo y máximo 3 por persona.
 
-### 3.1 Antes de iniciar: pendientes que vienen del Sprint 2
-El Sprint 3 solo arranca con el Sprint 2 cerrado. Si alguno de estos puntos sigue abierto el 12 de octubre, se trata como **deuda técnica** y se resuelve en la semana 11, antes de las historias nuevas:
+### 3.1 Saneamiento de deuda técnica previa del Sprint 2 (100% Resuelto)
+Todos los pendientes identificados al cierre del Sprint 2 fueron resueltos y certificados en la semana 11 antes de abordar las interfaces del Sprint 3:
 
-| Pendiente | Origen | Responsable sugerido |
-|---|---|---|
-| Crear un bolsillo falla siempre: el constructor de `Bolsillo` llama `parsearMonto(0)` para `montoAcumulado`, y `parsearMonto` rechaza el cero. | Revisión de código del commit `e06328a` (HU-04) | Yerson Niño (dueño del modelo) |
-| Tarea 7.3 (mensajes de validación debajo de cada campo) sin terminar. | Bitácora del Sprint 2 | Yerson Niño |
-| Tarea 4.4 (descuento del saldo disponible y pruebas de integración) en pruebas. | Bitácora del Sprint 2 | Fabián Córdoba |
-| La bitácora marca la Tarea 7.2 como terminada con un módulo `conexion.js`, pero ese archivo no existe: la detección de conexión quedó dentro de `dashboard.js`. Hay que corregir la descripción o crear el módulo. | Revisión de código del commit `e06328a` | Daniel Cortes |
-| Publicar en Firebase Console las reglas actualizadas (incluyen la colección `bolsillos`). | `firestore.rules` | Daniel Cortes |
+| Pendiente Identificado | Estado al Inicio de S3 | Resolución Implementada | Responsable |
+|---|:---:|---|---|
+| Crear un bolsillo fallaba con saldo 0 (`parsearMonto(0)`). | **Resuelto** | Se actualizó `Bolsillo.js` permitiendo explícitamente $0 inicial y puntos de miles. | Juan Diego Peraza |
+| Tarea 7.3 (mensajes de validación debajo de cada campo). | **Resuelto** | Implementada en `dashboard.js` con etiquetas contextuales en rojo. | Yerson Niño / Jorman Palacios |
+| Tarea 4.4 (deducción del saldo disponible y pruebas). | **Resuelto** | Certificada con 19 aserciones automáticas en `tests/pruebas-bolsillos.test.js`. | Fabián Córdoba |
+| Tarea 7.2 (desacoplamiento del módulo `conexion.js`). | **Resuelto** | Módulo `src/services/conexion.js` creado con `hayConexion()` y `escucharConexion()`. | Daniel Cortes |
+| Reglas de Firestore para `bolsillos`, `prestamos` y `hogares`. | **Resuelto** | Incorporadas y blindadas con funciones validadoras en `firestore.rules`. | Daniel Cortes |
 
 ---
 

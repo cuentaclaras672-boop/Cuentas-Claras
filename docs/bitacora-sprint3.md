@@ -11,9 +11,9 @@ Historias comprometidas en el Sprint 3. La columna de estado se actualiza a medi
 
 | Historia de Usuario | Condición técnica que refuerza | Story Points | Columna en Tablero |
 |---|---|:---:|:---:|
-| **HU-08: Préstamos a terceros con abonos parciales** | #1 (Persistencia) y #4 (Filtrado) | 8 SP | Por Hacer |
-| **HU-09: Hogar compartido entre convivientes** | #2 (Control de acceso) | 5 SP | Por Hacer |
-| **HU-10: Gráfica de gastos por categoría** | #4 (Filtrado) | 3 SP | Por Hacer |
+| **HU-08: Préstamos a terceros con abonos parciales** | #1 (Persistencia) y #4 (Filtrado) | 8 SP | En Desarrollo (WIP · Backend, Modelo y QA listos) |
+| **HU-09: Hogar compartido entre convivientes** | #2 (Control de acceso) | 5 SP | En Desarrollo (WIP · Backend, Modelo y QA listos) |
+| **HU-10: Gráfica de gastos por categoría** | #4 (Filtrado) | 3 SP | **Terminado (Done - S3)** |
 
 ---
 
@@ -41,11 +41,11 @@ Total de tareas del sprint: **11**. Se mide al cierre de cada semana (sábado). 
 | Semana | Corte | Ideal (restantes) | Planificado (restantes) | Real (restantes) |
 |:---:|:---:|:---:|:---:|:---:|
 | Inicio | 12 oct | 11 | 11 | 11 |
-| 11 | 17 oct | 7,3 | 10 | 4 |
+| 11 | 17 oct | 7,3 | 10 | 2 |
 | 12 | 24 oct | 3,7 | 5 | |
 | 13 | 31 oct | 0 | 0 | |
 
-> Avance favorable en la semana 11 tras la finalización y certificación temprana de los servicios de backend y suites de pruebas automatizadas por el Scrum Master.
+> Avance sobresaliente en la semana 11 tras la finalización y certificación temprana de los modelos de dominio (`Prestamo.js`, `Hogar.js`), servicios de persistencia, reglas de seguridad y suite completa de pruebas QA (9 tareas concluidas de 11). Quedan 2 tareas de interfaz asignadas a Jorman Palacios para las semanas 12 y 13.
 
 ### 1.3 Velocidad
 | Sprint | Duración | Historias terminadas | SP terminados |
@@ -63,6 +63,12 @@ Total de tareas del sprint: **11**. Se mide al cierre de cada semana (sábado). 
 - **Ayer:** Consolidación del cierre del Sprint 2 con el 100% de los 21 SP aprobados. Despliegue de servicios `prestamos.js` y `hogares.js` con reglas atómicas por Daniel Cortes y gráfica de categorías por Juan Diego Peraza.
 - **Hoy:** Ejecución de suites de pruebas de aseguramiento de calidad QA (Tareas 8.4, 9.4 y 10.3). Verificación de abonos atómicos, prueba negativa de aislamiento con tercera cuenta externa y reactividad de gráfica ante filtros.
 - **Impedimentos:** Ninguno. Cobertura de pruebas al 100% en `tests/runner.js` sin errores de consola.
+
+### Daily — 16 de Octubre de 2026 (Semana 11)
+- **Facilitador:** Fabián Córdoba (Scrum Master).
+- **Ayer:** Formalización de los modelos de dominio `Prestamo.js` y `Hogar.js` en `src/models/` y desacoplamiento de dependencias de red en la suite de pruebas unitarias.
+- **Hoy:** Coordinación del equipo de desarrollo frontend para la construcción de la Tarea 8.3 (UI de tarjetas de préstamos y modal de abonos) y Tarea 9.3 (pantalla de gestión de hogar con código de invitación de 6 caracteres) por Jorman Palacios. Sincronización con Yerson Niño para el registro de sus commits individuales de modelado de dominio.
+- **Impedimentos:** Recordatorio al equipo para publicar `firestore.rules` en Firebase Console previo a conectar las pantallas interactivas.
 
 ---
 

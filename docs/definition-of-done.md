@@ -51,8 +51,10 @@ Para que una Historia de Usuario, funcionalidad o tarea se considere **TERMINADA
 
 ### 2.5 Pruebas y Verificación en Vivo
 - [x] **Cero Errores de Consola:** La aplicación corre localmente en el navegador (`Live Server` o servidor HTTP) sin ningún error ni advertencia en DevTools (F12 en ceros).
-- [x] **Criterios de Aceptación 100% Verificados:** Cada criterio de aceptación de la historia fue probado manualmente por el Scrum Master o encargado de QA.
+- [x] **Criterios de Aceptación 100% Verificados:** Cada criterio de aceptación de la historia fue probado y certificado por el Scrum Master / QA Lead.
+- [x] **Suite Automatizada de Pruebas (QA):** Ejecución exitosa de `node tests/runner.js` certificando las suites de pruebas unitarias, de integración y seguridad con tasa de éxito del 100% (registrada en los informes de pruebas en `docs/`).
 
-### 2.6 Control de Versiones (Git y GitHub)
-- [x] **Commits Semánticos:** Registro de cambios con prefijos convencionales (`feat:`, `fix:`, `docs:`, `refactor:`) en la rama `main`.
-- [x] **Trazabilidad de Autoría:** Commits distribuidos en el tiempo evidenciando la contribución individual de los integrantes del equipo.
+### 2.6 Control de Versiones y Seguridad en Servidor (Git y Firebase)
+- [x] **Commits Semánticos:** Registro de cambios con prefijos convencionales (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`) en la rama `main`.
+- [x] **Trazabilidad de Autoría:** Commits distribuidos en el tiempo evidenciando la contribución individual identificable de los integrantes del equipo.
+- [x] **Publicación de Reglas en Servidor:** Toda actualización de seguridad en `firestore.rules` debe publicarse en Firebase Console para garantizar el aislamiento efectivo en la base de datos real.
