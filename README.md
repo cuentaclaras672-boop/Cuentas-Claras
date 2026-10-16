@@ -27,30 +27,38 @@ Aprendimos que el principal detonante de los problemas no es la falta de ingreso
 
 ---
 
-## 📋 4. Product Backlog Inicial
+## 📋 4. Product Backlog y Estado de Historias de Usuario (Scrum)
 
-Ordenado por prioridad. Lo primero es lo que bloquea a lo demás: sin login no se pueden separar los datos de cada persona, y sin movimientos registrados no hay saldo que mostrar.
+El backlog del producto se encuentra organizado, estimado en Story Points (escala Fibonacci) y clasificado por valor y dependencia técnica:
 
-| Prioridad | Feature | Por qué va en ese lugar | Sprint |
-|:---:|---|---|:---:|
-| 1 | **Control de acceso seguro:** autenticación para que solo los miembros autorizados vean y gestionen la información. | Bloquea todo lo demás; cada dato depende de quién lo creó. | 1 |
-| 2 | **Dashboard centralizado:** registro de ingresos y gastos, saldo consolidado del hogar, balance neto e ingresos vs. gastos. | Es lo mínimo que resuelve el problema de "cuánto dinero tenemos". | 1 |
-| 3 | **Cajas / Bolsillos:** separar fondos con propósito fijo (citas, bebé, viajes, emergencias). | Es la necesidad principal que vimos en las parejas, pero necesita el registro de movimientos. | 2 |
-| 4 | **Préstamos informales:** control del estado de deudas y préstamos a amigos o familiares. | Aporta valor, pero es un caso menos frecuente que los gastos del día a día. | 3 |
+| ID | Historia de Usuario | Story Points | Condición Técnica Vinculada | Sprint | Estado de Entrega |
+|:---:|---|:---:|:---:|:---:|:---:|
+| **HU-01** | **Autenticación y Control de Acceso:** registro e inicio de sesión seguro con Firebase Auth. | 5 SP | Condición #2 (Control de Acceso) | 1 | ✅ **Terminado (Done - S1)** |
+| **HU-02** | **Registro de Transacciones:** persistencia NoSQL de ingresos/gastos personales y compartidos. | 5 SP | Condición #1 (Persistencia Real) | 1 | ✅ **Terminado (Done - S1)** |
+| **HU-03** | **Dashboard de Saldo Líquido:** balance neto consolidado e ingresos vs. gastos en tiempo real. | 5 SP | Product Goal (Valor Núcleo) | 1 | ✅ **Terminado (Done - S1)** |
+| **HU-04** | **Bolsillos de Ahorro con Metas:** separación de fondos con barra de progreso y deducción de saldo. | 8 SP | Condición #1 (Persistencia Real) | 2 | ✅ **Terminado (Done - S2)** |
+| **HU-05** | **Historial y Búsqueda Avanzada:** filtros combinados por texto, categoría, tipo, ámbito y fechas. | 5 SP | Condición #4 (Filtrado y Búsqueda) | 2 | ✅ **Terminado (Done - S2)** |
+| **HU-06** | **Integración Externa TRM y Divisas:** consumo de API pública con respaldo y conversión COP/USD. | 5 SP | Condición #3 (API Externa) | 2 | ✅ **Terminado (Done - S2)** |
+| **HU-07** | **Resiliencia y Avisos Offline:** banner de desconexión, validaciones por campo y Toasts contextuales. | 3 SP | Condición #5 (Manejo de Errores) | 2 | ✅ **Terminado (Done - S2)** |
+| **HU-08** | **Préstamos a Terceros con Abonos:** seguimiento de cuentas por cobrar y abonos atómicos. | 8 SP | Refuerzo #1 y #4 | 3 | 🟡 **En Desarrollo (Backend y QA Done)** |
+| **HU-09** | **Hogar Compartido entre Convivientes:** código de 6 letras y aislamiento estricto de datos. | 5 SP | Refuerzo #2 (Seguridad RBAC) | 3 | 🟡 **En Desarrollo (Backend y QA Done)** |
+| **HU-10** | **Gráfica de Gastos por Categoría:** visualización de barras horizontales nativas en Tailwind CSS. | 3 SP | Refuerzo #4 (Filtrado y Agrupación) | 3 | ✅ **Terminado (Done - S3)** |
+
+> El detalle de criterios de aceptación, Definition of Ready (DoR) y Definition of Done (DoD) de cada historia se encuentra documentado en [docs/acta-planning-sprint2.md](docs/acta-planning-sprint2.md) y [docs/acta-planning-sprint3.md](docs/acta-planning-sprint3.md).
 
 ---
 
 ## 🛠️ 5. Cumplimiento de las Siete Condiciones Técnicas
 
-| # | Condición Técnica | Implementación en Cuentas Claras | Módulo Responsable |
-|---|---|---|---|
-| **1** | **Persistencia Real** | Almacenamiento persistente en base de datos NoSQL Cloud Firestore. Prohibido el uso de memoria volátil o `localStorage` para balances financieros. Operaciones CRUD y sincronización en tiempo real (`onSnapshot`). | [`src/services/firestore.js`](src/services/firestore.js) |
-| **2** | **Sesión o Control de Acceso** | Autenticación basada en Firebase Authentication SDK v10 (email y contraseña), asegurando la privacidad y el aislamiento de datos por usuario y hogar. | [`src/services/auth.js`](src/services/auth.js) |
-| **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar en tiempo real) para fundamentar decisiones de ahorro en el hogar. | [`src/services/indicadores.js`](src/services/indicadores.js) |
-| **4** | **Consulta con Filtrado** | Historial dinámico e interactivo de movimientos con capacidad de filtrado por ámbito (Personal / Compartido), tipo (Ingreso / Gasto) y categoría. | [`src/ui/dashboard.js`](src/ui/dashboard.js) |
-| **5** | **Manejo de Errores Visible** | Captura defensiva de fallos de red, validaciones y base de datos con `try/catch`, proyectados en pantalla mediante notificaciones flotantes contextuales (Toasts). El usuario nunca experimenta pantallas en blanco. | [`src/ui/notificaciones.js`](src/ui/notificaciones.js) |
-| **6** | **Repositorio de Código** | Repositorio formal en GitHub con trazabilidad de commits semánticos, ramas por funcionalidad y contribuciones individuales del equipo. | Control de versiones Git / GitHub |
-| **7** | **Documentación Técnica** | Documentación exhaustiva en `README.md` junto con los artefactos de gestión ágil en la carpeta `docs/` (`acta-planning.md`, `definition-of-done.md`, `sprint-goals.md`). | [`README.md`](README.md) y [`docs/`](docs/) |
+| # | Condición Técnica | Implementación en Cuentas Claras | Módulos Responsables | Verificación Automatizada |
+|---|---|---|---|---|
+| **1** | **Persistencia Real** | Almacenamiento persistente en Cloud Firestore para transacciones, bolsillos y préstamos. Prohibido `localStorage` para balances. Sincronización en tiempo real (`onSnapshot`) y transacciones atómicas (`runTransaction`). | [`src/services/firestore.js`](src/services/firestore.js)<br>[`src/services/prestamos.js`](src/services/prestamos.js) | [`tests/pruebas-bolsillos.test.js`](tests/pruebas-bolsillos.test.js)<br>[`tests/pruebas-prestamos.test.js`](tests/pruebas-prestamos.test.js) |
+| **2** | **Sesión o Control de Acceso** | Autenticación con Firebase Auth SDK v10 (email y contraseña), aislamiento estricto por UID y privacidad de movimientos compartidos en el hogar mediante reglas de backend en `firestore.rules`. | [`src/services/auth.js`](src/services/auth.js)<br>[`src/services/hogares.js`](src/services/hogares.js)<br>[`firestore.rules`](firestore.rules) | [`tests/pruebas-hogares.test.js`](tests/pruebas-hogares.test.js) (Pruebas de aislamiento y prueba negativa) |
+| **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar oficial) con estrategia de failover (3 endpoints), timeout de 5 s y fallback referencial offline. | [`src/services/indicadores.js`](src/services/indicadores.js) | [`tests/pruebas-indicadores.test.js`](tests/pruebas-indicadores.test.js) (Simulación de caída de red) |
+| **4** | **Consulta con Filtrado** | Historial interactivo con búsqueda en tiempo real insensible a tildes, filtros combinados por ámbito, tipo, categoría y rango de fechas, más gráfica de gastos reactiva a los filtros. | [`src/ui/dashboard.js`](src/ui/dashboard.js)<br>[`src/utils/estadisticas.js`](src/utils/estadisticas.js) | [`tests/pruebas-filtros.test.js`](tests/pruebas-filtros.test.js)<br>[`tests/pruebas-grafica.test.js`](tests/pruebas-grafica.test.js) |
+| **5** | **Manejo de Errores Visible** | Captura defensiva de fallos con `try/catch`, proyectados en pantalla mediante notificaciones flotantes contextuales (Toasts), validaciones en rojo por campo y banner persistente ante pérdida de conexión a Internet. | [`src/ui/notificaciones.js`](src/ui/notificaciones.js)<br>[`src/services/conexion.js`](src/services/conexion.js) | [`tests/pruebas-conexion.test.js`](tests/pruebas-conexion.test.js) (Simulación de modo offline y campos vacíos) |
+| **6** | **Repositorio de Código** | Repositorio formal en GitHub con trazabilidad de commits semánticos, ramas de trabajo, contribuciones individuales y suite de pruebas automatizadas con ejecutor maestro (`tests/runner.js`). | Control de versiones Git / GitHub | [`tests/runner.js`](tests/runner.js) (7 suites · 100% PASS) |
+| **7** | **Documentación Técnica** | Documentación exhaustiva en `README.md` junto con los artefactos formales de gestión ágil en la carpeta `docs/` (Actas de Planning, Bitácoras de seguimiento, Dailies, DoD/DoR, Registro de IA e Informes de QA). | [`README.md`](README.md)<br>[`docs/`](docs/) | [`docs/informe-pruebas-sprint2.md`](docs/informe-pruebas-sprint2.md)<br>[`docs/informe-pruebas-sprint3.md`](docs/informe-pruebas-sprint3.md) |
 
 ---
 
