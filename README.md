@@ -79,7 +79,8 @@ cuentas-claras/
 │   │   ├── Prestamo.js     # Entidad Prestamo con abonos parciales (HU-08)
 │   │   └── Hogar.js        # Entidad Hogar y membresía de convivientes (HU-09)
 │   ├── services/           # CAPA DE INFRAESTRUCTURA (Conexión Externa)
-│   │   ├── firebase.js     # Configuración e inicialización centralizada de Firebase SDK
+│   │   ├── firebase.js     # Inicialización Singleton de Firebase SDK (App, Auth, Firestore)
+│   │   ├── firebase-config.example.js # Plantilla de credenciales de conexión (ignorado en .gitignore)
 │   │   ├── auth.js         # Firebase Auth (Registro, Login, Logout, Observer)
 │   │   ├── firestore.js    # Firebase Firestore (Transacciones, bolsillos y Real-time)
 │   │   ├── prestamos.js    # Préstamos a terceros y abonos parciales (HU-08)
@@ -114,6 +115,7 @@ cuentas-claras/
 │   ├── pruebas-prestamos.test.js # Pruebas Tarea 8.4 (HU-08)
 │   ├── pruebas-hogares.test.js   # Pruebas Tarea 9.4 (HU-09)
 │   └── pruebas-grafica.test.js   # Pruebas Tarea 10.3 (HU-10)
+├── .gitignore              # Exclusiones de Git (node_modules, .env, credenciales locales)
 └── README.md               # Documentación general del proyecto
 ```
 
@@ -126,7 +128,7 @@ La conexión con Firebase se realiza mediante el SDK modular v10. Para configura
 1. Crear un proyecto en la [Consola de Firebase](https://console.firebase.google.com/).
 2. Habilitar **Firebase Authentication** con el proveedor de **Correo electrónico / Contraseña**.
 3. Crear una base de datos **Cloud Firestore** en modo de producción. Las colecciones `transacciones`, `bolsillos`, `prestamos` y `hogares` se crean solas al guardar el primer documento.
-4. Registrar una aplicación web en Firebase y verificar que las credenciales en [`src/services/firebase.js`](src/services/firebase.js) coincidan con el proyecto:
+4. Duplicar la plantilla [`src/services/firebase-config.example.js`](src/services/firebase-config.example.js) como `src/services/firebase-config.js` (archivo protegido y excluido en `.gitignore`) e ingresar las credenciales suministradas internamente por el equipo:
 
 ```javascript
 export const firebaseConfig = {
