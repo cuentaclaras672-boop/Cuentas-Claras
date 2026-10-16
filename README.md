@@ -66,7 +66,10 @@ cuentas-claras/
 │   └── assets/             # Recursos multimedia e iconografía
 ├── src/                    # Código Fuente Modular (ES6+ Modules)
 │   ├── models/             # CAPA DE DOMINIO
-│   │   └── Transaccion.js  # Entidad Transaccion, categorías y validación defensiva
+│   │   ├── Transaccion.js  # Entidad Transaccion, categorías y validación defensiva
+│   │   ├── Bolsillo.js     # Entidad Bolsillo con metas de ahorro (HU-04)
+│   │   ├── Prestamo.js     # Entidad Prestamo con abonos parciales (HU-08)
+│   │   └── Hogar.js        # Entidad Hogar y membresía de convivientes (HU-09)
 │   ├── services/           # CAPA DE INFRAESTRUCTURA (Conexión Externa)
 │   │   ├── auth.js         # Firebase Auth (Registro, Login, Logout, Observer)
 │   │   ├── firestore.js    # Firebase Firestore (Transacciones, bolsillos y Real-time)
@@ -79,7 +82,8 @@ cuentas-claras/
 │   │   ├── dashboard.js    # Renderizado reactivo de tarjetas y tabla con filtros
 │   │   └── notificaciones.js # Notificaciones flotantes (Toasts) para errores visibles
 │   ├── utils/              # CAPA TRANSVERSAL
-│   │   └── formateo.js     # Formato de divisa (COP), fechas y parseo seguro
+│   │   ├── formateo.js     # Formato de divisa (COP), fechas y parseo seguro
+│   │   └── estadisticas.js # Agregación de gastos y cálculo de porcentajes (HU-10)
 │   └── app.js              # Orquestador del ciclo de vida de la aplicación
 ├── docs/                   # Documentación de Gestión Ágil (Scrum)
 │   ├── acta-planning.md    # Acta de Planning y Backlog Sprint 1
@@ -88,8 +92,19 @@ cuentas-claras/
 │   ├── bitacora-sprint1.md # Bitácora de seguimiento y Dailies Sprint 1
 │   ├── bitacora-sprint2.md # Bitácora de seguimiento y Dailies Sprint 2
 │   ├── bitacora-sprint3.md # Bitácora de seguimiento y Dailies Sprint 3
+│   ├── informe-pruebas-sprint2.md # Certificación formal de pruebas QA Sprint 2
+│   ├── informe-pruebas-sprint3.md # Certificación formal de pruebas QA Sprint 3
 │   ├── definition-of-done.md # Criterios de calidad Definition of Done (DoD) y DoR
 │   └── sprint-goals.md     # Metas consolidadas de los Sprints
+├── tests/                  # SUITE AUTOMATIZADA DE PRUEBAS DE CALIDAD (QA)
+│   ├── runner.js           # Orquestador maestro de pruebas (100% PASS)
+│   ├── pruebas-bolsillos.test.js # Pruebas Tarea 4.4 (HU-04)
+│   ├── pruebas-filtros.test.js   # Pruebas Tarea 5.4 (HU-05)
+│   ├── pruebas-indicadores.test.js # Pruebas Tarea 6.4 (HU-06)
+│   ├── pruebas-conexion.test.js  # Pruebas Tarea 7.4 (HU-07)
+│   ├── pruebas-prestamos.test.js # Pruebas Tarea 8.4 (HU-08)
+│   ├── pruebas-hogares.test.js   # Pruebas Tarea 9.4 (HU-09)
+│   └── pruebas-grafica.test.js   # Pruebas Tarea 10.3 (HU-10)
 └── README.md               # Documentación general del proyecto
 ```
 
@@ -138,6 +153,13 @@ Acceder a: `http://localhost:3000/public/index.html`
 python -m http.server 8000
 ```
 Acceder a: `http://localhost:8000/public/index.html`
+
+### Ejecución de Pruebas Automatizadas (QA)
+Para ejecutar la suite integral de pruebas unitarias, de integración y de seguridad:
+```bash
+node tests/runner.js
+```
+Ejecuta las 7 suites automatizadas de los Sprints 2 y 3, verificando el 100% de los criterios de aceptación (CA) sin dependencias externas.
 
 > [!IMPORTANT]
 > **Condición de Entrada a la Sustentación (Lineamientos de la Asignatura):** El software debe correr localmente y sin errores de consola. De lo contrario, de acuerdo con la normativa innegociable de la cátedra TIC42695, la sustentación no se califica.

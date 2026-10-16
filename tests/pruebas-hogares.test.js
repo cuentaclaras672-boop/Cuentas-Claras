@@ -6,6 +6,7 @@
  */
 
 import assert from "node:assert/strict";
+import { Hogar, MAX_MIEMBROS_HOGAR } from "../src/models/Hogar.js";
 
 const CARACTERES_CODIGO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -124,6 +125,29 @@ class SimuladorFirestoreHogares {
 
 export function ejecutarPruebasHogares() {
   console.log("▶ Ejecutando pruebas de Tarea 9.4 (Hogar compartido, privacidad y prueba negativa)...");
+
+  // Verificación unitaria de la clase de dominio Hogar (Tarea 9.1)
+  const codigoModelo = Hogar.generarCodigo();
+  assert.equal(codigoModelo.length, 6);
+  assert.throws(() => new Hogar({ nombre: "Ho", codigo: codigoModelo, creadoPor: "u1" }), /entre 3 y 40 caracteres/);
+  const hogarEntidad = new Hogar({
+    nombre: "Hogar Familia",
+    codigo: codigoModelo,
+    miembros: ["u1"],
+    nombres: { u1: "Ana" },
+    creadoPor: "u1"
+  });
+  assert.equal(hogarEntidad.esMiembro("u1"), true);
+  hogarEntidad.agregarMiembro("u2", "Pedro");
+  assert.equal(hogarEntidad.esMiembro("u2"), true);
+  assert.equal(hogarEntidad.obtenerNombreMiembro("u2"), "Pedro");
+  hogarEntidad.removerMiembro("u2");
+  assert.equal(hogarEntidad.esMiembro("u2"), false);
+
+  const payloadHogar = hogarEntidad.aFirestore();
+  assert.equal(payloadHogar.nombre, "Hogar Familia");
+  const desdeDoc = Hogar.desdeFirestore(codigoModelo, payloadHogar);
+  assert.equal(desdeDoc.codigo, codigoModelo);
 
   const fs = new SimuladorFirestoreHogares();
 
