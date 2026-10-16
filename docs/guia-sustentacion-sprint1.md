@@ -34,9 +34,9 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 
 #### • Tarea 1.1: Configurar credenciales y SDK Firebase
 - **Responsable:** Juan Diego Peraza (18 ago - 21 ago).
-- **¿Qué se hizo?**: Se configuró el objeto `firebaseConfig` con las credenciales del proyecto de Google Cloud (`bdcuentasclaras-b1814`) y se importó el SDK modular v10 oficial mediante CDN sin necesidad de empaquetadores pesados.
-- **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (busca `firebaseConfig` y `getApps()`).
-- **Cómo defenderlo:** *"Se implementó un patrón Singleton usando `getApps().length` para garantizar que la conexión con Firebase se instancie una sola vez en toda la aplicación"*.
+- **¿Qué se hizo?**: Se configuró la conexión oficial con el SDK modular v10 de Firebase mediante CDN. Para garantizar seguridad y mantenibilidad, la inicialización de `app`, `auth` y `db` se centralizó bajo patrón Singleton en [`src/services/firebase.js`](../src/services/firebase.js), mientras que las credenciales activas se desacoplaron en `src/services/firebase-config.js` (protegido en `.gitignore`) con una plantilla de ejemplo versionada en [`src/services/firebase-config.example.js`](../src/services/firebase-config.example.js).
+- **¿Dónde está?**: En [`src/services/firebase.js`](../src/services/firebase.js) y [`src/services/firebase-config.example.js`](../src/services/firebase-config.example.js).
+- **Cómo defenderlo:** *"Se implementó un patrón Singleton usando `getApps().length` para garantizar que la conexión con Firebase se instancie una sola vez en toda la aplicación, y se desacopló la configuración de credenciales del código de infraestructura siguiendo principios de Clean Architecture y seguridad defensiva"*.
 
 #### • Tarea 1.2: Diseñar formulario visual de Login en HTML/Tailwind
 - **Responsable:** Juan Diego Peraza (20 ago - 23 ago).
@@ -195,3 +195,9 @@ En la sustentación, el docente te dará **15 a 20 minutos** para modificar algo
 
 3. **¿Cómo garantizan que la interfaz no se congele ante un error de red?**
    - *Respuesta:* *"Todos los llamados de red en `src/services/` están protegidos con bloques `try/catch`. Si la red falla o Firebase rechaza una operación, la promesa rechazada es interceptada y enviada a `src/ui/notificaciones.js`, la cual renderiza un Toast emergente flotante con el motivo del fallo, cumpliendo con la regla de manejo visible de errores."*
+
+4. **¿Por qué el `apiKey` de Firebase está en el cliente web y cómo se protege la base de datos contra accesos no autorizados?**
+   - *Respuesta:* *"En la arquitectura web de Firebase, el `apiKey` no es una clave privada administrativa ni una contraseña de servidor; es únicamente un identificador público del proyecto en Google Cloud para enrutar el tráfico. La seguridad real y el aislamiento de datos residen en las Reglas de Seguridad en el servidor (`firestore.rules`). Ningún usuario puede consultar, insertar, modificar o borrar documentos a menos que su token JWT esté autenticado (`request.auth.uid`) y coincida con las condiciones de negocio del recurso. Si un atacante intentara conectarse con el API key directamente, Firestore rechaza cualquier operación no autorizada con `permission-denied`."*
+
+5. **¿Qué ocurre si al crear un bolsillo o préstamo aparece el error 'Acceso denegado'?**
+   - *Respuesta:* *"Ese error indica que la consola de Firestore aún no tiene publicadas las reglas correspondientes a esas nuevas colecciones. La solución consiste en copiar el archivo `firestore.rules` del proyecto en la consola de Firebase (Firestore Database → Reglas) y presionar 'Publicar' para que el servidor aplique las políticas de validación para `bolsillos`, `prestamos` y `hogares`."*
