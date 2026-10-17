@@ -40,11 +40,22 @@ El backlog del producto se encuentra organizado, estimado en Story Points (escal
 | **HU-05** | **Historial y Búsqueda Avanzada:** filtros combinados por texto, categoría, tipo, ámbito y fechas. | 5 SP | Condición #4 (Filtrado y Búsqueda) | 2 | ✅ **Terminado (Done - S2)** |
 | **HU-06** | **Integración Externa TRM y Divisas:** consumo de API pública con respaldo y conversión COP/USD. | 5 SP | Condición #3 (API Externa) | 2 | ✅ **Terminado (Done - S2)** |
 | **HU-07** | **Resiliencia y Avisos Offline:** banner de desconexión, validaciones por campo y Toasts contextuales. | 3 SP | Condición #5 (Manejo de Errores) | 2 | ✅ **Terminado (Done - S2)** |
-| **HU-08** | **Préstamos a Terceros con Abonos:** seguimiento de cuentas por cobrar y abonos atómicos. | 8 SP | Refuerzo #1 y #4 | 3 | 🟡 **En Desarrollo (Backend y QA Done)** |
-| **HU-09** | **Hogar Compartido entre Convivientes:** código de 6 letras y aislamiento estricto de datos. | 5 SP | Refuerzo #2 (Seguridad RBAC) | 3 | 🟡 **En Desarrollo (Backend y QA Done)** |
+| **HU-08** | **Préstamos a Terceros con Abonos:** seguimiento de cuentas por cobrar y abonos atómicos. | 8 SP | Refuerzo #1 y #4 | 3 | ✅ **Terminado (Done - S3)** |
+| **HU-09** | **Hogar Compartido entre Convivientes:** código de 6 letras y aislamiento estricto de datos. | 5 SP | Refuerzo #2 (Seguridad RBAC) | 3 | ✅ **Terminado (Done - S3)** |
 | **HU-10** | **Gráfica de Gastos por Categoría:** visualización de barras horizontales nativas en Tailwind CSS. | 3 SP | Refuerzo #4 (Filtrado y Agrupación) | 3 | ✅ **Terminado (Done - S3)** |
 
-> El detalle de criterios de aceptación, Definition of Ready (DoR) y Definition of Done (DoD) de cada historia se encuentra documentado en [docs/acta-planning-sprint2.md](docs/acta-planning-sprint2.md) y [docs/acta-planning-sprint3.md](docs/acta-planning-sprint3.md).
+> **Total acumulado de velocidad:** 52 Story Points completados de 52 comprometidos (100% efectividad).
+
+### 📅 Cronograma Oficial de Sprints (Docente: Vilma Yenny Bohórquez)
+
+| Sprint | Fechas Inicio - Fin | Hito Académico Oficial | Estado |
+|:---:|:---:|---|:---:|
+| **Sprint 1** | 05/09/2026 – 18/09/2026 | Sustentación de Resultados Sprint 1 | ✅ **100% Finalizado (15 SP)** |
+| **Sprint 2** | 19/09/2026 – 02/10/2026 | Daily en vivo (26/09) · Sustentación Sprint 2 (03/10) | ✅ **100% Finalizado (21 SP)** |
+| **Sprint 3** | 03/10/2026 – 16/10/2026 | Receso (05-12 oct) · **PARCIAL Corte II, Review, Sustentación y Retro (17/10)** | ✅ **100% Finalizado (16 SP)** |
+| **Sprint 4** | 17/10/2026 – 30/10/2026 | Refinamiento y ejecución de funcionalidades avanzadas | 🚀 **En Arranque** |
+| **Sprint 5** | 31/10/2026 – 13/11/2026 | Auditoría de seguridad y pruebas de carga | ⏳ Planificado |
+| **Sprint 6** | 14/11/2026 – 27/11/2026 | **Parcial Corte III y Sustentación Final (21/11/2026)** | ⏳ Planificado |
 
 ---
 
@@ -99,13 +110,15 @@ cuentas-claras/
 │   ├── acta-planning.md    # Acta de Planning y Backlog Sprint 1
 │   ├── acta-planning-sprint2.md # Acta de Planning y Backlog Sprint 2
 │   ├── acta-planning-sprint3.md # Acta de Planning y Backlog Sprint 3
+│   ├── acta-review-sprint2.md   # Acta formal de Sprint Review Sprint 2 (03/10/2026)
+│   ├── acta-review-sprint3.md   # Acta formal de Sprint Review Sprint 3 (17/10/2026)
 │   ├── bitacora-sprint1.md # Bitácora de seguimiento y Dailies Sprint 1
 │   ├── bitacora-sprint2.md # Bitácora de seguimiento y Dailies Sprint 2
 │   ├── bitacora-sprint3.md # Bitácora de seguimiento y Dailies Sprint 3
 │   ├── informe-pruebas-sprint2.md # Certificación formal de pruebas QA Sprint 2
 │   ├── informe-pruebas-sprint3.md # Certificación formal de pruebas QA Sprint 3
 │   ├── definition-of-done.md # Criterios de calidad Definition of Done (DoD) y DoR
-│   └── sprint-goals.md     # Metas consolidadas de los Sprints
+│   └── sprint-goals.md     # Metas consolidadas y cronograma oficial de los Sprints
 ├── tests/                  # SUITE AUTOMATIZADA DE PRUEBAS DE CALIDAD (QA)
 │   ├── runner.js           # Orquestador maestro de pruebas (100% PASS)
 │   ├── pruebas-bolsillos.test.js # Pruebas Tarea 4.4 (HU-04)

@@ -1,9 +1,9 @@
 # Acta de Sprint Planning — Sprint 2
 **Proyecto:** Cuentas Claras — Gestión de Finanzas Compartidas en el Hogar  
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
-**Fecha del Planning:** 7 de septiembre de 2026  
-**Duración del Sprint:** 4 semanas (semanas 6 a 9, del 7 de septiembre al 3 de octubre de 2026)  
-**Cierre:** Sustentación 2 (10 de octubre de 2026, Grupo 2 - sábado). La semana 10 se usa para pruebas finales.  
+**Fecha del Planning:** 19 de septiembre de 2026  
+**Duración del Sprint:** 2 semanas (19 de septiembre al 02 de octubre de 2026)  
+**Hitos del Sprint:** Daily en vivo el 26 de septiembre de 2026 · Sustentación de Resultados el 03 de octubre de 2026.  
 
 ---
 
@@ -25,8 +25,8 @@
 ---
 
 ## 3. Velocidad de referencia y capacidad
-- **Velocidad del Sprint 1:** 3 historias terminadas, 15 SP, en un sprint de 2 semanas.
-- **Compromiso del Sprint 2:** 4 historias, **21 SP**, en un sprint de 4 semanas. Es menos del doble de la velocidad del Sprint 1, porque la HU-04 es la primera historia talla M y trae más incertidumbre.
+- **Velocidad del Sprint 1:** 3 historias terminadas, 15 SP, en un sprint de 2 semanas (05/09 al 18/09).
+- **Compromiso del Sprint 2:** 4 historias, **21 SP**, en un sprint de 2 semanas intensivas (19/09 al 02/10).
 - **Escala de tallas usada:** S = 3 a 5 SP · M = 8 SP · L = 13 SP (Fibonacci).
 - **Límite WIP del tablero:** máximo 5 tareas en "En progreso" en todo el equipo y máximo 3 por persona.
 

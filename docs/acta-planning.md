@@ -2,8 +2,8 @@
 **Proyecto:** Cuentas Claras — Gestión de Finanzas Compartidas en el Hogar  
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
 **Metodología:** Scrum / Ágil  
-**Duración del Sprint:** 2 semanas (semanas 3 y 4, del 17 al 29 de agosto de 2026). La semana 5 (31 ago - 5 sep) se usó para pruebas finales antes de la sustentación.  
-**Cierre y Aprobación:** Sustentación 1 (5 de septiembre de 2026, Grupo 2 - sábado)  
+**Duración del Sprint:** 2 semanas (05 de septiembre al 18 de septiembre de 2026)  
+**Cierre y Aprobación:** Sustentación de Resultados de Sprint 1 (18 de septiembre de 2026)  
 
 ---
 

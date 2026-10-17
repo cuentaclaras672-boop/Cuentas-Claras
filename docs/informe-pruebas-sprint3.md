@@ -2,7 +2,7 @@
 **Proyecto:** Cuentas Claras — Finanzas Compartidas en el Hogar  
 **Asignatura:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
 **Responsable de Calidad y Scrum Master:** Fabián Eduardo Córdoba (`cuentaclaras672@gmail.com`)  
-**Fecha de Emisión:** 15 de octubre de 2026 (Semana 11 · Sprint 3)  
+**Fecha de Emisión:** 16 de octubre de 2026 (Cierre de Sprint 3 · Sesión de Parcial Corte II y Review del 17/10/2026)  
 **Estado General:** ✅ **SUITES DE QA COMPLETADAS Y CERTIFICADAS (100% PASS)**
 
 ---

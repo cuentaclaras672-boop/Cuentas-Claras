@@ -1,9 +1,9 @@
 # Acta de Sprint Planning — Sprint 3
 **Proyecto:** Cuentas Claras — Gestión de Finanzas Compartidas en el Hogar  
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
-**Fecha del Planning:** 12 de octubre de 2026  
-**Duración del Sprint:** 3 semanas (semanas 11 a 13, del 12 al 31 de octubre de 2026)  
-**Cierre:** Sprint Review y Retrospectiva internos (31 de octubre de 2026). El Sprint 4 (semanas 14 a 16) prepara la Sustentación 3 — Entrega Final.  
+**Fecha del Planning:** 03 de octubre de 2026  
+**Duración del Sprint:** 2 semanas (03 al 16 de octubre de 2026 · Semana de receso estudiantil del 05 al 12 de octubre)  
+**Cierre:** PARCIAL Corte II, Sprint Review, Sustentación y Retrospectiva (17 de octubre de 2026).  
 
 ---
 
@@ -25,9 +25,9 @@
 ---
 
 ## 3. Velocidad de referencia y capacidad
-- **Velocidad del Sprint 1:** 3 historias terminadas, 15 SP, en 2 semanas (7,5 SP por semana).
-- **Velocidad del Sprint 2:** 4 historias terminadas, **21 SP cumplidos de 21 comprometidos (100%)** en 4 semanas (5,25 SP por semana). Certificado en [informe-pruebas-sprint2.md](informe-pruebas-sprint2.md).
-- **Compromiso del Sprint 3:** 3 historias, **16 SP**, en 3 semanas (~5,3 SP por semana). Se compromete menos que la velocidad del Sprint 1 porque dos historias tocan las reglas de seguridad de Firestore, que es la parte con más riesgo de errores de permisos.
+- **Velocidad del Sprint 1:** 3 historias terminadas, 15 SP, en 2 semanas (05/09 al 18/09).
+- **Velocidad del Sprint 2:** 4 historias terminadas, **21 SP cumplidos de 21 comprometidos (100%)** en 2 semanas (19/09 al 02/10). Certificado en [informe-pruebas-sprint2.md](informe-pruebas-sprint2.md).
+- **Compromiso del Sprint 3:** 3 historias, **16 SP**, en 2 semanas con receso intermedio (03/10 al 16/10), con sustentación y parcial el 17 de octubre de 2026.
 - **Escala de tallas usada:** S = 3 a 5 SP · M = 8 SP · L = 13 SP (Fibonacci).
 - **Límite WIP del tablero:** máximo 5 tareas en "En progreso" en todo el equipo y máximo 3 por persona.
 

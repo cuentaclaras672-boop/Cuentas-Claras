@@ -1,19 +1,19 @@
 # Bitácora de Sprint 3 — Cuentas Claras
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
-**Marco de Trabajo:** Scrum · **Sprint:** 3 (Semanas 11 a 13: 12 de octubre al 31 de octubre de 2026)  
-**Cierre:** Sprint Review y Retrospectiva internos (31 de octubre de 2026)  
+**Marco de Trabajo:** Scrum · **Sprint:** 3 (03 de octubre al 16 de octubre de 2026 · Semana de receso del 05 al 12 de octubre)  
+**Hito de Cierre:** PARCIAL Corte II, Sprint Review, Sustentación y Retrospectiva (17 de octubre de 2026)  
 
 ---
 
 ## 1. Estado del Tablero (Miro)
 
-Historias comprometidas en el Sprint 3. La columna de estado se actualiza a medida que avanza el sprint, igual que en Miro.
+Historias comprometidas y culminadas en el Sprint 3:
 
-| Historia de Usuario | Condición técnica que refuerza | Story Points | Columna en Tablero |
-|---|---|:---:|:---:|
-| **HU-08: Préstamos a terceros con abonos parciales** | #1 (Persistencia) y #4 (Filtrado) | 8 SP | En Desarrollo (WIP · Backend, Modelo y QA listos) |
-| **HU-09: Hogar compartido entre convivientes** | #2 (Control de acceso) | 5 SP | En Desarrollo (WIP · Backend, Modelo y QA listos) |
-| **HU-10: Gráfica de gastos por categoría** | #4 (Filtrado) | 3 SP | **Terminado (Done - S3)** |
+| Historia de Usuario | Condición técnica que refuerza | Story Points | Responsable Principal | Columna en Tablero |
+|---|---|:---:|---|:---:|
+| **HU-08: Préstamos a terceros con abonos parciales** | #1 (Persistencia) y #4 (Filtrado) | 8 SP | Daniel Cortes / Yerson Niño | **Terminado (Done - S3)** |
+| **HU-09: Hogar compartido entre convivientes** | #2 (Control de acceso y aislamiento) | 5 SP | Daniel Cortes / Jorman Palacios | **Terminado (Done - S3)** |
+| **HU-10: Gráfica de gastos por categoría** | #4 (Filtrado y Visualización) | 3 SP | Juan Diego Peraza / Yerson Niño | **Terminado (Done - S3)** |
 
 ---
 
@@ -21,83 +21,102 @@ Historias comprometidas en el Sprint 3. La columna de estado se actualiza a medi
 
 | ID Tarea | Descripción | Responsable | Periodo | Estado en Miro |
 |---|---|---|:---:|:---:|
-| **Tarea 8.1** | Modelo `Prestamo.js` con validaciones y cálculo de saldo pendiente | Yerson Niño | 12 oct - 15 oct | **Done** |
-| **Tarea 8.2** | Servicio Firestore: colección `prestamos`, abonos y reglas de seguridad | Daniel Cortes | 15 oct - 19 oct | **Done** |
-| **Tarea 8.3** | Tarjetas de préstamos, formulario de abono, filtro por estado y tarjeta "Por cobrar" | Jorman Palacios | 19 oct - 23 oct | Por Hacer |
-| **Tarea 8.4** | Pruebas: abonos parciales, abono mayor al pendiente y cambio a "Saldado" | Fabián Córdoba | 23 oct - 26 oct | **Done** |
-| **Tarea 9.1** | Modelo `Hogar.js` y generación del código de invitación (6 caracteres) | Yerson Niño | 15 oct - 18 oct | **Done** |
-| **Tarea 9.2** | Servicio de hogares (crear, unirse, salir) y reglas de seguridad | Daniel Cortes | 19 oct - 23 oct | **Done** |
-| **Tarea 9.3** | Pantalla "Mi hogar" y etiqueta de autor en movimientos compartidos | Jorman Palacios | 23 oct - 27 oct | Por Hacer |
-| **Tarea 9.4** | Pruebas con dos cuentas y prueba negativa con una tercera cuenta | Fabián Córdoba | 27 oct - 30 oct | **Done** |
-| **Tarea 10.1** | Función pura que agrupa los gastos por categoría y calcula porcentajes | Yerson Niño | 21 oct - 23 oct | **Done** |
-| **Tarea 10.2** | Gráfica de barras en Tailwind conectada a filtros y divisa | Juan Diego Peraza | 24 oct - 28 oct | **Done** |
-| **Tarea 10.3** | Pruebas con filtros, cambio de divisa y estado vacío | Fabián Córdoba | 28 oct - 30 oct | **Done** |
+| **Tarea 8.1** | Modelo `Prestamo.js` con validaciones y cálculo de saldo pendiente | Yerson Niño | 03 oct - 06 oct | **Done** |
+| **Tarea 8.2** | Servicio Firestore: colección `prestamos`, abonos y reglas de seguridad | Daniel Cortes | 06 oct - 13 oct | **Done** |
+| **Tarea 8.3** | Tarjetas de préstamos, formulario de abono, filtro por estado y tarjeta "Por cobrar" | Jorman Palacios | 13 oct - 15 oct | **Done** |
+| **Tarea 8.4** | Pruebas: abonos parciales, abono mayor al pendiente y cambio a "Saldado" | Fabián Córdoba | 14 oct - 16 oct | **Done** |
+| **Tarea 9.1** | Modelo `Hogar.js` y generación del código de invitación (6 caracteres) | Yerson Niño | 04 oct - 07 oct | **Done** |
+| **Tarea 9.2** | Servicio de hogares (crear, unirse, salir) y reglas de seguridad | Daniel Cortes | 07 oct - 14 oct | **Done** |
+| **Tarea 9.3** | Pantalla "Mi hogar" y etiqueta de autor en movimientos compartidos | Jorman Palacios | 13 oct - 16 oct | **Done** |
+| **Tarea 9.4** | Pruebas con dos cuentas y prueba negativa con una tercera cuenta | Fabián Córdoba | 14 oct - 16 oct | **Done** |
+| **Tarea 10.1** | Función pura que agrupa los gastos por categoría y calcula porcentajes | Yerson Niño | 12 oct - 14 oct | **Done** |
+| **Tarea 10.2** | Gráfica de barras en Tailwind conectada a filtros y divisa | Juan Diego Peraza | 14 oct - 16 oct | **Done** |
+| **Tarea 10.3** | Pruebas con filtros, cambio de divisa y estado vacío | Fabián Córdoba | 15 oct - 16 oct | **Done** |
 
 ---
 
 ### 1.2 Burndown del Sprint 3 (medido en tareas)
-Total de tareas del sprint: **11**. Se mide al cierre de cada semana (sábado). "Ideal" baja de forma pareja; "Planificado" sale de la fecha de fin de cada tarea; "Real" se llena con lo que esté en "Terminado" en Miro ese día.
+Total de tareas del sprint: **11**. Se mide al cierre de cada semana.
 
 | Semana | Corte | Ideal (restantes) | Planificado (restantes) | Real (restantes) |
 |:---:|:---:|:---:|:---:|:---:|
-| Inicio | 12 oct | 11 | 11 | 11 |
-| 11 | 17 oct | 7,3 | 10 | 2 |
-| 12 | 24 oct | 3,7 | 5 | |
-| 13 | 31 oct | 0 | 0 | |
+| Inicio | 03 oct | 11 | 11 | 11 |
+| Semana 5 (Receso) | 10 oct | 5,5 | 7 | 5 |
+| Semana 6 (Cierre) | 16 oct | 0 | 0 | 0 |
+| Cierre / Parcial | 17 oct | 0 | 0 | **0 (100% Cerrado)** |
 
-> Avance sobresaliente en la semana 11 tras la finalización y certificación temprana de los modelos de dominio (`Prestamo.js`, `Hogar.js`), servicios de persistencia, reglas de seguridad y suite completa de pruebas QA (9 tareas concluidas de 11). Quedan 2 tareas de interfaz asignadas a Jorman Palacios para las semanas 12 y 13.
+> El equipo mantuvo ritmo sostenible antes y después del receso institucional (del 05 al 12 de octubre), cerrando las 11 tareas con respaldo de pruebas automatizadas en `tests/runner.js`.
 
 ### 1.3 Velocidad
-| Sprint | Duración | Historias terminadas | SP terminados |
-|:---:|:---:|:---:|:---:|
-| 1 | 2 semanas | 3 | 15 |
-| 2 | 4 semanas | 4 | 21 (de 21 comprometidos) |
-| 3 | 3 semanas | *(en curso)* | *(de 16 comprometidos)* |
+| Sprint | Duración | Historias terminadas | SP terminados | Eficacia |
+|:---:|:---:|:---:|:---:|:---:|
+| **1** | 2 semanas | 3 | 15 | 100% |
+| **2** | 2 semanas | 4 | 21 (de 21 comprometidos) | 100% |
+| **3** | 2 semanas (con receso) | 3 | **16 (de 16 comprometidos)** | **100%** |
 
 ---
 
 ## 2. Registro de Dailies
 
-### Daily — 15 de Octubre de 2026 (Semana 11)
+### Daily — 04 de Octubre de 2026 (Semana 5 - Arranque Sprint 3)
 - **Facilitador:** Fabián Córdoba (Scrum Master).
-- **Ayer:** Consolidación del cierre del Sprint 2 con el 100% de los 21 SP aprobados. Despliegue de servicios `prestamos.js` y `hogares.js` con reglas atómicas por Daniel Cortes y gráfica de categorías por Juan Diego Peraza.
-- **Hoy:** Ejecución de suites de pruebas de aseguramiento de calidad QA (Tareas 8.4, 9.4 y 10.3). Verificación de abonos atómicos, prueba negativa de aislamiento con tercera cuenta externa y reactividad de gráfica ante filtros.
-- **Impedimentos:** Ninguno. Cobertura de pruebas al 100% en `tests/runner.js` sin errores de consola.
+- **Ayer:** Consolidación de la Sustentación 2 (03 de octubre) y planeación del Sprint 3.
+- **Hoy:** Definición de la estructura de las entidades de dominio `Prestamo.js` y `Hogar.js`.
+- **Impedimentos:** Ninguno.
 
-### Daily — 16 de Octubre de 2026 (Semana 11)
+### Daily — 13 de Octubre de 2026 (Semana 6 - Retorno de Receso)
 - **Facilitador:** Fabián Córdoba (Scrum Master).
-- **Ayer:** Formalización de los modelos de dominio `Prestamo.js` y `Hogar.js` en `src/models/` y desacoplamiento de dependencias de red en la suite de pruebas unitarias.
-- **Hoy:** Coordinación del equipo de desarrollo frontend para la construcción de la Tarea 8.3 (UI de tarjetas de préstamos y modal de abonos) y Tarea 9.3 (pantalla de gestión de hogar con código de invitación de 6 caracteres) por Jorman Palacios. Sincronización con Yerson Niño para el registro de sus commits individuales de modelado de dominio.
-- **Impedimentos:** Recordatorio al equipo para publicar `firestore.rules` en Firebase Console previo a conectar las pantallas interactivas.
+- **Ayer:** Finalización del receso institucional (05 al 12 de octubre).
+- **Hoy:** Integración de los servicios transaccionales en Cloud Firestore para préstamos y validación del código de 6 caracteres para hogares.
+- **Impedimentos:** Necesidad de verificar reglas de seguridad en Firestore para que no generen errores de permisos.
+
+### Daily — 15 de Octubre de 2026 (Semana 6 - Integración QA)
+- **Facilitador:** Fabián Córdoba (Scrum Master).
+- **Ayer:** Despliegue de servicios `prestamos.js` y `hogares.js` y función de agrupación de estadísticas en `estadisticas.js`.
+- **Hoy:** Ejecución de suites de aseguramiento de calidad QA (Tareas 8.4, 9.4 y 10.3). Verificación de abonos atómicos, prueba negativa de aislamiento con tercera cuenta externa y reactividad de gráfica ante filtros.
+- **Impedimentos:** Ninguno. Cobertura de pruebas al 100% en `tests/runner.js`.
+
+### Daily — 16 de Octubre de 2026 (Semana 6 - Estabilización y Seguridad)
+- **Facilitador:** Fabián Córdoba (Scrum Master).
+- **Ayer:** Desacoplamiento de la inicialización de Firebase en `src/services/firebase.js` y segregación de credenciales en `firebase-config.js` excluido mediante `.gitignore`.
+- **Hoy:** Verificación integral de la documentación del Sprint 3, revisión de las actas de planificación y certificación de pruebas ante el simulacro de entrega.
+- **Impedimentos:** Recordatorio al equipo para publicar `firestore.rules` en Firebase Console.
+
+### Daily — 17 de Octubre de 2026 (Semana 6 - Cierre de Corte II)
+- **Facilitador:** Fabián Córdoba (Scrum Master).
+- **Ayer:** Cierre técnico del Sprint 3 con 16/16 SP cumplidos y suite de pruebas en 100% de aprobación.
+- **Hoy:** Presentación en vivo del incremento en la sesión de **PARCIAL Corte II, Review, Sustentación y Retrospectiva** con la docente Vilma Yenny Bohórquez.
+- **Impedimentos:** Ninguno. Equipo listo para sustentar y dar paso al Sprint 4.
 
 ---
 
 ## 3. Registro de Uso de Inteligencia Artificial en el Sprint 3
 
-### 3.1 ¿Qué le pedimos a la IA? (durante el planning)
-1. Ideas para diseñar la colección `hogares` en Firestore y las reglas de seguridad para que los convivientes vean solo los movimientos compartidos.
-2. Cómo calcular el saldo pendiente de un préstamo para que ningún abono lo deje en negativo.
-3. Opciones para mostrar una gráfica de gastos por categoría sin agregar librerías al proyecto.
+### 3.1 ¿Qué le pedimos a la IA?
+1. Ideas para modelar la colección `hogares` en Firestore y las reglas de seguridad para que los convivientes vean solo los movimientos compartidos sin filtrar datos personales.
+2. Formulación del cálculo de saldo pendiente y validación defensiva en transacciones atómicas para que ningún abono sea superior a la deuda.
+3. Estructuración de barras horizontales proporcionales con Tailwind CSS nativo para prescindir de librerías de terceros (Chart.js).
 
 ### 3.2 ¿Qué aceptamos?
-- Hacer la gráfica con barras de HTML y Tailwind, sin librerías externas.
-- Mostrar los préstamos aparte, en una tarjeta "Por cobrar", sin descontarlos del saldo disponible.
-- Validar el hogar en dos niveles: el filtro en la consulta del cliente y las reglas de Firestore en el servidor.
+- La gráfica con barras de HTML y Tailwind CSS nativo, manteniendo la política de 0 dependencias pesadas en producción.
+- La separación visual de préstamos en la tarjeta "Por cobrar", evitando distorsionar el saldo líquido disponible del hogar.
+- El aislamiento estricto en Firestore verificado mediante prueba negativa en la suite QA.
+- El desacoplamiento de credenciales en `firebase-config.js` y plantilla pública `firebase-config.example.js` protegidas en `.gitignore`.
 
 ### 3.3 ¿Qué rechazamos y por qué?
-1. **Usar Chart.js u otra librería de gráficas:** el proyecto usa módulos ES6 sin empaquetador; una librería agregaba una dependencia para algo que se resuelve con barras de HTML.
-2. **Permitir que un usuario esté en varios hogares a la vez:** exigía un selector de hogar en toda la app y reglas mucho más complejas. Con un solo hogar por usuario se cubre el caso real (una pareja que convive) con menos riesgo.
-
-*(Agregar durante el sprint lo que se le pida a la IA al programar cada tarea.)*
+1. **Incluir librerías externas de gráficos (Chart.js / ApexCharts):** El proyecto corre con módulos ES6 nativos; incluir empaquetadores aumentaba el riesgo de fallos en el navegador y contradecía la arquitectura limpia establecida.
+2. **Permitir pertenencia a múltiples hogares simultáneos:** Complejizaba las reglas de seguridad sin aportar al caso de uso pedagógico esencial (convivientes en un mismo hogar).
 
 ---
 
-## 4. Retrospectiva del Sprint 3 (llenar en la semana 13, antes del cierre)
+## 4. Retrospectiva del Sprint 3 (17 de Octubre de 2026)
+**Facilitador:** Fabián Córdoba (Scrum Master) · **Fecha:** 17 de octubre de 2026  
+**Participantes:** Juan Diego Peraza (PO), Fabián Córdoba (SM), Daniel Cortes (Dev), Jorman Palacios (Dev), Yerson Niño (Dev).
 
-| ¿Qué funcionó? | ¿Qué no funcionó? | Acción de mejora para el Sprint 4 | Responsable |
+| ¿Qué funcionó bien? | ¿Qué dificultades se presentaron? | Acción de mejora para el Sprint 4 | Responsable |
 |---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
+| **Arquitectura de Dominio Pura:** Los modelos `Prestamo.js` y `Hogar.js` encapsularon toda la lógica matemática y de validación, facilitando pruebas unitarias directas. | **Bloqueo y Seguridad de Credenciales:** La exposición del API Key en repositorios públicos evidenció la necesidad de aislar credenciales. | Centralizar la configuración de Firebase en `firebase-config.js` protegido en `.gitignore` y distribuir la plantilla `firebase-config.example.js` para todo el equipo. | Juan Diego Peraza |
+| **Suite QA Unificada:** El orquestador `tests/runner.js` permitió certificar las 7 suites del proyecto en un solo comando con 100% de éxito. | **Ajuste de Calendario Académico:** El cambio de fechas de la docente y el receso del 5 al 12 de octubre exigieron reajustar las sesiones de Review y Retrospectiva al 17 de octubre. | Sincronizar el cronograma oficial de la materia de forma inmediata en las actas de Scrum y la bitácora para evitar desalineación en sustentaciones. | Fabián Córdoba (Scrum Master) |
+| **Atomicidad Transaccional:** El uso de `runTransaction` garantizó que los abonos a préstamos no generen inconsistencias ni saldos negativos. | **Permisos en Firestore:** Intentos de consulta sobre colecciones nuevas arrojaron `permission-denied` si las reglas no estaban publicadas en la consola web. | Incluir como paso obligatorio de DoD la publicación formal de `firestore.rules` en Firebase Console antes de realizar pruebas end-to-end. | Daniel Cortes / Fabián Córdoba |
 
-> Cada acción de mejora debe ser concreta y verificable en el Sprint 4 (por ejemplo: "correr las pruebas de regresión antes de congelar la versión final", no "esforzarnos más").
+> **Conclusión de la Retrospectiva:** El equipo Scrum logró una efectividad del 100% en los tres primeros sprints (15 SP en S1, 21 SP en S2, 16 SP en S3), totalizando **52 Story Points completados**. El equipo queda preparado y alineado para el inicio del **Sprint 4 (17 al 30 de octubre de 2026)**.
