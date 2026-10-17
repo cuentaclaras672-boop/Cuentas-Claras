@@ -62,10 +62,10 @@ Todas las historias del Sprint 1 están estimadas en **talla pequeña (S)** para
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Periodo | Estado |
 |---|---|---|:---:|:---:|
-| **1.1** | Configurar credenciales y SDK Firebase | Juan Diego Peraza | 18 ago - 21 ago | **Done** |
-| **1.2** | Diseñar formulario visual de Login en HTML/Tailwind | Juan Diego Peraza | 20 ago - 23 ago | **Done** |
-| **1.3** | Lógica de autenticación con Firebase Auth | Juan Diego Peraza | 23 ago - 27 ago | **Done** |
-| **1.4** | Persistencia de sesión y logout | Juan Diego Peraza | 27 ago - 30 ago | **Done** |
+| **1.1** | Configurar credenciales y SDK Firebase | Juan Diego Peraza | 05 sep - 08 sep | **Done** |
+| **1.2** | Diseñar formulario visual de Login en HTML/Tailwind | Juan Diego Peraza | 07 sep - 10 sep | **Done** |
+| **1.3** | Lógica de autenticación con Firebase Auth | Juan Diego Peraza | 09 sep - 13 sep | **Done** |
+| **1.4** | Persistencia de sesión y logout | Juan Diego Peraza | 12 sep - 15 sep | **Done** |
 
 ---
 
@@ -101,10 +101,10 @@ Todas las historias del Sprint 1 están estimadas en **talla pequeña (S)** para
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Periodo | Estado |
 |---|---|---|:---:|:---:|
-| **2.1** | Definir colección transacciones en Firestore | Daniel Cortes / Juan Diego Peraza | 21 ago - 24 ago | **Done** |
-| **2.2** | Modal y formulario para captura de montos y categorías | Jorman Palacios Murillo | 24 ago - 27 ago | **Done** |
-| **2.3** | Función de inserción `addDoc` a Firestore | Juan Diego Peraza | 27 ago - 31 ago | **Done** |
-| **2.4** | Pruebas de persistencia ante recarga de página | Fabián Córdoba | 31 ago - 03 sep | **Done** |
+| **2.1** | Definir colección transacciones en Firestore | Daniel Cortes / Juan Diego Peraza | 07 sep - 10 sep | **Done** |
+| **2.2** | Modal y formulario para captura de montos y categorías | Jorman Palacios Murillo | 09 sep - 12 sep | **Done** |
+| **2.3** | Función de inserción `addDoc` a Firestore | Juan Diego Peraza | 11 sep - 15 sep | **Done** |
+| **2.4** | Pruebas de persistencia ante recarga de página | Fabián Córdoba | 14 sep - 17 sep | **Done** |
 
 ---
 
@@ -139,10 +139,10 @@ Todas las historias del Sprint 1 están estimadas en **talla pequeña (S)** para
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Periodo | Estado |
 |---|---|---|:---:|:---:|
-| **3.1** | Diseñar tarjeta hero de Saldo Disponible y métricas | Jorman Palacios Murillo | 26 ago - 29 ago | **Done** |
-| **3.2** | Consulta reactiva `onSnapshot` a Firestore | Daniel Cortes | 29 ago - 01 sep | **Done** |
-| **3.3** | Algoritmo de cálculo de saldos en JavaScript | Yerson Niño Guerrero | 01 sep - 03 sep | **Done** |
-| **3.4** | Pruebas de actualización de balance en vivo | Fabián Córdoba / Juan Diego Peraza | 03 sep - 05 sep | **Done** |
+| **3.1** | Diseñar tarjeta hero de Saldo Disponible y métricas | Jorman Palacios Murillo | 10 sep - 13 sep | **Done** |
+| **3.2** | Consulta reactiva `onSnapshot` a Firestore | Daniel Cortes | 12 sep - 15 sep | **Done** |
+| **3.3** | Algoritmo de cálculo de saldos en JavaScript | Yerson Niño Guerrero | 14 sep - 17 sep | **Done** |
+| **3.4** | Pruebas de actualización de balance en vivo | Fabián Córdoba / Juan Diego Peraza | 16 sep - 18 sep | **Done** |
 
 ---
 

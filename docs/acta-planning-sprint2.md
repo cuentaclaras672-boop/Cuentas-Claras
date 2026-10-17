@@ -72,10 +72,10 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Fechas planificadas |
 |---|---|---|:---:|
-| **5.1** | Barra de búsqueda y selectores de categoría, tipo y fechas en HTML/Tailwind | Jorman Palacios | 09 sep - 12 sep |
-| **5.2** | Función de filtrado combinado (texto, categoría, tipo, ámbito) en `dashboard.js` | Yerson Niño | 13 sep - 16 sep |
-| **5.3** | Filtro por rango de fechas con validación "desde ≤ hasta" | Daniel Cortes | 16 sep - 20 sep |
-| **5.4** | Pruebas de combinaciones de filtros, estado vacío y botón limpiar | Fabián Córdoba | 21 sep - 26 sep |
+| **5.1** | Barra de búsqueda y selectores de categoría, tipo y fechas en HTML/Tailwind | Jorman Palacios | 19 sep - 21 sep |
+| **5.2** | Función de filtrado combinado (texto, categoría, tipo, ámbito) en `dashboard.js` | Yerson Niño | 21 sep - 24 sep |
+| **5.3** | Filtro por rango de fechas con validación "desde ≤ hasta" | Daniel Cortes | 24 sep - 26 sep |
+| **5.4** | Pruebas de combinaciones de filtros, estado vacío y botón limpiar | Fabián Córdoba | 26 sep - 28 sep |
 
 ---
 
@@ -109,10 +109,10 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Fechas planificadas |
 |---|---|---|:---:|
-| **6.1** | Servicio `indicadores.js`: consumo de la API de la TRM con respaldos | Daniel Cortes | 10 sep - 14 sep |
-| **6.2** | Conversión COP → USD y formato con decimales en `formateo.js` | Yerson Niño | 15 sep - 19 sep |
-| **6.3** | Indicador de TRM y selector COP / USD en el dashboard | Juan Diego Peraza / Jorman Palacios | 20 sep - 24 sep |
-| **6.4** | Pruebas con la API caída (bloqueo en F12) y verificación del valor referencial | Fabián Córdoba | 24 sep - 28 sep |
+| **6.1** | Servicio `indicadores.js`: consumo de la API de la TRM con respaldos | Daniel Cortes | 20 sep - 22 sep |
+| **6.2** | Conversión COP → USD y formato con decimales en `formateo.js` | Yerson Niño | 22 sep - 24 sep |
+| **6.3** | Indicador de TRM y selector COP / USD en el dashboard | Juan Diego Peraza / Jorman Palacios | 24 sep - 27 sep |
+| **6.4** | Pruebas con la API caída (bloqueo en F12) y verificación del valor referencial | Fabián Córdoba | 27 sep - 29 sep |
 
 ---
 
@@ -149,10 +149,10 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Fechas planificadas |
 |---|---|---|:---:|
-| **4.1** | Modelo `Bolsillo.js` con validaciones (nombre, meta, monto asignado) | Yerson Niño | 18 sep - 22 sep |
-| **4.2** | Servicio en Firestore: crear, asignar dinero y eliminar bolsillos, y reglas de seguridad | Daniel Cortes | 23 sep - 27 sep |
-| **4.3** | Tarjetas de bolsillos con barra de progreso y formulario de creación | Jorman Palacios | 27 sep - 30 sep |
-| **4.4** | Descuento del saldo disponible y pruebas de integración de toda la HU | Fabián Córdoba | 30 sep - 03 oct |
+| **4.1** | Modelo `Bolsillo.js` con validaciones (nombre, meta, monto asignado) | Yerson Niño | 22 sep - 25 sep |
+| **4.2** | Servicio en Firestore: crear, asignar dinero y eliminar bolsillos, y reglas de seguridad | Daniel Cortes | 25 sep - 28 sep |
+| **4.3** | Tarjetas de bolsillos con barra de progreso y formulario de creación | Jorman Palacios | 28 sep - 30 sep |
+| **4.4** | Descuento del saldo disponible y pruebas de integración de toda la HU | Fabián Córdoba | 30 sep - 02 oct |
 
 ---
 
@@ -186,22 +186,19 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Fechas planificadas |
 |---|---|---|:---:|
-| **7.1** | Diseño del aviso "Sin conexión" y del estilo de error por campo en Tailwind | Jorman Palacios | 12 sep - 16 sep |
-| **7.2** | Módulo `conexion.js` que escucha los eventos `online` / `offline` | Daniel Cortes | 16 sep - 20 sep |
-| **7.3** | Mensajes de validación debajo de cada campo en los formularios | Yerson Niño | 21 sep - 24 sep |
-| **7.4** | Pruebas en modo offline (F12 → Network → Offline) y con datos inválidos | Fabián Córdoba | 25 sep - 29 sep |
+| **7.1** | Diseño del aviso "Sin conexión" y del estilo de error por campo en Tailwind | Jorman Palacios | 21 sep - 23 sep |
+| **7.2** | Módulo `conexion.js` que escucha los eventos `online` / `offline` | Daniel Cortes | 23 sep - 26 sep |
+| **7.3** | Mensajes de validación debajo de cada campo en los formularios | Yerson Niño | 26 sep - 28 sep |
+| **7.4** | Pruebas en modo offline (F12 → Network → Offline) y con datos inválidos | Fabián Córdoba | 28 sep - 30 sep |
 
 ---
 
-## 5. Cronograma por semana
+## 5. Cronograma por semana (Semanas 3 y 4 de la materia)
 
 | Semana | Fechas | Foco |
 |:---:|---|---|
-| 6 | 07 - 12 sep | Planning, estimación, diseño de la búsqueda y arranque del servicio de la TRM. |
-| 7 | 14 - 19 sep | Filtros combinados, conversión de divisas, aviso de conexión y modelo `Bolsillo`. |
-| 8 | 21 - 26 sep | Pruebas de HU-05 y HU-06, validaciones por campo y servicio de bolsillos. |
-| 9 | 28 sep - 03 oct | Interfaz de bolsillos, integración, pruebas de regresión, Sprint Review y Retrospectiva. |
-| 10 | 05 - 10 oct | Verificación final (app corriendo sin errores de consola) y Sustentación 2. |
+| 3 | 19 - 25 sep | Planning de Sprint 2, diseño de búsqueda, API de TRM, modelo Bolsillo y **Daily en vivo (26/09)**. |
+| 4 | 26 sep - 02 oct | Integración de bolsillos, resiliencia offline, pruebas integrales QA, Review y **Sustentación 2 (03/10)**. |
 
 ---
 

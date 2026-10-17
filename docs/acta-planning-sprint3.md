@@ -32,7 +32,7 @@
 - **Límite WIP del tablero:** máximo 5 tareas en "En progreso" en todo el equipo y máximo 3 por persona.
 
 ### 3.1 Saneamiento de deuda técnica previa del Sprint 2 (100% Resuelto)
-Todos los pendientes identificados al cierre del Sprint 2 fueron resueltos y certificados en la semana 11 antes de abordar las interfaces del Sprint 3:
+Todos los pendientes identificados al cierre del Sprint 2 fueron resueltos y certificados en la semana 5 antes de abordar las interfaces del Sprint 3:
 
 | Pendiente Identificado | Estado al Inicio de S3 | Resolución Implementada | Responsable |
 |---|:---:|---|---|
@@ -88,10 +88,10 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Fechas planificadas |
 |---|---|---|:---:|
-| **8.1** | Modelo `Prestamo.js` con validaciones y cálculo del saldo pendiente | Yerson Niño | 12 oct - 15 oct |
-| **8.2** | Servicio en Firestore: crear préstamo, registrar abono, eliminar y escuchar en tiempo real; reglas de seguridad | Daniel Cortes | 15 oct - 19 oct |
-| **8.3** | Tarjetas de préstamos, formulario de abono, filtro por estado y tarjeta "Por cobrar" | Jorman Palacios | 19 oct - 23 oct |
-| **8.4** | Pruebas: abonos parciales, abono mayor al pendiente, cambio a "Saldado" y recarga de página | Fabián Córdoba | 23 oct - 26 oct |
+| **8.1** | Modelo `Prestamo.js` con validaciones y cálculo del saldo pendiente | Yerson Niño | 03 oct - 06 oct |
+| **8.2** | Servicio en Firestore: crear préstamo, registrar abono, eliminar y escuchar en tiempo real; reglas de seguridad | Daniel Cortes | 06 oct - 13 oct |
+| **8.3** | Tarjetas de préstamos, formulario de abono, filtro por estado y tarjeta "Por cobrar" | Jorman Palacios | 13 oct - 15 oct |
+| **8.4** | Pruebas: abonos parciales, abono mayor al pendiente, cambio a "Saldado" y recarga de página | Fabián Córdoba | 14 oct - 16 oct |
 
 ---
 
@@ -129,10 +129,10 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Fechas planificadas |
 |---|---|---|:---:|
-| **9.1** | Modelo `Hogar.js` y generación del código de invitación | Yerson Niño | 15 oct - 18 oct |
-| **9.2** | Servicio de hogares (crear, unirse, salir) y reglas de seguridad de `hogares` y `transacciones` | Daniel Cortes | 19 oct - 23 oct |
-| **9.3** | Pantalla "Mi hogar" y etiqueta con el autor en los movimientos compartidos | Jorman Palacios | 23 oct - 27 oct |
-| **9.4** | Pruebas con dos cuentas y prueba negativa con una tercera cuenta | Fabián Córdoba | 27 oct - 30 oct |
+| **9.1** | Modelo `Hogar.js` y generación del código de invitación | Yerson Niño | 04 oct - 07 oct |
+| **9.2** | Servicio de hogares (crear, unirse, salir) y reglas de seguridad de `hogares` y `transacciones` | Daniel Cortes | 07 oct - 14 oct |
+| **9.3** | Pantalla "Mi hogar" y etiqueta con el autor en los movimientos compartidos | Jorman Palacios | 13 oct - 16 oct |
+| **9.4** | Pruebas con dos cuentas y prueba negativa con una tercera cuenta | Fabián Córdoba | 14 oct - 16 oct |
 
 ---
 
@@ -164,9 +164,9 @@ Cada historia incluye su **Prioridad**, **Talla/Estimación**, **Condición Téc
 #### • Tareas Asignadas:
 | Tarea | Descripción | Responsable | Fechas planificadas |
 |---|---|---|:---:|
-| **10.1** | Función pura que agrupa los gastos por categoría y calcula porcentajes | Yerson Niño | 21 oct - 23 oct |
-| **10.2** | Componente visual de barras en Tailwind conectado a filtros y divisa | Juan Diego Peraza | 24 oct - 28 oct |
-| **10.3** | Pruebas con filtros, cambio de divisa y estado vacío | Fabián Córdoba | 28 oct - 30 oct |
+| **10.1** | Función pura que agrupa los gastos por categoría y calcula porcentajes | Yerson Niño | 12 oct - 14 oct |
+| **10.2** | Componente visual de barras en Tailwind conectado a filtros y divisa | Juan Diego Peraza | 14 oct - 16 oct |
+| **10.3** | Pruebas con filtros, cambio de divisa y estado vacío | Fabián Córdoba | 15 oct - 16 oct |
 
 ---
 
@@ -177,10 +177,10 @@ Probabilidad e impacto en escala Baja / Media / Alta. Se revisa en cada daily de
 | ID | Riesgo | Prob. | Impacto | Mitigación | Disparador | Responsable |
 |---|---|:---:|:---:|---|---|---|
 | R1 | Las reglas del hogar compartido quedan mal: o un usuario ve movimientos de otro hogar, o los convivientes no ven nada (`permission-denied`). | Alta | Alta | Probar las reglas en el simulador de Firebase Console antes de publicarlas; prueba negativa con una tercera cuenta (Tarea 9.4). | Cualquier `permission-denied` inesperado o un dato ajeno visible en las pruebas. | Daniel Cortes |
-| R2 | Los pendientes del Sprint 2 (sección 3.1) ocupan más de la semana 11 y retrasan las historias nuevas. | Alta | Media | Límite de 2 días para la deuda técnica; si no se cierra, se pasa al Sprint 4 y se informa en el Review. | El 14 de octubre sigue abierto algún pendiente de la sección 3.1. | Fabián Córdoba |
+| R2 | Los pendientes del Sprint 2 (sección 3.1) ocupan más de lo previsto y retrasan las historias nuevas. | Alta | Media | Límite de 2 días para la deuda técnica; si no se cierra, se pasa al Sprint 4 y se informa en el Review. | El 06 de octubre sigue abierto algún pendiente de la sección 3.1. | Fabián Córdoba |
 | R3 | Los movimientos registrados antes de la HU-09 no tienen `hogarId` y el conviviente no los ve. | Media | Media | Decisión del DoR: solo se comparten los movimientos nuevos; se explica en la pantalla "Mi hogar". | Un usuario reporta que no ve gastos compartidos anteriores. | Yerson Niño |
-| R4 | La Tarea 9.3 (pantalla "Mi hogar") depende de la 9.2 (servicio); si la 9.2 se atrasa, se bloquea la 9.3. | Media | Alta | La 9.3 empieza por la maqueta en HTML con datos de prueba mientras termina la 9.2. | La 9.2 no está en "Terminado" el 23 de octubre. | Jorman Palacios |
-| R5 | La HU-09 está subestimada (5 SP) porque toca reglas de seguridad de dos colecciones. | Media | Media | Si el 24 de octubre la HU-09 lleva menos de la mitad de sus tareas, se recorta la CA-9.7 (salir del hogar) y pasa al Sprint 4. | Burndown real por encima del planificado el 24 de octubre. | Juan Diego Peraza |
+| R4 | La Tarea 9.3 (pantalla "Mi hogar") depende de la 9.2 (servicio); si la 9.2 se atrasa, se bloquea la 9.3. | Media | Alta | La 9.3 empieza por la maqueta en HTML con datos de prueba mientras termina la 9.2. | La 9.2 no está en "Terminado" el 14 de octubre. | Jorman Palacios |
+| R5 | La HU-09 está subestimada (5 SP) porque toca reglas de seguridad de dos colecciones. | Media | Media | Si el 14 de octubre la HU-09 lleva menos de la mitad de sus tareas, se recorta la CA-9.7 (salir del hogar) y pasa al Sprint 4. | Burndown real por encima del planificado el 14 de octubre. | Juan Diego Peraza |
 | R6 | La API de la TRM cambia de formato o deja de responder y la gráfica en USD muestra valores errados. | Baja | Media | Ya existen dos APIs de respaldo y un valor referencial (HU-06); la Tarea 10.3 prueba la gráfica con la API bloqueada. | El indicador muestra "referencial" más de un día seguido. | Daniel Cortes |
 
 ---
@@ -194,13 +194,13 @@ Probabilidad e impacto en escala Baja / Media / Alta. Se revisa en cada daily de
 
 ---
 
-## 7. Cronograma por semana
+## 7. Cronograma por semana (Semanas 5 y 6 de la materia)
 
 | Semana | Fechas | Foco |
 |:---:|---|---|
-| 11 | 12 - 17 oct | Planning. Cierre de la deuda técnica del Sprint 2 (sección 3.1). Modelos `Prestamo` y `Hogar`. Servicio de préstamos. |
-| 12 | 19 - 24 oct | Servicio de hogares y reglas de seguridad. Interfaz de préstamos. Función de agrupación por categoría. |
-| 13 | 26 - 31 oct | Pantalla "Mi hogar", gráfica, pruebas con dos cuentas, Sprint Review y Retrospectiva. |
+| 5 | 03 - 09 oct | Planning del Sprint 3, diseño de modelos `Prestamo.js` y `Hogar.js`, spike de reglas en Firestore e inicio del receso estudiantil (05 al 12 de octubre). |
+| 6 | 10 - 16 oct | Retorno de receso: servicios transaccionales en Firestore, componentes visuales, gráfica de gastos y pruebas integrales QA (7/7 suites). |
+| Cierre | 17 oct | **PARCIAL Corte II, Sprint Review, Sustentación y Retrospectiva** ante la docente Vilma Yenny Bohórquez. |
 
 ---
 

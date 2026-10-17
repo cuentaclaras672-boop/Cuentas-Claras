@@ -33,25 +33,25 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 > **Propósito:** Que el sistema identifique quién lo usa y aísle los datos de su hogar (Condición Técnica #2).
 
 #### • Tarea 1.1: Configurar credenciales y SDK Firebase
-- **Responsable:** Juan Diego Peraza (18 ago - 21 ago).
+- **Responsable:** Juan Diego Peraza (05 sep - 08 sep).
 - **¿Qué se hizo?**: Se configuró la conexión oficial con el SDK modular v10 de Firebase mediante CDN. Para garantizar seguridad y mantenibilidad, la inicialización de `app`, `auth` y `db` se centralizó bajo patrón Singleton en [`src/services/firebase.js`](../src/services/firebase.js), mientras que las credenciales activas se desacoplaron en `src/services/firebase-config.js` (protegido en `.gitignore`) con una plantilla de ejemplo versionada en [`src/services/firebase-config.example.js`](../src/services/firebase-config.example.js).
 - **¿Dónde está?**: En [`src/services/firebase.js`](../src/services/firebase.js) y [`src/services/firebase-config.example.js`](../src/services/firebase-config.example.js).
 - **Cómo defenderlo:** *"Se implementó un patrón Singleton usando `getApps().length` para garantizar que la conexión con Firebase se instancie una sola vez en toda la aplicación, y se desacopló la configuración de credenciales del código de infraestructura siguiendo principios de Clean Architecture y seguridad defensiva"*.
 
 #### • Tarea 1.2: Diseñar formulario visual de Login en HTML/Tailwind
-- **Responsable:** Juan Diego Peraza (20 ago - 23 ago).
+- **Responsable:** Juan Diego Peraza (07 sep - 10 sep).
 - **¿Qué se hizo?**: Se maquetó la vista `#auth-view` con diseño moderno en modo oscuro (Dark Slate), inputs con validaciones HTML5 (`required`, `type="email"`, `minlength="6"`) y botones para alternar dinámicamente entre la vista de Login y Registro.
 - **¿Dónde está?**: En [`public/index.html`](../public/index.html) (busca `id="auth-view"`; ahí están `form-login` y `form-registro`).
 - **Cómo defenderlo:** *"Los formularios no recargan la página porque sus eventos `submit` son interceptados de forma asíncrona mediante JavaScript modular"*.
 
 #### • Tarea 1.3: Lógica de autenticación con Firebase Auth
-- **Responsable:** Juan Diego Peraza (23 ago - 27 ago).
+- **Responsable:** Juan Diego Peraza (09 sep - 13 sep).
 - **¿Qué se hizo?**: Se construyeron las funciones asíncronas `iniciarSesion(email, password)` y `registrarUsuario(email, password, nombre)`. Incluyen validación defensiva con expresiones regulares (Regex) y mapeo de errores para traducir códigos crudos de Google (como `auth/wrong-password`) a mensajes amigables en español.
 - **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (funciones `registrarUsuario`, `iniciarSesion` y `traducirErrorAuth`).
 - **Cómo defenderlo:** *"El servicio de autenticación no toca el DOM; si ocurre un error, lanza una excepción tipificada que la capa visual captura y muestra en un Toast"*.
 
 #### • Tarea 1.4: Persistencia de sesión y logout
-- **Responsable:** Juan Diego Peraza (27 ago - 30 ago).
+- **Responsable:** Juan Diego Peraza (12 sep - 15 sep).
 - **¿Qué se hizo?**: Se implementó el observador reactivo `suscribirEstadoAuth(callback)` envolviendo `onAuthStateChanged()`. Cuando el usuario inicia sesión o recarga la página, Firebase recupera su token y el orquestador conmuta la pantalla de Login al Dashboard. Al dar clic en "Salir", ejecuta `cerrarSesion()` y regresa al Login de forma instantánea.
 - **¿Dónde está?**: En [`src/services/auth.js`](../src/services/auth.js) (función `suscribirEstadoAuth`) y orquestado en [`src/app.js`](../src/app.js) (función `iniciarAplicacion`).
 
@@ -61,23 +61,23 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 > **Propósito:** Que los ingresos y gastos se guarden permanentemente en la nube y sobrevivan al cerrar la página (Condición Técnica #1).
 
 #### • Tarea 2.1: Definir colección transacciones en Firestore
-- **Responsable:** Daniel Felipe Cortes / Juan Diego Peraza (21 ago - 24 ago).
+- **Responsable:** Daniel Felipe Cortes / Juan Diego Peraza (07 sep - 10 sep).
 - **¿Qué se hizo?**: Se diseñó la estructura del documento NoSQL en Cloud Firestore dentro de la colección `transacciones`. Cada documento almacena: `descripcion`, `monto` (número), `tipo` ('INGRESO'|'GASTO'), `ambito` ('PERSONAL'|'COMPARTIDO'), `categoria`, `creadoPor` (UID del usuario), `nombreUsuario` y `fecha` (Timestamp).
 - **¿Dónde está?**: Definido formalmente en [`src/models/Transaccion.js`](../src/models/Transaccion.js) y consumido en [`src/services/firestore.js`](../src/services/firestore.js).
 
 #### • Tarea 2.2: Modal y formulario para captura de montos y categorías
-- **Responsable:** Jorman Palacios Murillo (24 ago - 27 ago).
+- **Responsable:** Jorman Palacios Murillo (09 sep - 12 sep).
 - **¿Qué se hizo?**: Se construyó la sección `#form-transaccion` en el Dashboard. Cuando el usuario cambia el tipo entre "Gasto" e "Ingreso", el selector de categorías cambia dinámicamente mediante JavaScript para mostrar las categorías correspondientes (ej. Alimentación, Vivienda, Transporte para gastos; Salario, Honorarios para ingresos).
 - **¿Dónde está?**: HTML en [`public/index.html`](../public/index.html) (busca `id="form-transaccion"`) y lógica de selección en [`src/ui/dashboard.js`](../src/ui/dashboard.js) (función `poblarCategorias`).
 
 #### • Tarea 2.3: Función de inserción `addDoc` a Firestore
-- **Responsable:** Juan Diego Peraza (27 ago - 31 ago).
+- **Responsable:** Juan Diego Peraza (11 sep - 15 sep).
 - **¿Qué se hizo?**: Se creó la función asíncrona `registrarTransaccion(transaccion)`. Recibe la instancia validada del modelo, la serializa mediante `.aFirestore()` y la envía a Cloud Firestore usando `addDoc(collection(db, "transacciones"), payload)`.
 - **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (función `registrarTransaccion`).
 - **Cómo defenderlo:** *"No se almacena nada en arreglos temporales ni en `localStorage`. La inserción viaja de forma asíncrona a los servidores de Firestore y el listener reactivo actualiza la pantalla automáticamente"*.
 
 #### • Tarea 2.4: Pruebas de persistencia ante recarga
-- **Responsable:** Fabián Eduardo Córdoba (31 ago - 03 sep).
+- **Responsable:** Fabián Eduardo Córdoba (14 sep - 17 sep).
 - **¿Qué se hizo?**: Pruebas de integridad consistentes en registrar movimientos, forzar el refresco de página (F5 o Ctrl+Shift+R) y verificar que los datos reaparecen intactos desde la base de datos sin pérdida de sincronía.
 
 ---
@@ -86,23 +86,23 @@ Si el docente te pide abrir un archivo o cambiar algo de la interfaz, busca aqu�
 > **Propósito:** Mostrar de un vistazo cuánto dinero real tiene el hogar y la separación entre gastos personales y compartidos (Condición Técnica #4).
 
 #### • Tarea 3.1: Diseñar tarjeta hero de Saldo Disponible y métricas
-- **Responsable:** Jorman Palacios Murillo (26 ago - 29 ago).
+- **Responsable:** Jorman Palacios Murillo (10 sep - 13 sep).
 - **¿Qué se hizo?**: Se construyó el grid superior con 4 tarjetas de métricas: **Balance Neto** (Ingresos - Gastos), **Ingresos Totales**, **Gastos Totales** y **Gastos del Hogar (Compartidos)**. Cada una cuenta con tipografía destacada y código de colores semántico (verde para positivo/ingreso, rojo para negativo/gasto, índigo para compartido).
 - **¿Dónde está?**: En [`public/index.html`](../public/index.html) (busca `id="resumen-balance"`; las 4 tarjetas están juntas).
 
 #### • Tarea 3.2: Consulta reactiva `onSnapshot` a Firestore
-- **Responsable:** Daniel Felipe Cortes (29 ago - 01 sep).
+- **Responsable:** Daniel Felipe Cortes (12 sep - 15 sep).
 - **¿Qué se hizo?**: Se implementó `escucharTransacciones(usuarioId, onActualizacion, onError)`. Utiliza la tecnología WebSocket de Firebase (`onSnapshot`) filtrando por el UID del usuario (`where("creadoPor", "==", usuarioId)`). Cualquier cambio en la base de datos (registro nuevo o borrado) se refleja en milisegundos en la pantalla sin recargar.
 - **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (función `escucharTransacciones`). Los movimientos se ordenan por fecha en el navegador con `sort()`, así no hace falta crear un índice compuesto en Firebase.
 
 #### • Tarea 3.3: Algoritmo de cálculo de saldos en JavaScript
-- **Responsable:** Yerson Niño Guerrero (01 sep - 03 sep).
+- **Responsable:** Yerson Niño Guerrero (14 sep - 17 sep).
 - **¿Qué se hizo?**: Función pura `calcularTotales(listaTransacciones)`. Itera la lista una sola vez ($O(n)$) sumando ingresos, egresos y acumulando por separado aquellos cuyo ámbito sea `COMPARTIDO`. Calcula el balance neto (`totalIngresos - totalGastos`).
 - **¿Dónde está?**: En [`src/services/firestore.js`](../src/services/firestore.js) (función `calcularTotales`).
 - **Cómo defenderlo:** *"Es una función matemática pura: no muta datos externos, no depende del DOM y es 100% testeable de forma unitaria"*.
 
 #### • Tarea 3.4: Pruebas de actualización de balance en vivo
-- **Responsable:** Fabián Eduardo Córdoba / Juan Diego Peraza (03 sep - 05 sep).
+- **Responsable:** Fabián Eduardo Córdoba / Juan Diego Peraza (16 sep - 18 sep).
 - **¿Qué se hizo?**: Validación del renderizado condicional: si el Balance Neto es mayor o igual a 0 se tiñe de verde (`text-emerald-400`); si los gastos superan a los ingresos se tiñe de rojo (`text-rose-400`).
 
 ---
