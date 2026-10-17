@@ -101,7 +101,7 @@ cuentas-claras/
 │   │   └── conexion.js     # Detección de conexión online / offline (HU-07)
 │   ├── ui/                 # CAPA DE PRESENTACIÓN (Manipulación del DOM)
 │   │   ├── ui-auth.js      # Formularios de acceso y alternancia de vistas
-│   │   ├── dashboard.js    # Renderizado reactivo de tarjetas y tabla con filtros
+│   │   ├── dashboard.js    # Renderizado reactivo de métricas, filtros, bolsillos y Mi Hogar (HU-09)
 │   │   └── notificaciones.js # Notificaciones flotantes (Toasts) para errores visibles
 │   ├── utils/              # CAPA TRANSVERSAL
 │   │   ├── formateo.js     # Formato de divisa (COP), fechas y parseo seguro

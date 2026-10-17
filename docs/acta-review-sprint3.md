@@ -43,13 +43,15 @@ Durante la sesión del Parcial de Corte II se demostraron en vivo las tres Histo
 - **Resultado:** Aprobada al 100% con felicitaciones por la consistencia transaccional.
 
 ### 3.2 [HU-09] Hogar compartido entre convivientes (5 SP · Prioridad 2)
-- **Componentes Demostrados:** Modelo de dominio `Hogar.js`, servicio `hogares.js` y suite `pruebas-hogares.test.js`.
+- **Componentes Demostrados:** Modelo de dominio `Hogar.js`, servicio `hogares.js`, interfaz interactiva en `public/index.html` (sección `#seccion-hogar`, ayudas contextuales en `#form-transaccion` y etiquetas de autor en transacciones compartidas de `src/ui/dashboard.js`), integración reactiva en `src/app.js` y suite `pruebas-hogares.test.js`.
 - **Criterios Validados:**
   - Creación de hogar con código de invitación único de 6 caracteres alfanuméricos (`/^[A-Z0-9]{6}$/`).
   - Unirse a un hogar existente mediante código y abandono seguro del hogar.
   - Membresía múltiple con límite seguro de hasta 6 convivientes (`MAX_MIEMBROS_HOGAR = 6`).
+  - **Identificación de autor en movimientos compartidos (CA-9.5 / Tarea 9.3):** Etiqueta dinámica con el nombre del conviviente autor (`Compartido • por Juan Diego`) y restricción de eliminación solo para el creador original.
+  - **Guía contextual en el formulario de registro:** Advertencia en vivo si el usuario no tiene hogar vinculado y confirmación de los miembros con quienes se comparte.
   - **Prueba Negativa y Aislamiento de Datos (Condición Técnica #2):** Demostración en vivo donde un usuario ajeno al hogar recibe `permission-denied` estricto en Firestore al intentar consultar transacciones ajenas, mientras los convivientes pueden ver los movimientos marcados como compartidos pero nunca los personales ajenos.
-- **Resultado:** Aprobada al 100%. Se destaca la arquitectura de seguridad multicapa.
+- **Resultado:** Aprobada al 100%. Se destaca la arquitectura de seguridad multicapa y la experiencia de usuario guiada.
 
 ### 3.3 [HU-10] Gráfica de gastos por categoría (3 SP · Prioridad 3)
 - **Componentes Demostrados:** Módulo transversal `estadisticas.js` y suite `pruebas-grafica.test.js`.

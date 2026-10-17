@@ -201,3 +201,7 @@ En la sustentación, el docente te dará **15 a 20 minutos** para modificar algo
 
 5. **¿Qué ocurre si al crear un bolsillo o préstamo aparece el error 'Acceso denegado'?**
    - *Respuesta:* *"Ese error indica que la consola de Firestore aún no tiene publicadas las reglas correspondientes a esas nuevas colecciones. La solución consiste en copiar el archivo `firestore.rules` del proyecto en la consola de Firebase (Firestore Database → Reglas) y presionar 'Publicar' para que el servidor aplique las políticas de validación para `bolsillos`, `prestamos` y `hogares`."*
+
+6. **¿Cómo funcionan los gastos compartidos y con quién se comparten? (HU-09)**
+   - *Respuesta:* *"En Cuentas Claras los gastos compartidos no se asignan por correo electrónico individual por cada gasto, sino bajo el modelo de Hogar Compartido (HU-09). Un usuario crea un Hogar que genera un código único de 6 caracteres; su pareja o conviviente se une ingresando ese código. Cualquier movimiento registrado con ámbito 'COMPARTIDO' guarda el `hogarId` y se sincroniza reactivamente en tiempo real para todos los miembros de ese hogar, mostrando el nombre de quién lo registró y sumándolo al balance del hogar. Por el contrario, los movimientos con ámbito 'PERSONAL' permanecen estrictamente privados para su autor mediante validación en `firestore.rules`."*
+

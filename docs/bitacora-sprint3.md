@@ -76,16 +76,16 @@ Total de tareas del sprint: **11**. Se mide al cierre de cada semana.
 - **Hoy:** Ejecución de suites de aseguramiento de calidad QA (Tareas 8.4, 9.4 y 10.3). Verificación de abonos atómicos, prueba negativa de aislamiento con tercera cuenta externa y reactividad de gráfica ante filtros.
 - **Impedimentos:** Ninguno. Cobertura de pruebas al 100% en `tests/runner.js`.
 
-### Daily — 16 de Octubre de 2026 (Semana 6 - Estabilización y Seguridad)
+### Daily — 16 de Octubre de 2026 (Semana 6 - Estabilización, Seguridad e Interfaz)
 - **Facilitador:** Fabián Córdoba (Scrum Master).
 - **Ayer:** Desacoplamiento de la inicialización de Firebase en `src/services/firebase.js` y segregación de credenciales en `firebase-config.js` excluido mediante `.gitignore`.
-- **Hoy:** Verificación integral de la documentación del Sprint 3, revisión de las actas de planificación y certificación de pruebas ante el simulacro de entrega.
-- **Impedimentos:** Recordatorio al equipo para publicar `firestore.rules` en Firebase Console.
+- **Hoy:** Integración de la interfaz de "Mi Hogar Compartido" (Tarea 9.3) en `public/index.html` y `src/ui/dashboard.js`, etiquetado de autor en gastos compartidos (`Compartido • por Autor`), ayuda contextual dinámica en el formulario de registro y suscripción reactiva en tiempo real en `src/app.js`. Verificación integral de actas de planificación y certificación de pruebas ante el simulacro de entrega.
+- **Impedimentos:** Recordatorio al equipo para publicar `firestore.rules` en Firebase Console para habilitar permisos sobre `hogares`.
 
 ### Daily — 17 de Octubre de 2026 (Semana 6 - Cierre de Corte II)
 - **Facilitador:** Fabián Córdoba (Scrum Master).
-- **Ayer:** Cierre técnico del Sprint 3 con 16/16 SP cumplidos y suite de pruebas en 100% de aprobación.
-- **Hoy:** Presentación en vivo del incremento en la sesión de **PARCIAL Corte II, Review, Sustentación y Retrospectiva** con la docente Vilma Yenny Bohórquez.
+- **Ayer:** Cierre técnico del Sprint 3 con 16/16 SP cumplidos, interfaz de Mi Hogar completamente integrada y suite de pruebas en 100% de aprobación.
+- **Hoy:** Presentación en vivo del incremento en la sesión de **PARCIAL Corte II, Review, Sustentación y Retrospectiva** con la docente Vilma Yenny Bohórquez. Demostración en vivo de creación de hogar con código de 6 caracteres, vinculación de convivientes, visualización contextual de con quién se comparten gastos y aislamiento estricto de transacciones personales.
 - **Impedimentos:** Ninguno. Equipo listo para sustentar y dar paso al Sprint 4.
 
 ---

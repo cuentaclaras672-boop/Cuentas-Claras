@@ -20,7 +20,7 @@ El presente informe documenta las pruebas unitarias, de integración y de seguri
 | ID Tarea | Historia | Criterios Evaluados | Método de Verificación | Evidencia / Resultado | Estado |
 |---|---|---|---|---|:---:|
 | **Tarea 8.4** | HU-08 | CA-8.1 a CA-8.8 | Validación de deudor, recálculo de saldo pendiente, rechazo de abonos excesivos, paso a SALDADO y filtros | `tests/pruebas-prestamos.test.js` ejecutado con éxito. Se comprobó que ningún abono deja saldo negativo y el total por cobrar suma únicamente saldos pendientes. | **Aprobado** |
-| **Tarea 9.4** | HU-09 | CA-9.1 a CA-9.7 | Código de invitación de 6 caracteres, visibilidad de gastos compartidos, aislamiento de gastos personales y prueba negativa | `tests/pruebas-hogares.test.js` ejecutado con éxito. Se validó la regla de seguridad: convivientes no acceden a personales ajenos y cuentas terceras reciben denegación estricta de lectura. | **Aprobado** |
+| **Tarea 9.4** | HU-09 | CA-9.1 a CA-9.7 | Código de invitación de 6 caracteres, visibilidad de gastos compartidos, etiqueta de autor (CA-9.5), aislamiento de gastos personales y prueba negativa | `tests/pruebas-hogares.test.js` y pruebas de UI en navegador ejecutadas con éxito. Se validó la regla de seguridad y la interfaz: convivientes no acceden a personales ajenos, cuentas terceras reciben denegación estricta y los movimientos compartidos reflejan el nombre de su autor. | **Aprobado** |
 | **Tarea 10.3** | HU-10 | CA-10.1 a CA-10.5 | Agrupación pura de gastos por categoría, ordenamiento decreciente, porcentajes con un decimal, selector COP/USD y estado vacío | `tests/pruebas-grafica.test.js` ejecutado con éxito. Ingresos ignorados en la sumatoria, sanitización XSS con `escaparHTML` comprobada y estado vacío visual. | **Aprobado** |
 
 ---
