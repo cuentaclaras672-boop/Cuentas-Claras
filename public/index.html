@@ -288,6 +288,150 @@
       </section>
 
       <!-- ========================================================================= -->
+      <!-- SECCIÓN: MI HOGAR COMPARTIDO (Tarea 9.3 - Jorman Palacios / HU-09)       -->
+      <!-- ========================================================================= -->
+      <section id="seccion-hogar" class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
+        <!-- Estado 1: Usuario SIN Hogar vinculado -->
+        <div id="hogar-vacio" class="space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+              <div>
+                <h2 class="text-base font-semibold text-white">Mi Hogar Compartido</h2>
+                <p class="text-xs text-slate-400 mt-0.5">Comparte gastos de mercado, servicios y vivienda con tu pareja o convivientes</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opciones: Crear Hogar o Unirse a Hogar -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Tarjeta Crear Hogar -->
+            <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60">
+              <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                <span>🏠 Crear un Nuevo Hogar</span>
+              </h3>
+              <p class="text-xs text-slate-400 mt-1 mb-3">Genera un código de invitación para compartir con tus convivientes.</p>
+              <form id="form-crear-hogar" class="flex flex-col sm:flex-row gap-2">
+                <input 
+                  id="crear-hogar-nombre" 
+                  type="text" 
+                  required 
+                  minlength="3" 
+                  maxlength="40" 
+                  placeholder="Nombre (ej: Apartamento 302)" 
+                  class="flex-1 px-3 py-2 rounded-xl bg-slate-800/90 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                <button 
+                  type="submit" 
+                  class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold rounded-xl transition-all shadow-md shadow-indigo-600/20 whitespace-nowrap"
+                >
+                  Crear Hogar
+                </button>
+              </form>
+            </div>
+
+            <!-- Tarjeta Unirse a Hogar -->
+            <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60">
+              <h3 class="text-sm font-semibold text-white flex items-center gap-2">
+                <span>🔑 Unirme con Código</span>
+              </h3>
+              <p class="text-xs text-slate-400 mt-1 mb-3">Ingresa el código de 6 caracteres que te compartió tu conviviente.</p>
+              <form id="form-unirse-hogar" class="flex flex-col sm:flex-row gap-2">
+                <input 
+                  id="unirse-hogar-codigo" 
+                  type="text" 
+                  required 
+                  minlength="6" 
+                  maxlength="6" 
+                  placeholder="Ej: K9X2P4" 
+                  class="flex-1 px-3 py-2 uppercase tracking-widest text-center font-mono rounded-xl bg-slate-800/90 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                <button 
+                  type="submit" 
+                  class="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold rounded-xl transition-all whitespace-nowrap"
+                >
+                  Unirme
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- Estado 2: Usuario CON Hogar activo -->
+        <div id="hogar-activo" class="hidden space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center justify-center">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 id="hogar-activo-nombre" class="text-base font-semibold text-white">Mi Hogar</h2>
+                  <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Hogar Activo</span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">Los gastos marcados como "Compartido" se sincronizan entre todos los miembros</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 self-start sm:self-auto">
+              <button 
+                id="btn-salir-hogar" 
+                type="button" 
+                class="px-3 py-1.5 text-xs text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 border border-rose-500/20 rounded-xl transition-all"
+              >
+                Salir del Hogar
+              </button>
+            </div>
+          </div>
+
+          <!-- Datos del Hogar: Código de invitación y miembros -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Código de invitación -->
+            <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col justify-between">
+              <div>
+                <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Código de Invitación</span>
+                <div class="flex items-center justify-between mt-2">
+                  <span id="hogar-activo-codigo" class="text-2xl font-mono font-bold tracking-widest text-indigo-300">------</span>
+                  <button 
+                    id="btn-copiar-codigo-hogar" 
+                    type="button" 
+                    class="px-2.5 py-1.5 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 border border-indigo-500/30 text-xs font-semibold rounded-lg flex items-center gap-1 transition-all"
+                    title="Copiar código para enviar a tu conviviente"
+                  >
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Copiar</span>
+                  </button>
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-2">Envía este código a tu pareja o conviviente para que se una a tu hogar.</p>
+            </div>
+
+            <!-- Miembros convivientes -->
+            <div class="md:col-span-2 p-4 rounded-xl bg-slate-800/40 border border-slate-700/60 flex flex-col justify-between">
+              <div>
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[11px] font-medium text-slate-400 uppercase tracking-wider">Convivientes Miembros</span>
+                  <span id="hogar-conteo-miembros" class="text-xs text-slate-400">1 / 6 miembros</span>
+                </div>
+                <div id="hogar-lista-miembros" class="flex flex-wrap gap-2 mt-2">
+                  <!-- Renderizado dinámico de chips de convivientes -->
+                </div>
+              </div>
+              <p class="text-[11px] text-slate-500 mt-2">Cualquier gasto compartido creado por ti o por ellos aparecerá automáticamente en el historial.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ========================================================================= -->
       <!-- SECCIÓN: BOLSILLOS DE AHORRO CON METAS (Tarea 4.3 - Jorman Palacios / HU-04) -->
       <!-- ========================================================================= -->
       <section class="bg-slate-900/60 border border-slate-800 rounded-2xl p-6">
@@ -427,6 +571,11 @@
                   <option value="COMPARTIDO" selected>Compartido</option>
                 </select>
               </div>
+            </div>
+
+            <!-- Ayuda contextual sobre Ámbito y Convivientes (HU-09 / Tarea 9.3) -->
+            <div id="aviso-ambito-movimiento" class="p-3 rounded-xl text-xs border transition-all">
+              <!-- Se actualiza dinámicamente desde dashboard.js -->
             </div>
 
             <div>
@@ -573,6 +722,6 @@
   </div>
 
   <!-- Orquestador Principal de la Aplicación (con cache-buster) -->
-  <script type="module" src="../src/app.js?v=6"></script>
+  <script type="module" src="../src/app.js?v=7"></script>
 </body>
 </html>

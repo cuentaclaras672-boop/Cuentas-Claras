@@ -70,6 +70,7 @@ export class Transaccion {
    * @param {string} params.creadoPor - UID del usuario en Firebase Auth.
    * @param {string} [params.nombreUsuario='Anónimo'] - Nombre visible del autor.
    * @param {Date|string|object} [params.fecha=new Date()] - Fecha del movimiento.
+   * @param {string|null} [params.hogarId=null] - Código o ID del hogar al que pertenece la transacción.
    */
   constructor({
     id = null,
@@ -80,7 +81,8 @@ export class Transaccion {
     categoria,
     creadoPor,
     nombreUsuario = 'Anónimo',
-    fecha = new Date()
+    fecha = new Date(),
+    hogarId = null
   }) {
     this.id = id;
     this.descripcion = (descripcion || '').trim();
@@ -91,6 +93,7 @@ export class Transaccion {
     this.creadoPor = creadoPor;
     this.nombreUsuario = (nombreUsuario || 'Anónimo').trim();
     this.fecha = fecha instanceof Date ? fecha : new Date(fecha || Date.now());
+    this.hogarId = typeof hogarId === 'string' && hogarId.trim() ? hogarId.trim() : null;
 
     // Ejecuta validaciones de dominio defensivas al instanciarse
     this.validar();
@@ -131,7 +134,7 @@ export class Transaccion {
    * @returns {object} Objeto serializable para Cloud Firestore.
    */
   aFirestore() {
-    return {
+    const payload = {
       descripcion: this.descripcion,
       monto: this.monto,
       tipo: this.tipo,
@@ -141,6 +144,12 @@ export class Transaccion {
       nombreUsuario: this.nombreUsuario,
       fecha: this.fecha instanceof Date ? this.fecha : new Date()
     };
+
+    if (this.hogarId) {
+      payload.hogarId = this.hogarId;
+    }
+
+    return payload;
   }
 
   /**
@@ -171,7 +180,8 @@ export class Transaccion {
       categoria: data.categoria,
       creadoPor: data.creadoPor,
       nombreUsuario: data.nombreUsuario,
-      fecha: fechaFormateada
+      fecha: fechaFormateada,
+      hogarId: data.hogarId || null
     });
   }
 }

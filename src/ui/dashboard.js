@@ -13,8 +13,10 @@ import {
   abonarFondosBolsillo,
   calcularTotalBolsillos
 } from "../services/firestore.js";
+import { crearHogar, unirseAHogar, salirDelHogar } from "../services/hogares.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
+import { Hogar } from "../models/Hogar.js";
 import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMontoCOP, fechaLocalISO } from "../utils/formateo.js?v=5";
 import { consultarTRM } from "../services/indicadores.js?v=5";
 import { agruparGastosPorCategoria } from "../utils/estadisticas.js";
@@ -22,6 +24,7 @@ import { mostrarToast } from "./notificaciones.js";
 import { escucharConexion, hayConexion } from "../services/conexion.js";
 
 let usuarioActual = null;
+let hogarActual = null;
 let transaccionesEnMemoria = [];
 let bolsillosEnMemoria = [];
 let filtroBusquedaTexto = "";
@@ -66,6 +69,10 @@ export function inicializarDashboardUI(usuario) {
   // Cargar indicador externo de TRM (Condición Técnica #3)
   cargarIndicadorTRM();
 
+  // Renderizar estado visual de Hogar y ayudas de ámbito
+  renderizarSeccionHogar();
+  actualizarAvisoAmbito();
+
   // Si los listeners del DOM ya fueron configurados previamente, evitar duplicación
   if (listenersInicializados) {
     return;
@@ -98,16 +105,115 @@ export function inicializarDashboardUI(usuario) {
     });
   }
 
+  // =========================================================================
+  // MANEJADORES DE MI HOGAR COMPARTIDO (Tarea 9.3 - Jorman Palacios / HU-09)
+  // =========================================================================
+  const formCrearHogar = document.getElementById("form-crear-hogar");
+  if (formCrearHogar) {
+    formCrearHogar.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const inputNombre = document.getElementById("crear-hogar-nombre");
+      const btnSubmit = formCrearHogar.querySelector("button[type='submit']");
+      const nombre = inputNombre?.value?.trim() || "";
+
+      if (nombre.length < 3) {
+        mostrarToast("El nombre del hogar debe tener al menos 3 caracteres.", "alerta");
+        return;
+      }
+
+      try {
+        cambiarEstadoBoton(btnSubmit, true, "Creando...");
+        const usuarioPayload = {
+          uid: usuarioActual.uid,
+          nombre: usuarioActual.displayName || usuarioActual.email || "Conviviente"
+        };
+        const nuevoHogar = await crearHogar(nombre, usuarioPayload, Hogar.generarCodigo);
+        mostrarToast(`¡Hogar "${nuevoHogar.nombre}" creado! Código: ${nuevoHogar.codigo}`, "exito", 6000);
+        formCrearHogar.reset();
+      } catch (error) {
+        mostrarToast(error.message, "error");
+      } finally {
+        cambiarEstadoBoton(btnSubmit, false, "Crear Hogar");
+      }
+    });
+  }
+
+  const formUnirseHogar = document.getElementById("form-unirse-hogar");
+  if (formUnirseHogar) {
+    formUnirseHogar.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const inputCodigo = document.getElementById("unirse-hogar-codigo");
+      const btnSubmit = formUnirseHogar.querySelector("button[type='submit']");
+      const codigo = inputCodigo?.value?.trim() || "";
+
+      if (codigo.length !== 6) {
+        mostrarToast("El código de invitación debe tener exactamente 6 caracteres.", "alerta");
+        return;
+      }
+
+      try {
+        cambiarEstadoBoton(btnSubmit, true, "Uniéndote...");
+        const usuarioPayload = {
+          uid: usuarioActual.uid,
+          nombre: usuarioActual.displayName || usuarioActual.email || "Conviviente"
+        };
+        const hogarUnido = await unirseAHogar(codigo, usuarioPayload);
+        mostrarToast(`¡Te has unido con éxito a "${hogarUnido.nombre}"!`, "exito");
+        formUnirseHogar.reset();
+      } catch (error) {
+        mostrarToast(error.message, "error");
+      } finally {
+        cambiarEstadoBoton(btnSubmit, false, "Unirme");
+      }
+    });
+  }
+
+  const btnCopiarCodigo = document.getElementById("btn-copiar-codigo-hogar");
+  if (btnCopiarCodigo) {
+    btnCopiarCodigo.addEventListener("click", async () => {
+      if (!hogarActual?.codigo) return;
+      try {
+        await navigator.clipboard.writeText(hogarActual.codigo);
+        mostrarToast(`Código ${hogarActual.codigo} copiado al portapapeles. ¡Compártelo con tu conviviente!`, "exito");
+      } catch {
+        mostrarToast(`Código de invitación: ${hogarActual.codigo}`, "info");
+      }
+    });
+  }
+
+  const btnSalirHogar = document.getElementById("btn-salir-hogar");
+  if (btnSalirHogar) {
+    btnSalirHogar.addEventListener("click", async () => {
+      if (!hogarActual) return;
+      if (confirm(`¿Confirmas que deseas salir del hogar "${hogarActual.nombre}"?\nDejarás de ver los movimientos compartidos de tus convivientes.`)) {
+        try {
+          await salirDelHogar(hogarActual.id, usuarioActual.uid);
+          mostrarToast("Has salido del hogar exitosamente.", "info");
+        } catch (error) {
+          mostrarToast(error.message, "error");
+        }
+      }
+    });
+  }
+
   const selectTipo = document.getElementById("transaccion-tipo");
   const selectCategoria = document.getElementById("transaccion-categoria");
   const formTransaccion = document.getElementById("form-transaccion");
   const selectFiltroAmbito = document.getElementById("filtro-ambito");
+  const selectAmbito = document.getElementById("transaccion-ambito");
 
   // Actualizar categorías dinámicamente según el tipo seleccionado
   if (selectTipo && selectCategoria) {
     poblarCategorias(selectTipo.value, selectCategoria);
     selectTipo.addEventListener("change", () => {
       poblarCategorias(selectTipo.value, selectCategoria);
+    });
+  }
+
+  // Actualizar ayuda contextual sobre ámbito cuando el usuario cambia el selector
+  if (selectAmbito) {
+    selectAmbito.addEventListener("change", () => {
+      actualizarAvisoAmbito();
     });
   }
 
@@ -118,11 +224,13 @@ export function inicializarDashboardUI(usuario) {
 
       const inputDescripcion = document.getElementById("transaccion-descripcion");
       const inputMonto = document.getElementById("transaccion-monto");
-      const selectAmbito = document.getElementById("transaccion-ambito");
       const btnSubmit = formTransaccion.querySelector("button[type='submit']");
 
       try {
         cambiarEstadoBoton(btnSubmit, true, "Registrando...");
+
+        const esCompartido = selectAmbito.value === AMBITO_TRANSACCION.COMPARTIDO;
+        const idHogarDestino = esCompartido && hogarActual?.id ? hogarActual.id : null;
 
         const nuevaTransaccion = new Transaccion({
           descripcion: inputDescripcion.value,
@@ -131,14 +239,24 @@ export function inicializarDashboardUI(usuario) {
           ambito: selectAmbito.value,
           categoria: selectCategoria.value,
           creadoPor: usuarioActual.uid,
-          nombreUsuario: usuarioActual.displayName || usuarioActual.email,
-          fecha: new Date()
+          nombreUsuario: usuarioActual.displayName || usuarioActual.email || "Conviviente",
+          fecha: new Date(),
+          hogarId: idHogarDestino
         });
 
-        await registrarTransaccion(nuevaTransaccion);
-        mostrarToast("Transacción registrada con éxito en Firestore.", "exito");
+        await registrarTransaccion(nuevaTransaccion, idHogarDestino);
+
+        if (esCompartido && !hogarActual) {
+          mostrarToast("Gasto compartido registrado. Aviso: Aún no tienes convivientes vinculados a un Hogar.", "info", 5000);
+        } else if (esCompartido && hogarActual) {
+          mostrarToast(`Gasto compartido registrado y sincronizado con ${hogarActual.nombre}.`, "exito");
+        } else {
+          mostrarToast("Transacción registrada con éxito en Firestore.", "exito");
+        }
+
         formTransaccion.reset();
         poblarCategorias(selectTipo.value, selectCategoria);
+        actualizarAvisoAmbito();
       } catch (error) {
         mostrarToast(error.message, "error");
       } finally {
@@ -396,6 +514,119 @@ export function actualizarDashboard(lista) {
 }
 
 /**
+ * Actualiza los datos del hogar activo en memoria y refresca la sección de Mi Hogar y avisos de ámbito (HU-09).
+ * @param {object|null} hogar - Objeto con datos del hogar o null si no pertenece a ninguno.
+ */
+export function actualizarHogarUI(hogar) {
+  hogarActual = hogar;
+  renderizarSeccionHogar();
+  actualizarAvisoAmbito();
+}
+
+/**
+ * Renderiza la sección de Mi Hogar según si el usuario pertenece o no a un hogar (HU-09 / Tarea 9.3).
+ */
+function renderizarSeccionHogar() {
+  const panelVacio = document.getElementById("hogar-vacio");
+  const panelActivo = document.getElementById("hogar-activo");
+  if (!panelVacio || !panelActivo) return;
+
+  if (!hogarActual) {
+    panelVacio.classList.remove("hidden");
+    panelActivo.classList.add("hidden");
+    return;
+  }
+
+  panelVacio.classList.add("hidden");
+  panelActivo.classList.remove("hidden");
+
+  const elemNombre = document.getElementById("hogar-activo-nombre");
+  const elemCodigo = document.getElementById("hogar-activo-codigo");
+  const elemConteo = document.getElementById("hogar-conteo-miembros");
+  const contenedorMiembros = document.getElementById("hogar-lista-miembros");
+
+  if (elemNombre) elemNombre.textContent = hogarActual.nombre || "Mi Hogar";
+  if (elemCodigo) elemCodigo.textContent = hogarActual.codigo || "------";
+  if (elemConteo) elemConteo.textContent = `${hogarActual.miembros?.length || 1} / 6 miembros`;
+
+  if (contenedorMiembros && Array.isArray(hogarActual.miembros)) {
+    contenedorMiembros.innerHTML = hogarActual.miembros.map((uid) => {
+      const esYo = uid === usuarioActual?.uid;
+      const nombre = (hogarActual.nombres && hogarActual.nombres[uid]) || (esYo ? "Tú" : "Conviviente");
+      return `
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${
+          esYo 
+            ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/30" 
+            : "bg-slate-800 text-slate-300 border border-slate-700"
+        }">
+          <span class="w-2 h-2 rounded-full ${esYo ? "bg-indigo-400" : "bg-emerald-400"}"></span>
+          <span>${escaparHTML(nombre)}${esYo ? " (Tú)" : ""}</span>
+        </span>
+      `;
+    }).join("");
+  }
+}
+
+/**
+ * Actualiza el cuadro contextual debajo del selector de ámbito en el formulario de transacciones.
+ */
+function actualizarAvisoAmbito() {
+  const contenedorAviso = document.getElementById("aviso-ambito-movimiento");
+  const selectAmbito = document.getElementById("transaccion-ambito");
+  if (!contenedorAviso || !selectAmbito) return;
+
+  const ambito = selectAmbito.value;
+
+  if (ambito === AMBITO_TRANSACCION.COMPARTIDO) {
+    if (hogarActual) {
+      const nombresMiembros = Object.values(hogarActual.nombres || {});
+      const textoMiembros = nombresMiembros.length > 0 
+        ? nombresMiembros.join(", ") 
+        : `${hogarActual.miembros?.length || 1} convivientes`;
+
+      contenedorAviso.className = "p-3 rounded-xl text-xs border bg-indigo-500/10 border-indigo-500/30 text-indigo-200 transition-all";
+      contenedorAviso.innerHTML = `
+        <div class="flex items-start gap-2">
+          <svg class="w-4 h-4 mt-0.5 shrink-0 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <div>
+            <span class="font-semibold text-white">Compartiendo con tu hogar "${escaparHTML(hogarActual.nombre)}":</span>
+            <p class="text-[11px] text-slate-300 mt-0.5">Sincronizado con: <span class="text-indigo-300 font-medium">${escaparHTML(textoMiembros)}</span>.</p>
+          </div>
+        </div>
+      `;
+    } else {
+      contenedorAviso.className = "p-3 rounded-xl text-xs border bg-amber-500/10 border-amber-500/30 text-amber-200 transition-all";
+      contenedorAviso.innerHTML = `
+        <div class="flex items-start gap-2">
+          <svg class="w-4 h-4 mt-0.5 shrink-0 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+          <div>
+            <span class="font-semibold text-amber-200">Aún no perteneces a ningún hogar:</span>
+            <p class="text-[11px] text-slate-300 mt-0.5">Para compartir gastos con tu pareja o conviviente, primero crea o únete a un hogar con un código de invitación en <a href="#seccion-hogar" class="text-indigo-400 underline font-semibold hover:text-indigo-300">Mi Hogar</a>.</p>
+          </div>
+        </div>
+      `;
+    }
+  } else {
+    contenedorAviso.className = "p-3 rounded-xl text-xs border bg-slate-800/60 border-slate-700/60 text-slate-300 transition-all";
+    contenedorAviso.innerHTML = `
+      <div class="flex items-start gap-2">
+        <svg class="w-4 h-4 mt-0.5 shrink-0 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+        </svg>
+        <div>
+          <span class="font-semibold text-white">Gasto Personal Privado:</span>
+          <p class="text-[11px] text-slate-400 mt-0.5">Solo tú podrás ver este movimiento. Ningún otro conviviente tendrá acceso.</p>
+        </div>
+      </div>
+    `;
+  }
+}
+
+/**
  * Renderiza las tarjetas de balance general, saldo disponible, ingresos, gastos y fondos en bolsillos.
  */
 function renderizarTarjetasResumen() {
@@ -564,6 +795,8 @@ function renderizarListaTransacciones() {
   contenedor.innerHTML = filtradas.map((t) => {
     const esIngreso = t.tipo === TIPO_TRANSACCION.INGRESO;
     const esCompartido = t.ambito === AMBITO_TRANSACCION.COMPARTIDO;
+    const esPropio = t.creadoPor === usuarioActual?.uid;
+    const nombreAutor = t.nombreUsuario || (esPropio ? "Tú" : "Conviviente");
 
     return `
       <div class="flex items-center justify-between p-4 bg-slate-800/60 hover:bg-slate-800 border border-slate-700/60 rounded-xl transition-colors">
@@ -578,7 +811,7 @@ function renderizarListaTransacciones() {
             <div class="flex items-center gap-2">
               <h4 class="font-medium text-white text-sm">${escaparHTML(t.descripcion)}</h4>
               <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full ${esCompartido ? 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30' : 'bg-slate-700 text-slate-300'}">
-                ${escaparHTML(t.ambito)}
+                ${escaparHTML(t.ambito)}${esCompartido ? ` • por ${escaparHTML(nombreAutor)}` : ''}
               </span>
             </div>
             <p class="text-xs text-slate-400 mt-0.5">
@@ -591,16 +824,24 @@ function renderizarListaTransacciones() {
           <span class="font-semibold text-sm ${esIngreso ? 'text-emerald-400' : 'text-rose-400'}">
             ${esIngreso ? '+' : '-'} ${formatearMoneda(t.monto / divisor, divisaLabel, decimales)}
           </span>
-          <button 
-            type="button" 
-            data-id="${t.id}" 
-            class="btn-eliminar-transaccion p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
-            title="Eliminar transacción"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-          </button>
+          ${esPropio ? `
+            <button 
+              type="button" 
+              data-id="${t.id}" 
+              class="btn-eliminar-transaccion p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+              title="Eliminar transacción"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          ` : `
+            <span class="p-1.5 text-slate-500 cursor-not-allowed" title="Solo el creador (${escaparHTML(nombreAutor)}) puede eliminar este registro">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+            </span>
+          `}
         </div>
       </div>
     `;

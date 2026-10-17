@@ -8,12 +8,15 @@
 
 import { suscribirEstadoAuth } from "./services/auth.js";
 import { escucharTransacciones, escucharBolsillos } from "./services/firestore.js";
+import { escucharHogarDelUsuario } from "./services/hogares.js";
 import { inicializarAuthUI } from "./ui/ui-auth.js";
-import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI } from "./ui/dashboard.js?v=6";
+import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI, actualizarHogarUI } from "./ui/dashboard.js?v=7";
 import { mostrarToast } from "./ui/notificaciones.js";
 
 let desuscribirTransacciones = null;
 let desuscribirBolsillos = null;
+let desuscribirHogar = null;
+let idHogarActivo = null;
 
 /**
  * Punto de entrada principal que inicializa los controladores y listeners cuando el DOM está listo.
@@ -44,19 +47,46 @@ function iniciarAplicacion() {
       // Cancelar suscripciones anteriores si existían para evitar fugas de memoria
       if (typeof desuscribirTransacciones === "function") {
         desuscribirTransacciones();
+        desuscribirTransacciones = null;
       }
       if (typeof desuscribirBolsillos === "function") {
         desuscribirBolsillos();
+        desuscribirBolsillos = null;
+      }
+      if (typeof desuscribirHogar === "function") {
+        desuscribirHogar();
+        desuscribirHogar = null;
       }
 
-      // Conectar listener de Firestore en tiempo real para transacciones (HU-02)
-      desuscribirTransacciones = escucharTransacciones(
+      // Conectar listener de Hogar en tiempo real (HU-09 / Tarea 9.2 y 9.3)
+      desuscribirHogar = escucharHogarDelUsuario(
         usuario.uid,
-        (listaTransacciones) => {
-          actualizarDashboard(listaTransacciones);
+        (hogar) => {
+          const nuevoHogarId = hogar?.id || null;
+          const cambioDeHogar = nuevoHogarId !== idHogarActivo;
+          idHogarActivo = nuevoHogarId;
+
+          actualizarHogarUI(hogar);
+
+          // Si es la primera carga o cambió el vínculo del hogar, reconectar transacciones
+          if (cambioDeHogar || !desuscribirTransacciones) {
+            if (typeof desuscribirTransacciones === "function") {
+              desuscribirTransacciones();
+            }
+            desuscribirTransacciones = escucharTransacciones(
+              usuario.uid,
+              (listaTransacciones) => {
+                actualizarDashboard(listaTransacciones);
+              },
+              (error) => {
+                mostrarToast(`Error de base de datos: ${error.message}`, "error");
+              },
+              nuevoHogarId
+            );
+          }
         },
         (error) => {
-          mostrarToast(`Error de base de datos: ${error.message}`, "error");
+          console.warn("[app.js] Error en suscripción de hogar:", error.message);
         }
       );
 
@@ -80,10 +110,17 @@ function iniciarAplicacion() {
         desuscribirBolsillos();
         desuscribirBolsillos = null;
       }
+      if (typeof desuscribirHogar === "function") {
+        desuscribirHogar();
+        desuscribirHogar = null;
+      }
+
+      idHogarActivo = null;
 
       // Limpiar los datos del usuario anterior para que no se vean en el próximo login
       actualizarDashboard([]);
       actualizarBolsillosUI([]);
+      actualizarHogarUI(null);
 
       if (vistaDashboard) vistaDashboard.classList.add("hidden");
       if (vistaAuth) vistaAuth.classList.remove("hidden");
