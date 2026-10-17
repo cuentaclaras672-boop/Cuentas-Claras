@@ -96,6 +96,7 @@ cuentas-claras/
 │   │   ├── firestore.js    # Firebase Firestore (Transacciones, bolsillos y Real-time)
 │   │   ├── prestamos.js    # Préstamos a terceros y abonos parciales (HU-08)
 │   │   ├── hogares.js      # Hogar compartido: crear, unirse con código y salir (HU-09)
+│   │   ├── categorias.js   # Gestión de categorías personalizadas por usuario
 │   │   ├── indicadores.js  # API externa de la TRM con respaldos y tiempo límite
 │   │   └── conexion.js     # Detección de conexión online / offline (HU-07)
 │   ├── ui/                 # CAPA DE PRESENTACIÓN (Manipulación del DOM)
