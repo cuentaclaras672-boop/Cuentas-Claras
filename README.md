@@ -63,7 +63,7 @@ El backlog del producto se encuentra organizado, estimado en Story Points (escal
 
 | # | Condición Técnica | Implementación en Cuentas Claras | Módulos Responsables | Verificación Automatizada |
 |---|---|---|---|---|
-| **1** | **Persistencia Real** | Almacenamiento persistente en Cloud Firestore para transacciones, bolsillos y préstamos. Prohibido `localStorage` para balances. Sincronización en tiempo real (`onSnapshot`) y transacciones atómicas (`runTransaction`). | [`src/services/firestore.js`](src/services/firestore.js)<br>[`src/services/prestamos.js`](src/services/prestamos.js) | [`tests/pruebas-bolsillos.test.js`](tests/pruebas-bolsillos.test.js)<br>[`tests/pruebas-prestamos.test.js`](tests/pruebas-prestamos.test.js) |
+| **1** | **Persistencia Real** | Almacenamiento persistente en Cloud Firestore para transacciones, bolsillos y préstamos. Prohibido `localStorage` para balances. Sincronización en tiempo real (`onSnapshot`) y transacciones atómicas (`runTransaction`). | [`src/services/firestore.js`](src/services/firestore.js)<br>[`src/services/prestamos.js`](src/services/prestamos.js)<br>[`src/services/liquidaciones.js`](src/services/liquidaciones.js) | [`tests/pruebas-bolsillos.test.js`](tests/pruebas-bolsillos.test.js)<br>[`tests/pruebas-prestamos.test.js`](tests/pruebas-prestamos.test.js) |
 | **2** | **Sesión o Control de Acceso** | Autenticación con Firebase Auth SDK v10 (email y contraseña), aislamiento estricto por UID y privacidad de movimientos compartidos en el hogar mediante reglas de backend en `firestore.rules`. | [`src/services/auth.js`](src/services/auth.js)<br>[`src/services/hogares.js`](src/services/hogares.js)<br>[`firestore.rules`](firestore.rules) | [`tests/pruebas-hogares.test.js`](tests/pruebas-hogares.test.js) (Pruebas de aislamiento y prueba negativa) |
 | **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar oficial) con estrategia de failover (3 endpoints), timeout de 5 s y fallback referencial offline. | [`src/services/indicadores.js`](src/services/indicadores.js) | [`tests/pruebas-indicadores.test.js`](tests/pruebas-indicadores.test.js) (Simulación de caída de red) |
 | **4** | **Consulta con Filtrado** | Historial interactivo con búsqueda en tiempo real insensible a tildes, filtros combinados por ámbito, tipo, categoría y rango de fechas, más gráfica de gastos reactiva a los filtros. | [`src/ui/dashboard.js`](src/ui/dashboard.js)<br>[`src/utils/estadisticas.js`](src/utils/estadisticas.js) | [`tests/pruebas-filtros.test.js`](tests/pruebas-filtros.test.js)<br>[`tests/pruebas-grafica.test.js`](tests/pruebas-grafica.test.js) |
@@ -96,6 +96,7 @@ cuentas-claras/
 │   │   ├── firestore.js    # Firebase Firestore (Transacciones, bolsillos y Real-time)
 │   │   ├── prestamos.js    # Préstamos a terceros y abonos parciales (HU-08)
 │   │   ├── hogares.js      # Hogar compartido: crear, unirse con código y salir (HU-09)
+│   │   ├── liquidaciones.js # Cuadre del hogar: gastos compartidos del mes y liquidación saldada (HU-11)
 │   │   ├── categorias.js   # Gestión de categorías personalizadas por usuario
 │   │   ├── indicadores.js  # API externa de la TRM con respaldos y tiempo límite
 │   │   └── conexion.js     # Detección de conexión online / offline (HU-07)
@@ -141,7 +142,7 @@ La conexión con Firebase se realiza mediante el SDK modular v10. Para configura
 
 1. Crear un proyecto en la [Consola de Firebase](https://console.firebase.google.com/).
 2. Habilitar **Firebase Authentication** con el proveedor de **Correo electrónico / Contraseña**.
-3. Crear una base de datos **Cloud Firestore** en modo de producción. Las colecciones `transacciones`, `bolsillos`, `prestamos` y `hogares` se crean solas al guardar el primer documento.
+3. Crear una base de datos **Cloud Firestore** en modo de producción. Las colecciones `transacciones`, `bolsillos`, `prestamos`, `hogares` y `liquidaciones` se crean solas al guardar el primer documento.
 4. Duplicar la plantilla [`src/services/firebase-config.example.js`](src/services/firebase-config.example.js) como `src/services/firebase-config.js` (archivo protegido y excluido en `.gitignore`) e ingresar las credenciales suministradas internamente por el equipo:
 
 ```javascript

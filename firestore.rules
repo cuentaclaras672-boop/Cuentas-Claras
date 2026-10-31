@@ -192,6 +192,33 @@ service cloud.firestore {
         resource.data.miembros == [request.auth.uid];
     }
 
+    // Reglas para la colección de liquidaciones del hogar (Tarea 11.2 / HU-11 - CA-11.5 y CA-11.6)
+    // El ID del documento es '{hogarId}_{AAAA-MM}': una liquidación por hogar y por mes.
+    match /liquidaciones/{liquidacionId} {
+      // LECTURA: solo los miembros del hogar. El hogar se toma del ID para que también se pueda
+      // consultar un mes que aún no se ha saldado (el documento no existe todavía).
+      allow read: if request.auth != null &&
+        liquidacionId.matches('^[A-Z0-9]{6}_[0-9]{4}-(0[1-9]|1[0-2])$') &&
+        esMiembroDelHogar(liquidacionId.split('_')[0]);
+
+      // CREACIÓN: un miembro del hogar marca el mes como saldado a su nombre, con la hora del servidor
+      // y como máximo 5 transferencias (con 6 miembros, el cuadre nunca necesita más).
+      allow create: if request.auth != null &&
+        request.resource.data.keys().hasOnly(['hogarId', 'periodo', 'transferencias', 'saldadaPor', 'fecha']) &&
+        request.resource.data.keys().hasAll(['hogarId', 'periodo', 'transferencias', 'saldadaPor', 'fecha']) &&
+        request.resource.data.hogarId is string &&
+        request.resource.data.periodo is string &&
+        request.resource.data.periodo.matches('^[0-9]{4}-(0[1-9]|1[0-2])$') &&
+        liquidacionId == request.resource.data.hogarId + '_' + request.resource.data.periodo &&
+        esMiembroDelHogar(request.resource.data.hogarId) &&
+        request.resource.data.saldadaPor == request.auth.uid &&
+        request.resource.data.transferencias is list &&
+        request.resource.data.transferencias.size() <= 5 &&
+        request.resource.data.fecha == request.time;
+
+      // Sin update ni delete: una liquidación guardada queda como registro del cuadre.
+    }
+
     // Por defecto, denegar cualquier acceso no especificado a la base de datos
     match /{document=**} {
       allow read, write: if false;
