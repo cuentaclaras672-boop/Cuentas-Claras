@@ -15,7 +15,7 @@ Durante el Sprint 4, el equipo abordó el núcleo de valor diferencial del produ
 | **Story Points (SP)** | 16 SP | 16 SP | ✅ 100% Cumplido |
 | **Historias de Usuario** | 3 historias | 3 historias | ✅ 100% Terminadas |
 | **Tareas Técnicas** | 8 tareas | 8 tareas | ✅ 100% Cerradas |
-| **Suites de Pruebas QA** | 8 suites en `runner.js` | 8 aprobadas (100% PASS) | ✅ Certificado |
+| **Suites de Pruebas QA** | 9 suites en `runner.js` | 9 aprobadas (100% PASS) | ✅ Certificado |
 | **Deuda Técnica** | 0 bloqueantes | 0 pendientes | ✅ Saneada |
 
 ---
