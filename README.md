@@ -198,7 +198,7 @@ Para ejecutar la suite integral de pruebas unitarias, de integración y de segur
 ```bash
 node tests/runner.js
 ```
-Ejecuta las 8 suites automatizadas de los Sprints 2, 3 y 4, verificando el 100% de los criterios de aceptación (CA) sin dependencias externas.
+Ejecuta las 9 suites automatizadas de los Sprints 2, 3 y 4, verificando el 100% de los criterios de aceptación (CA) sin dependencias externas.
 
 > [!IMPORTANT]
 > **Condición de Entrada a la Sustentación (Lineamientos de la Asignatura):** El software debe correr localmente y sin errores de consola. De lo contrario, de acuerdo con la normativa innegociable de la cátedra TIC42695, la sustentación no se califica.

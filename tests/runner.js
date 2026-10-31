@@ -16,6 +16,7 @@ import { ejecutarPruebasPrestamos } from "./pruebas-prestamos.test.js";
 import { ejecutarPruebasHogares } from "./pruebas-hogares.test.js";
 import { ejecutarPruebasGrafica } from "./pruebas-grafica.test.js";
 import { ejecutarPruebasLiquidaciones } from "./pruebas-liquidaciones.test.js";
+import { ejecutarPruebasCategorias } from "./pruebas-categorias.test.js";
 
 async function ejecutarTodasLasPruebas() {
   console.log("===============================================================");
@@ -31,7 +32,8 @@ async function ejecutarTodasLasPruebas() {
     { nombre: "Sprint 3 - Tarea 8.4: Préstamos a Terceros y Abonos (HU-08)", fn: ejecutarPruebasPrestamos },
     { nombre: "Sprint 3 - Tarea 9.4: Hogar Compartido y Aislamiento (HU-09)", fn: ejecutarPruebasHogares },
     { nombre: "Sprint 3 - Tarea 10.3: Gráfica de Gastos y Divisa (HU-10)", fn: ejecutarPruebasGrafica },
-    { nombre: "Sprint 4 - Tarea 11.4 / 13.1: Cuadre del Hogar y Control de Descripción (HU-11 / HU-13)", fn: ejecutarPruebasLiquidaciones }
+    { nombre: "Sprint 4 - Tarea 11.4 / 13.1: Cuadre del Hogar y Control de Descripción (HU-11 / HU-13)", fn: ejecutarPruebasLiquidaciones },
+    { nombre: "Sprint 4 - Tarea 12.4: Categorías Personalizadas por Usuario (HU-12)", fn: ejecutarPruebasCategorias }
   ];
 
   let exitosas = 0;

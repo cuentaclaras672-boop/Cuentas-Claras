@@ -20,6 +20,14 @@ import { Hogar } from "../models/Hogar.js";
 import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMontoCOP, fechaLocalISO } from "../utils/formateo.js?v=5";
 import { consultarTRM } from "../services/indicadores.js?v=5";
 import { agruparGastosPorCategoria } from "../utils/estadisticas.js";
+import { 
+  escucharGastosCompartidosDelPeriodo, 
+  escucharLiquidacion, 
+  marcarLiquidacionSaldada, 
+  periodoDe 
+} from "../services/liquidaciones.js";
+import { calcularCuadreMes } from "../utils/cuadre.js";
+import { guardarCategoria, obtenerCategorias } from "../services/categorias.js";
 import { mostrarToast } from "./notificaciones.js";
 import { escucharConexion, hayConexion } from "../services/conexion.js";
 
@@ -34,6 +42,12 @@ let filtroCategoriaActual = "TODAS";
 let filtroFechaDesdeActual = "";
 let filtroFechaHastaActual = "";
 let divisaActiva = "COP";
+let categoriasPersonalizadas = [];
+let unsubLiquidacionPeriodo = null;
+let unsubGastosPeriodo = null;
+let periodoLiquidacionActivo = periodoDe(new Date());
+let liquidacionActualEnMemoria = null;
+let gastosCompartidosPeriodoEnMemoria = [];
 let tasaTRM = 3329.61;
 let listenersInicializados = false;
 
@@ -68,6 +82,8 @@ export function inicializarDashboardUI(usuario) {
 
   // Cargar indicador externo de TRM (Condición Técnica #3)
   cargarIndicadorTRM();
+  cargarCategoriasUsuario();
+  inicializarLiquidacionesUI();
 
   // Renderizar estado visual de Hogar y ayudas de ámbito
   renderizarSeccionHogar();
@@ -214,6 +230,29 @@ export function inicializarDashboardUI(usuario) {
   if (selectAmbito) {
     selectAmbito.addEventListener("change", () => {
       actualizarAvisoAmbito();
+    });
+  }
+
+  // Botón para crear nueva categoría personalizada (HU-12 / Tarea 12.3)
+  const btnCrearCategoria = document.getElementById("btn-crear-categoria");
+  if (btnCrearCategoria) {
+    btnCrearCategoria.addEventListener("click", async () => {
+      const tipo = selectTipo.value === TIPO_TRANSACCION.INGRESO ? 'ingreso' : 'gasto';
+      const inputNombre = prompt(`Ingresa el nombre de la nueva categoría personalizada de ${tipo.toUpperCase()} (3 a 40 caracteres):`);
+      if (!inputNombre) return;
+      const nombre = inputNombre.trim();
+      if (nombre.length < 3 || nombre.length > 40) {
+        mostrarToast("El nombre de la categoría debe tener entre 3 y 40 caracteres.", "alerta");
+        return;
+      }
+      try {
+        await guardarCategoria(nombre, tipo);
+        mostrarToast(`Categoría "${nombre}" creada exitosamente.`, "exito");
+        await cargarCategoriasUsuario();
+        if (selectCategoria) selectCategoria.value = nombre;
+      } catch (error) {
+        mostrarToast(error.message, "error");
+      }
     });
   }
 
