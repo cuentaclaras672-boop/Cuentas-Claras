@@ -14,7 +14,7 @@ import {
   calcularTotalBolsillos
 } from "../services/firestore.js";
 import { crearHogar, unirseAHogar, salirDelHogar } from "../services/hogares.js";
-import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO } from "../models/Transaccion.js";
+import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO, MAX_DESCRIPCION } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
 import { Hogar } from "../models/Hogar.js";
 import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMontoCOP, fechaLocalISO } from "../utils/formateo.js?v=5";
@@ -217,6 +217,19 @@ export function inicializarDashboardUI(usuario) {
     });
   }
 
+  // Contador de caracteres de la descripción (Tarea 13.1): el input ya corta en MAX_DESCRIPCION
+  const inputDescripcionContador = document.getElementById("transaccion-descripcion");
+  const textoContadorDescripcion = document.getElementById("contador-descripcion");
+  const actualizarContadorDescripcion = () => {
+    if (!inputDescripcionContador || !textoContadorDescripcion) return;
+    const restantes = MAX_DESCRIPCION - inputDescripcionContador.value.length;
+    textoContadorDescripcion.textContent = `Quedan ${restantes} ${restantes === 1 ? "carácter" : "caracteres"}`;
+  };
+  if (inputDescripcionContador) {
+    inputDescripcionContador.addEventListener("input", actualizarContadorDescripcion);
+    actualizarContadorDescripcion();
+  }
+
   // Manejador del formulario de nueva transacción
   if (formTransaccion) {
     formTransaccion.addEventListener("submit", async (e) => {
@@ -255,6 +268,7 @@ export function inicializarDashboardUI(usuario) {
         }
 
         formTransaccion.reset();
+        actualizarContadorDescripcion();
         poblarCategorias(selectTipo.value, selectCategoria);
         actualizarAvisoAmbito();
       } catch (error) {

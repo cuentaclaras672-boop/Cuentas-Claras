@@ -7,6 +7,12 @@
 import { parsearMonto } from "../utils/formateo.js";
 
 /**
+ * Largo máximo de la descripción (Tarea 13.1). Debe coincidir con firestore.rules y con el maxlength del formulario.
+ * @type {number}
+ */
+export const MAX_DESCRIPCION = 120;
+
+/**
  * Enumeración para los tipos de transacción permitidos.
  * @readonly
  * @enum {string}
@@ -106,6 +112,10 @@ export class Transaccion {
   validar() {
     if (!this.descripcion || this.descripcion.length < 3) {
       throw new Error('La descripción debe contener al menos 3 caracteres.');
+    }
+
+    if (this.descripcion.length > MAX_DESCRIPCION) {
+      throw new Error(`La descripción no puede superar los ${MAX_DESCRIPCION} caracteres.`);
     }
 
     if (typeof this.monto !== 'number' || isNaN(this.monto) || this.monto <= 0) {

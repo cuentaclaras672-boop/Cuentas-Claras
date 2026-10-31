@@ -10,7 +10,7 @@ import { suscribirEstadoAuth } from "./services/auth.js";
 import { escucharTransacciones, escucharBolsillos } from "./services/firestore.js";
 import { escucharHogarDelUsuario } from "./services/hogares.js";
 import { inicializarAuthUI } from "./ui/ui-auth.js";
-import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI, actualizarHogarUI } from "./ui/dashboard.js?v=7";
+import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI, actualizarHogarUI } from "./ui/dashboard.js?v=8";
 import { mostrarToast } from "./ui/notificaciones.js";
 
 let desuscribirTransacciones = null;
