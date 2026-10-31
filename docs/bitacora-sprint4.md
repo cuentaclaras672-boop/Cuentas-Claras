@@ -78,15 +78,48 @@ Durante el Sprint 4, el equipo abordó el núcleo de valor diferencial del produ
 
 ---
 
-## 4. Retrospectiva del Sprint 4 (30 de Octubre de 2026)
+## 4. Burndown del Sprint 4 (Medido en Tareas)
+Total de tareas del sprint: **8 tareas técnicas** (HU-11, HU-12 y HU-13).
 
-**Facilitador:** Fabián Córdoba (Scrum Master) · **Fecha:** 30 de octubre de 2026  
-**Participantes:** Juan Diego Peraza (PO), Fabián Córdoba (SM), Daniel Cortes (Dev), Jorman Palacios (Dev), Yerson Niño (Dev).
+| Semana | Corte | Ideal (restantes) | Planificado (restantes) | Real (restantes) |
+|:---:|:---:|:---:|:---:|:---:|
+| Inicio | 17 oct | 8 | 8 | 8 |
+| Semana 7 | 24 oct | 4 | 4 | 3 |
+| Semana 8 (Cierre) | 30 oct | 0 | 0 | **0 (100% Cerrado)** |
 
-| ¿Qué funcionó bien? | ¿Qué dificultades se presentaron? | Acción de mejora para el Sprint 5 | Responsable |
+---
+
+## 5. Retrospectiva del Sprint 4 — Dinámica del Barco (30 de Octubre de 2026)
+
+**Facilitación en sesión:** Daniel Felipe Cortes (en suplencia del Scrum Master) y Juan Diego Peraza (Product Owner).  
+**Aportes consolidados del equipo:** Juan Diego Peraza, Fabián Córdoba, Daniel Cortes, Jorman Palacios, Yerson Niño.
+
+### 5.1 Lienzo de la Dinámica del Barco (Sailboat)
+
+*   **LA ISLA (Nuestra Meta / Visión hacia Sprint 5 y 6):**
+    *   Llegar a la Sustentación Final de Corte III (21 de noviembre) con el 100% de las 7 condiciones técnicas blindadas, auditoría de carga superada y exportación de reportes financieros (CSV / PDF).
+*   **EL SOL (Reconocimientos / Lo que nos dio energía):**
+    *   Alcanzar **68 Story Points acumulados** (15 + 21 + 16 + 16) con 100% de eficacia en 4 sprints consecutivos y 9 suites de pruebas en `tests/runner.js` corriendo en ~0.35 segundos.
+*   **EL VIENTO EN LAS VELAS (¿Qué nos impulsó en el Sprint 4?):**
+    *   **Lógica Pura Desacoplada (`src/utils/cuadre.js`):** Implementar el algoritmo Greedy de transferencias mínimas ($N-1$) como función matemática pura permitió probarlo sin depender de la red.
+    *   **Alineación Cliente-Servidor (HU-13):** Sincronizar `MAX_DESCRIPCION = 120` en el HTML (`maxlength="120"`), en `Transaccion.js` y en `firestore.rules` evitó rechazos inesperados.
+    *   **Transacciones Atómicas e Idempotencia:** El ID determinista `{hogarId}_{AAAA-MM}` con `runTransaction` en `liquidaciones.js` evitó cobros o cierres duplicados.
+*   **LAS ANCLAS (¿Qué nos frenó o dificultó el avance?):**
+    *   **Ancla 1 — Formato heterogéneo de Fechas:** Al leer documentos en tiempo real desde Firestore, algunos flujos entregaban objetos `Date` nativos y otros `Timestamp` (`toDate()`), exigiendo validación defensiva extra.
+    *   **Ancla 2 — Diferencia de versión en CDN de Firebase:** Un commit en `categorias.js` importó accidentalmente Firebase `10.8.0` mientras el resto del proyecto usaba `10.13.0`, generando conflicto de instancias.
+    *   **Ancla 3 — Sincronización de ramas remotas:** El trabajo en paralelo requirió alinear `origin/main` antes de cada jornada para evitar conflictos de merge.
+*   **LAS ROCAS / ICEBERGS (Riesgos que vemos hacia el Sprint 5):**
+    *   **Roca 1:** Comportamiento de Firestore y tiempos de respuesta (<500 ms) ante ráfagas concurrentes de múltiples convivientes.
+    *   **Roca 2:** Vectores de inyección o permisos abiertos en las 6 colecciones (`transacciones`, `bolsillos`, `prestamos`, `hogares`, `liquidaciones`, `categorias`).
+    *   **Roca 3:** Ausencias imprevistas en sustentaciones presenciales/sincrónicas que exigen que cualquier integrante domine el 100% de las capas del código.
+
+### 5.2 Plan de Acción de Mejora Continua (El Timón hacia el Sprint 5)
+
+| Hallazgo del Barco | Acción de Mejora Concreta y Verificable para el Sprint 5 | Artefacto donde es Visible | Responsable |
 |---|---|---|---|
-| **Lógica Pura Desacoplada:** La creación de `src/utils/cuadre.js` como módulo puro permitió probar exhaustivamente el algoritmo con múltiples combinaciones sin depender de la base de datos. | **Formato de Fechas en Objetos:** Al recuperar documentos en tiempo real, algunos entornos entregaban objetos `Date` nativos y otros `Timestamp` con método `toDate()`, requiriendo normalización defensiva. | Estandarizar una función auxiliar transversal de conversión de fecha en `formateo.js` para todos los servicios de Firestore. | Daniel Cortes / Yerson Niño |
-| **Alineación Cliente-Servidor:** La sincronización estricta del límite de 120 caracteres entre el input HTML, el modelo `Transaccion.js` y `firestore.rules` evitó errores de red inesperados. | **Diferencias de Versión en SDK:** Un commit incorporó accidentalmente Firebase `10.8.0` en `categorias.js` mientras el resto del sistema usaba `10.13.0`. | Establecer en la DoD una verificación obligatoria de versiones de CDN en todos los archivos que consuman Firebase. | Fabián Córdoba (Scrum Master) |
-| **Crecimiento de la Suite QA:** Se incorporó la 8ª suite de pruebas (`pruebas-liquidaciones.test.js`) manteniendo el tiempo de ejecución del runner en menos de 1 segundo. | **Sincronización de Commits Remotos:** El trabajo en paralelo de compañeros requiere comunicación continua para evitar conflictos al rebasar ramas de desarrollo. | Realizar pull diario de `origin/main` antes de iniciar cada jornada de desarrollo local. | Todo el equipo |
+| **Ancla 1:** Fechas `Date` vs `Timestamp` | Estandarizar función transversal de normalización de fechas en `src/utils/formateo.js`. | `src/utils/formateo.js` y suite QA | Daniel Cortes / Yerson Niño |
+| **Ancla 2:** Versiones del SDK de Firebase | Incluir en la DoD la verificación estricta de versión única (`10.13.0`) en todos los `import` de `src/services/`. | `docs/definition-of-done.md` y código | Fabián Córdoba / Juan Diego Peraza |
+| **Roca 1 y 2:** Estrés y Seguridad en las 6 colecciones | Ejecutar auditoría de `firestore.rules` y crear suite de estrés concurrente (50 peticiones) en **HU-14**. | `acta-planning-sprint5.md` (Tarea 14.1 y 14.2) | Daniel Cortes / Fabián Córdoba |
+| **Roca 3:** Dominio integral del código | Documentar el mapa completo de los módulos S1-S4 y asegurar `git pull origin main` diario. | `bitacora-sprint5.md` y Repositorio | Todo el equipo |
 
 > **Conclusión de la Retrospectiva:** El equipo completó satisfactoriamente los 16 Story Points del Sprint 4, alcanzando un total acumulado de **68 Story Points** en el proyecto. Con la funcionalidad de cuadre de cuentas entregada, el equipo se declara listo para iniciar el **Sprint 5 (31 de octubre al 13 de noviembre de 2026)** enfocado en auditoría de seguridad, pruebas de carga y reportes.

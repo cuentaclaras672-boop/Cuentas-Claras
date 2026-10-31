@@ -12,11 +12,14 @@
 
 | Integrante | Rol Scrum | Participación en la Sesión |
 |---|---|---|
-| **Juan Diego Peraza Amado** | Product Owner | Presentación del incremento de producto, validación de criterios de aceptación de liquidaciones y balance general de velocidad. |
-| **Fabián Eduardo Córdoba** | Scrum Master / QA | Moderación de la sesión de Review, presentación de la 8ª suite de pruebas automatizadas y certificación de calidad. |
-| **Daniel Felipe Cortes** | Development Team | Demostración de persistencia de liquidaciones en Firestore, validación de periodos y transacciones atómicas. |
-| **Jorman Palacios Murillo** | Development Team | Demostración de la interfaz del contador interactivo de 120 caracteres y componentes visuales del formulario. |
-| **Yerson Niño Guerrero** | Development Team | Demostración del algoritmo matemático de simplificación de transferencias (`cuadre.js`) y servicio de categorías. |
+| **Juan Diego Peraza Amado** | Product Owner | Conducción de la presentación del incremento de producto, validación de criterios de negocio de liquidaciones y balance de velocidad. |
+| **Daniel Felipe Cortes** | Development Team / Suplencia Scrum Master | Demostración técnica de liquidaciones en Firestore, reglas de inmutabilidad, límite de descripción y co-facilitación de la Retrospectiva del Barco. |
+| **Fabián Eduardo Córdoba** | Scrum Master / QA | Participación en desarrollo previo y diseño de la suite de pruebas QA (ausencia justificada en sustentación presencial). |
+| **Jorman Palacios Murillo** | Development Team | Participación en interfaz de usuario y componentes visuales (ausencia justificada en sustentación presencial). |
+| **Yerson Niño Guerrero** | Development Team | Participación en servicios y validaciones de categorías (ausencia justificada en sustentación presencial). |
+
+> [!NOTE]
+> **Propiedad Colectiva del Código y Suplencia Ágil:** Debido a motivos de fuerza mayor justificados de tres compañeros de equipo, la sustentación, demo del incremento y dinámica de retrospectiva son asumidas y defendidas en vivo por **Juan Diego Peraza** y **Daniel Felipe Cortes**, evidenciando la versatilidad técnica y dominio integral del repositorio por parte de los miembros presentes.
 
 ---
 
@@ -67,7 +70,7 @@ Durante la sesión se validaron en vivo las tres Historias de Usuario completada
 | **Historias de Usuario (HU)** | 3 historias | 3 historias entregadas y aceptadas | 100% |
 | **Story Points (SP)** | 16 SP | 16 SP certificados | 100% |
 | **Tareas del Sprint Backlog** | 8 tareas | 8 tareas cerradas en Done | 100% |
-| **Suites de Pruebas QA** | 8 suites consolidadas | 8 de 8 aprobadas en `runner.js` | 100% PASS |
+| **Suites de Pruebas QA** | 9 suites consolidadas | 9 de 9 aprobadas en `runner.js` | 100% PASS |
 | **Tiempo de Ejecución QA** | Menor a 2 segundos | ~0.35 segundos | Óptimo |
 | **Deuda Técnica Acumulada** | 0 deudas | 0 defectos pendientes | Resuelta |
 
