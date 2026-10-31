@@ -179,7 +179,16 @@ export function escucharGastosCompartidosDelPeriodo(hogarId, periodo, onActualiz
       const gastos = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        const fecha = data.fecha && typeof data.fecha.toDate === "function" ? data.fecha.toDate() : null;
+        let fecha = null;
+        if (data.fecha && typeof data.fecha.toDate === "function") {
+          fecha = data.fecha.toDate();
+        } else if (data.fecha instanceof Date) {
+          fecha = data.fecha;
+        } else if (data.fecha && data.fecha.seconds) {
+          fecha = new Date(data.fecha.seconds * 1000);
+        } else if (data.fecha) {
+          fecha = new Date(data.fecha);
+        }
         if (data.tipo !== TIPO_TRANSACCION.GASTO || !fecha || fecha < inicio || fecha >= fin) return;
         gastos.push({
           id: docSnap.id,

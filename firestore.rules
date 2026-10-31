@@ -219,6 +219,19 @@ service cloud.firestore {
       // Sin update ni delete: una liquidación guardada queda como registro del cuadre.
     }
 
+    // Reglas para la colección de categorías personalizadas (HU-12)
+    match /categorias/{categoriaId} {
+      allow read, delete: if request.auth != null && resource.data.uid == request.auth.uid;
+      allow create: if request.auth != null &&
+        request.resource.data.uid == request.auth.uid &&
+        request.resource.data.nombre is string &&
+        request.resource.data.nombre.size() >= 3 &&
+        request.resource.data.nombre.size() <= 40;
+      allow update: if request.auth != null &&
+        resource.data.uid == request.auth.uid &&
+        request.resource.data.uid == request.auth.uid;
+    }
+
     // Por defecto, denegar cualquier acceso no especificado a la base de datos
     match /{document=**} {
       allow read, write: if false;

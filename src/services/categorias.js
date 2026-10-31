@@ -1,3 +1,10 @@
+/**
+ * @file categorias.js
+ * @description Capa de Infraestructura / Servicios - Categorías personalizadas en Cloud Firestore (HU-12).
+ * Permite a los usuarios crear, consultar, actualizar y eliminar categorías dinámicas para sus transacciones.
+ * @module services/categorias
+ */
+
 import { db, auth } from './firebase.js';
 import { 
   collection, 
@@ -8,32 +15,43 @@ import {
   deleteDoc, 
   query, 
   where 
-} from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+} from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
+import { traducirErrorFirestore } from './firestore.js';
 
 /**
- * Tarea 8.2: Servicio para guardar categorias personalizadas por usuario (HU-08)
+ * Servicio para registrar una categoría personalizada por usuario (HU-12).
+ * @async
+ * @param {string} nombre - Nombre descriptivo de la categoría.
+ * @param {'gasto'|'ingreso'} [tipo='gasto'] - Tipo de flujo asociado.
+ * @returns {Promise<string>} ID generado en Firestore.
  */
 export async function guardarCategoria(nombre, tipo = 'gasto') {
   const user = auth.currentUser;
   if (!user) throw new Error("Usuario no autenticado");
 
+  const nombreLimpio = typeof nombre === 'string' ? nombre.trim() : '';
+  if (nombreLimpio.length < 3 || nombreLimpio.length > 40) {
+    throw new Error("El nombre de la categoría debe tener entre 3 y 40 caracteres.");
+  }
+
   try {
     const docRef = await addDoc(collection(db, "categorias"), {
       uid: user.uid,
-      nombre: nombre.trim(),
+      nombre: nombreLimpio,
       tipo: tipo,
       fechaCreacion: new Date().toISOString()
     });
-    console.log("Categoría creada exitosamente con ID:", docRef.id);
     return docRef.id;
   } catch (error) {
-    console.error("Error al guardar la categoría en Firestore:", error);
-    throw error;
+    console.error("[CategoriasService.guardarCategoria] Error:", error.message);
+    throw new Error(traducirErrorFirestore(error));
   }
 }
 
 /**
- * Servicio para obtener las categorias del usuario autenticado
+ * Obtiene las categorías personalizadas del usuario autenticado.
+ * @async
+ * @returns {Promise<Array<{id: string, nombre: string, tipo: string}>>}
  */
 export async function obtenerCategorias() {
   const user = auth.currentUser;
@@ -48,13 +66,17 @@ export async function obtenerCategorias() {
     });
     return categorias;
   } catch (error) {
-    console.error("Error al obtener las categorías:", error);
-    throw error;
+    console.error("[CategoriasService.obtenerCategorias] Error:", error.message);
+    throw new Error(traducirErrorFirestore(error));
   }
 }
 
 /**
- * Tarea 9.1: Servicio para actualizar una categoría (HU-09)
+ * Actualiza los datos de una categoría personalizada (HU-12).
+ * @async
+ * @param {string} idCategoria - ID del documento en Firestore.
+ * @param {object} nuevosDatos - Campos a actualizar.
+ * @returns {Promise<boolean>}
  */
 export async function actualizarCategoria(idCategoria, nuevosDatos) {
   const user = auth.currentUser;
@@ -63,16 +85,18 @@ export async function actualizarCategoria(idCategoria, nuevosDatos) {
   try {
     const categoriaRef = doc(db, "categorias", idCategoria);
     await updateDoc(categoriaRef, nuevosDatos);
-    console.log("Categoría actualizada correctamente:", idCategoria);
     return true;
   } catch (error) {
-    console.error("Error al actualizar la categoría:", error);
-    throw error;
+    console.error("[CategoriasService.actualizarCategoria] Error:", error.message);
+    throw new Error(traducirErrorFirestore(error));
   }
 }
 
 /**
- * Tarea 9.2: Servicio para eliminar una categoría (HU-09)
+ * Elimina una categoría personalizada del usuario (HU-12).
+ * @async
+ * @param {string} idCategoria - ID del documento en Firestore.
+ * @returns {Promise<boolean>}
  */
 export async function eliminarCategoria(idCategoria) {
   const user = auth.currentUser;
@@ -81,10 +105,9 @@ export async function eliminarCategoria(idCategoria) {
   try {
     const categoriaRef = doc(db, "categorias", idCategoria);
     await deleteDoc(categoriaRef);
-    console.log("Categoría eliminada correctamente:", idCategoria);
     return true;
   } catch (error) {
-    console.error("Error al eliminar la categoría:", error);
-    throw error;
+    console.error("[CategoriasService.eliminarCategoria] Error:", error.message);
+    throw new Error(traducirErrorFirestore(error));
   }
 }

@@ -1,7 +1,7 @@
 /**
  * @file runner.js
  * @description Suite Maestra y Ejecutor de Pruebas Automatizadas de Calidad (QA).
- * Permite certificar el 100% de los criterios de aceptación de los Sprints 2 y 3.
+ * Permite certificar el 100% de los criterios de aceptación de los Sprints 2, 3 y 4.
  * Responsable: Fabián Córdoba <cuentaclaras672@gmail.com> (Scrum Master / QA Lead).
  * 
  * Uso:
@@ -15,6 +15,7 @@ import { ejecutarPruebasBolsillos } from "./pruebas-bolsillos.test.js";
 import { ejecutarPruebasPrestamos } from "./pruebas-prestamos.test.js";
 import { ejecutarPruebasHogares } from "./pruebas-hogares.test.js";
 import { ejecutarPruebasGrafica } from "./pruebas-grafica.test.js";
+import { ejecutarPruebasLiquidaciones } from "./pruebas-liquidaciones.test.js";
 
 async function ejecutarTodasLasPruebas() {
   console.log("===============================================================");
@@ -29,7 +30,8 @@ async function ejecutarTodasLasPruebas() {
     { nombre: "Sprint 2 - Tarea 4.4: Bolsillos y Saldo Disponible (HU-04)", fn: ejecutarPruebasBolsillos },
     { nombre: "Sprint 3 - Tarea 8.4: Préstamos a Terceros y Abonos (HU-08)", fn: ejecutarPruebasPrestamos },
     { nombre: "Sprint 3 - Tarea 9.4: Hogar Compartido y Aislamiento (HU-09)", fn: ejecutarPruebasHogares },
-    { nombre: "Sprint 3 - Tarea 10.3: Gráfica de Gastos y Divisa (HU-10)", fn: ejecutarPruebasGrafica }
+    { nombre: "Sprint 3 - Tarea 10.3: Gráfica de Gastos y Divisa (HU-10)", fn: ejecutarPruebasGrafica },
+    { nombre: "Sprint 4 - Tarea 11.4 / 13.1: Cuadre del Hogar y Control de Descripción (HU-11 / HU-13)", fn: ejecutarPruebasLiquidaciones }
   ];
 
   let exitosas = 0;
