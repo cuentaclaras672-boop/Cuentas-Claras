@@ -50,6 +50,7 @@ let liquidacionActualEnMemoria = null;
 let gastosCompartidosPeriodoEnMemoria = [];
 let tasaTRM = 3329.61;
 let listenersInicializados = false;
+let listenersLiquidacionInicializados = false;
 
 /**
  * Normaliza un texto removiendo diacríticos/tildes y convirtiendo a minúsculas para búsqueda insensible.
@@ -321,9 +322,7 @@ export function inicializarDashboardUI(usuario) {
   // Poblado inicial del selector de categorías en la barra de filtros
   const selectFiltroCategoria = document.getElementById("filtro-categoria");
   if (selectFiltroCategoria) {
-    const todasCategorias = [...new Set([...CATEGORIAS_GASTO, ...CATEGORIAS_INGRESO])].sort();
-    selectFiltroCategoria.innerHTML = `<option value="TODAS">Todas las categorías</option>` +
-      todasCategorias.map((cat) => `<option value="${cat}">${cat}</option>`).join("");
+    poblarFiltroCategorias(selectFiltroCategoria);
   }
 
   // CA-5.1: Búsqueda en tiempo real por texto (descripción/concepto o categoría)
@@ -571,9 +570,15 @@ export function actualizarDashboard(lista) {
  * @param {object|null} hogar - Objeto con datos del hogar o null si no pertenece a ninguno.
  */
 export function actualizarHogarUI(hogar) {
+  const cambioDeHogar = (hogar?.id || null) !== (hogarActual?.id || null);
   hogarActual = hogar;
   renderizarSeccionHogar();
   actualizarAvisoAmbito();
+  if (cambioDeHogar) {
+    suscribirLiquidacionDelPeriodo();
+  } else {
+    renderizarCuadreHogar();
+  }
 }
 
 /**
@@ -925,8 +930,65 @@ function renderizarListaTransacciones() {
  * @returns {void}
  */
 function poblarCategorias(tipo, elementoSelect) {
-  const lista = tipo === TIPO_TRANSACCION.INGRESO ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO;
-  elementoSelect.innerHTML = lista.map((cat) => `<option value="${cat}">${cat}</option>`).join("");
+  const base = tipo === TIPO_TRANSACCION.INGRESO ? CATEGORIAS_INGRESO : CATEGORIAS_GASTO;
+  const tipoPersonalizado = tipo === TIPO_TRANSACCION.INGRESO ? "ingreso" : "gasto";
+  const propias = categoriasPersonalizadas
+    .filter((c) => c.tipo === tipoPersonalizado)
+    .map((c) => c.nombre)
+    .filter((nombre) => !base.includes(nombre));
+  const lista = [...base, ...propias];
+  elementoSelect.innerHTML = lista
+    .map((cat) => `<option value="${escaparHTML(cat)}">${escaparHTML(cat)}</option>`)
+    .join("");
+}
+
+/**
+ * Llena el selector de categorías de la barra de filtros con las categorías base y las personalizadas.
+ * Conserva la opción elegida si sigue existiendo.
+ * @param {HTMLSelectElement} elementoSelect - Selector de filtro de categoría.
+ * @returns {void}
+ */
+function poblarFiltroCategorias(elementoSelect) {
+  const seleccion = elementoSelect.value;
+  const todas = [...new Set([
+    ...CATEGORIAS_GASTO,
+    ...CATEGORIAS_INGRESO,
+    ...categoriasPersonalizadas.map((c) => c.nombre)
+  ])].sort((a, b) => a.localeCompare(b, "es"));
+  elementoSelect.innerHTML = `<option value="TODAS">Todas las categorías</option>` +
+    todas.map((cat) => `<option value="${escaparHTML(cat)}">${escaparHTML(cat)}</option>`).join("");
+  if (seleccion && [...elementoSelect.options].some((o) => o.value === seleccion)) {
+    elementoSelect.value = seleccion;
+  }
+}
+
+/**
+ * Consulta las categorías personalizadas del usuario (HU-12) y refresca los selectores del
+ * formulario y de los filtros. Si la consulta falla, se conservan las categorías base.
+ * @async
+ * @returns {Promise<void>}
+ */
+async function cargarCategoriasUsuario() {
+  try {
+    categoriasPersonalizadas = await obtenerCategorias();
+  } catch (error) {
+    categoriasPersonalizadas = [];
+    console.warn("[Dashboard] No se pudieron cargar las categorías personalizadas:", error.message);
+  }
+
+  const selectTipo = document.getElementById("transaccion-tipo");
+  const selectCategoria = document.getElementById("transaccion-categoria");
+  if (selectTipo && selectCategoria) {
+    const seleccion = selectCategoria.value;
+    poblarCategorias(selectTipo.value, selectCategoria);
+    if (seleccion && [...selectCategoria.options].some((o) => o.value === seleccion)) {
+      selectCategoria.value = seleccion;
+    }
+  }
+  const selectFiltroCategoria = document.getElementById("filtro-categoria");
+  if (selectFiltroCategoria) {
+    poblarFiltroCategorias(selectFiltroCategoria);
+  }
 }
 
 /**
@@ -1158,4 +1220,213 @@ function renderizarListaBolsillos() {
 }
 
 
+/* ==========================================================================
+   Cuadre mensual y liquidación del hogar (HU-11 / Tarea 11.3)
+   ========================================================================== */
 
+/**
+ * Prepara el panel de cuadre mensual: fija el periodo actual en el selector, escucha sus cambios
+ * y conecta las suscripciones del hogar activo.
+ * @returns {void}
+ */
+function inicializarLiquidacionesUI() {
+  const inputPeriodo = document.getElementById("select-periodo-liquidacion");
+  if (inputPeriodo) {
+    inputPeriodo.value = periodoLiquidacionActivo;
+    if (!listenersLiquidacionInicializados) {
+      inputPeriodo.addEventListener("change", (e) => {
+        if (!e.target.value) return;
+        periodoLiquidacionActivo = e.target.value;
+        suscribirLiquidacionDelPeriodo();
+      });
+    }
+  }
+
+  const contenedor = document.getElementById("contenedor-cuadre-hogar");
+  if (contenedor && !listenersLiquidacionInicializados) {
+    contenedor.addEventListener("click", (e) => {
+      if (e.target.closest("#btn-marcar-saldado")) {
+        manejarMarcarSaldado();
+      }
+    });
+  }
+
+  listenersLiquidacionInicializados = true;
+  suscribirLiquidacionDelPeriodo();
+}
+
+/**
+ * Cancela las suscripciones activas del cuadre del hogar.
+ * @returns {void}
+ */
+function cancelarSuscripcionesLiquidacion() {
+  if (typeof unsubLiquidacionPeriodo === "function") unsubLiquidacionPeriodo();
+  if (typeof unsubGastosPeriodo === "function") unsubGastosPeriodo();
+  unsubLiquidacionPeriodo = null;
+  unsubGastosPeriodo = null;
+}
+
+/**
+ * Escucha en tiempo real los gastos compartidos del periodo y su liquidación para el hogar activo.
+ * @returns {void}
+ */
+function suscribirLiquidacionDelPeriodo() {
+  cancelarSuscripcionesLiquidacion();
+  liquidacionActualEnMemoria = null;
+  gastosCompartidosPeriodoEnMemoria = [];
+
+  if (!hogarActual?.id || !usuarioActual) {
+    renderizarCuadreHogar();
+    return;
+  }
+
+  renderizarCuadreHogar(true);
+  try {
+    unsubGastosPeriodo = escucharGastosCompartidosDelPeriodo(
+      hogarActual.id,
+      periodoLiquidacionActivo,
+      (gastos) => {
+        gastosCompartidosPeriodoEnMemoria = gastos;
+        renderizarCuadreHogar();
+      },
+      (error) => mostrarToast(error.message, "error")
+    );
+    unsubLiquidacionPeriodo = escucharLiquidacion(
+      hogarActual.id,
+      periodoLiquidacionActivo,
+      (liquidacion) => {
+        liquidacionActualEnMemoria = liquidacion;
+        renderizarCuadreHogar();
+      },
+      (error) => mostrarToast(error.message, "error")
+    );
+  } catch (error) {
+    console.error("[Dashboard] No se pudo iniciar el cuadre del hogar:", error);
+    mostrarToast(error.message, "error");
+  }
+}
+
+/**
+ * Nombre visible de un conviviente a partir de su UID.
+ * @param {string} uid - UID del miembro.
+ * @returns {string} Nombre para mostrar.
+ */
+function nombreConviviente(uid) {
+  const nombre = hogarActual?.nombres?.[uid] || "Conviviente";
+  return uid === usuarioActual?.uid ? `${nombre} (Tú)` : nombre;
+}
+
+/**
+ * Pinta el panel de cuadre: estado sin hogar, cargando, mes saldado o cálculo de transferencias pendientes.
+ * @param {boolean} [cargando=false] - Indica si aún se esperan los datos del periodo.
+ * @returns {void}
+ */
+function renderizarCuadreHogar(cargando = false) {
+  const contenedor = document.getElementById("contenedor-cuadre-hogar");
+  if (!contenedor) return;
+
+  const mensaje = (texto) => `<div class="text-center py-4 text-xs text-slate-400">${texto}</div>`;
+
+  if (!hogarActual) {
+    contenedor.innerHTML = mensaje("Crea o únete a un hogar para cuadrar los gastos compartidos del mes.");
+    return;
+  }
+  if (cargando) {
+    contenedor.innerHTML = mensaje("Cargando estado de la liquidación del periodo...");
+    return;
+  }
+
+  const filaTransferencia = (t) => `
+    <li class="flex items-center justify-between gap-3 px-3 py-2 rounded-lg bg-slate-900/60 border border-slate-700/60 text-xs">
+      <span class="text-slate-300"><span class="font-semibold text-white">${escaparHTML(nombreConviviente(t.de))}</span>
+        le paga a <span class="font-semibold text-white">${escaparHTML(nombreConviviente(t.para))}</span></span>
+      <span class="font-semibold text-amber-300 whitespace-nowrap">${formatearMoneda(t.monto, "COP")}</span>
+    </li>`;
+
+  if (liquidacionActualEnMemoria) {
+    const liq = liquidacionActualEnMemoria;
+    const lista = liq.transferencias.length
+      ? `<ul class="space-y-2 mt-3">${liq.transferencias.map(filaTransferencia).join("")}</ul>`
+      : `<p class="text-xs text-slate-400 mt-2">No hubo transferencias pendientes en este periodo.</p>`;
+    contenedor.innerHTML = `
+      <div class="flex items-center gap-2">
+        <span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">Mes saldado</span>
+        <span class="text-xs text-slate-400">Marcado por ${escaparHTML(nombreConviviente(liq.saldadaPor))} el ${formatearFecha(liq.fecha)}</span>
+      </div>
+      ${lista}`;
+    return;
+  }
+
+  const gastos = gastosCompartidosPeriodoEnMemoria;
+  if (!gastos.length) {
+    contenedor.innerHTML = mensaje("No hay gastos compartidos registrados en este periodo.");
+    return;
+  }
+
+  const miembros = Array.isArray(hogarActual.miembros) ? hogarActual.miembros : [];
+  const cuadre = calcularCuadreMes(gastos, miembros);
+
+  const filasMiembros = miembros.map((uid) => {
+    const balance = cuadre.balances[uid] || 0;
+    const estado = balance > 0.01
+      ? `<span class="text-emerald-400">le deben ${formatearMoneda(balance, "COP")}</span>`
+      : balance < -0.01
+        ? `<span class="text-rose-400">debe ${formatearMoneda(Math.abs(balance), "COP")}</span>`
+        : `<span class="text-slate-400">al día</span>`;
+    return `
+      <div class="flex items-center justify-between gap-3 text-xs py-1">
+        <span class="text-slate-300">${escaparHTML(nombreConviviente(uid))}</span>
+        <span class="text-slate-400">pagó <span class="text-white font-medium">${formatearMoneda(cuadre.pagadoPor[uid] || 0, "COP")}</span> · ${estado}</span>
+      </div>`;
+  }).join("");
+
+  const transferencias = cuadre.transferencias.length
+    ? `<ul class="space-y-2">${cuadre.transferencias.map(filaTransferencia).join("")}</ul>`
+    : `<p class="text-xs text-slate-400">Todos aportaron lo mismo: no hay transferencias pendientes.</p>`;
+
+  contenedor.innerHTML = `
+    <div class="grid grid-cols-2 gap-3 mb-3">
+      <div>
+        <p class="text-[10px] uppercase tracking-wide text-slate-500">Total compartido</p>
+        <p class="text-sm font-semibold text-white">${formatearMoneda(cuadre.totalGastos, "COP")}</p>
+      </div>
+      <div>
+        <p class="text-[10px] uppercase tracking-wide text-slate-500">Cuota por conviviente</p>
+        <p class="text-sm font-semibold text-white">${formatearMoneda(cuadre.cuotaPorMiembro, "COP")}</p>
+      </div>
+    </div>
+    <div class="border-t border-slate-700/60 pt-2 mb-3">${filasMiembros}</div>
+    <p class="text-[11px] font-medium text-slate-300 mb-2">Transferencias para quedar a paz y salvo</p>
+    ${transferencias}
+    <button id="btn-marcar-saldado" type="button"
+      class="mt-4 w-full sm:w-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors">
+      Marcar mes como saldado
+    </button>`;
+}
+
+/**
+ * Guarda la liquidación del periodo activo con las transferencias calculadas (CA-11.5).
+ * @async
+ * @returns {Promise<void>}
+ */
+async function manejarMarcarSaldado() {
+  if (!hogarActual || !usuarioActual) return;
+  if (!hayConexion()) {
+    mostrarToast("Sin conexión a Internet. Intenta de nuevo cuando vuelvas a estar en línea.", "alerta");
+    return;
+  }
+  const cuadre = calcularCuadreMes(gastosCompartidosPeriodoEnMemoria, hogarActual.miembros || []);
+  if (!confirm(`¿Confirmas que el periodo ${periodoLiquidacionActivo} quedó saldado? Esta acción no se puede deshacer.`)) {
+    return;
+  }
+
+  const boton = document.getElementById("btn-marcar-saldado");
+  cambiarEstadoBoton(boton, true, "Guardando...");
+  try {
+    await marcarLiquidacionSaldada(hogarActual, periodoLiquidacionActivo, cuadre.transferencias, usuarioActual.uid);
+    mostrarToast(`Periodo ${periodoLiquidacionActivo} marcado como saldado.`, "exito");
+  } catch (error) {
+    mostrarToast(error.message, "error");
+    cambiarEstadoBoton(boton, false, "Marcar mes como saldado");
+  }
+}
