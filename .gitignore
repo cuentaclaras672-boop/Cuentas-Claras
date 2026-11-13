@@ -38,3 +38,9 @@ desktop.ini
 coverage/
 .nyc_output/
 *.log
+
+# Firebase CLI (Tarea 16.1)
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
