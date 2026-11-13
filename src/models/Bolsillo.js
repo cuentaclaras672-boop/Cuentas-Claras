@@ -14,7 +14,7 @@ export class Bolsillo {
   /**
    * @param {object} params - Parámetros de inicialización.
    * @param {string} [params.id] - Identificador único generado por Firestore.
-   * @param {string} params.nombre - Nombre del bolsillo (mínimo 3 caracteres).
+   * @param {string} params.nombre - Nombre del bolsillo (entre 3 y 40 caracteres).
    * @param {number|string} params.meta - Meta monetaria a alcanzar en pesos (mayor a 0).
    * @param {number|string} [params.montoAcumulado=0] - Monto acumulado actual (mayor o igual a 0).
    * @param {string} params.creadoPor - UID del usuario creador en Firebase Auth.
@@ -37,8 +37,8 @@ export class Bolsillo {
    * @returns {boolean} Retorna true si es válido.
    */
   validar() {
-    if (!this.nombre || this.nombre.length < 3) {
-      throw new Error("El nombre del bolsillo debe tener al menos 3 caracteres.");
+    if (!this.nombre || this.nombre.length < 3 || this.nombre.length > 40) {
+      throw new Error("El nombre del bolsillo debe tener al menos 3 caracteres y máximo 40.");
     }
 
     if (isNaN(this.meta) || this.meta <= 0) {

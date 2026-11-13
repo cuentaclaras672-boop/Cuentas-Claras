@@ -1,0 +1,10 @@
+{
+  "name": "cuentas-claras-pruebas-emulador",
+  "private": true,
+  "type": "module",
+  "description": "Pruebas de reglas de Firestore contra el emulador local (Tarea 14.1)",
+  "devDependencies": {
+    "firebase": "^10.13.0",
+    "firebase-tools": "^13.0.0"
+  }
+}

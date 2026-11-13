@@ -25,14 +25,37 @@ service cloud.firestore {
                          'creadoPor', 'fecha']) &&
         d.descripcion is string &&
         d.descripcion.size() >= 3 && d.descripcion.size() <= 120 &&
-        d.monto is number && d.monto > 0 &&
+        d.monto is number && d.monto > 0 && d.monto <= 1000000000000 &&
         d.tipo in ['INGRESO', 'GASTO'] &&
         d.ambito in ['PERSONAL', 'COMPARTIDO'] &&
         d.categoria is string && d.categoria.size() > 0 &&
         d.creadoPor is string &&
-        (!('nombreUsuario' in d) || d.nombreUsuario is string) &&
+        (!('nombreUsuario' in d) || (d.nombreUsuario is string && d.nombreUsuario.size() <= 100)) &&
         d.fecha is timestamp &&
         (d.get('hogarId', null) == null || d.hogarId is string);
+    }
+
+    // Estructura válida de un bolsillo (espejo de src/models/Bolsillo.js). Tarea 14.1:
+    // antes no se limitaban los campos ni el largo del nombre.
+    function esBolsilloValido(d) {
+      return d.keys().hasOnly(['nombre', 'meta', 'montoAcumulado', 'creadoPor', 'fecha']) &&
+        d.keys().hasAll(['nombre', 'meta', 'montoAcumulado', 'creadoPor', 'fecha']) &&
+        d.nombre is string && d.nombre.size() >= 3 && d.nombre.size() <= 40 &&
+        d.meta is number && d.meta > 0 && d.meta <= 1000000000000 &&
+        d.montoAcumulado is number && d.montoAcumulado >= 0 &&
+        d.creadoPor is string &&
+        d.fecha is timestamp;
+    }
+
+    // Estructura válida de una categoría personalizada (espejo de src/services/categorias.js). Tarea 14.1:
+    // antes la actualización aceptaba cualquier campo y cualquier nombre.
+    function esCategoriaValida(d) {
+      return d.keys().hasOnly(['uid', 'nombre', 'tipo', 'fechaCreacion']) &&
+        d.keys().hasAll(['uid', 'nombre']) &&
+        d.uid is string &&
+        d.nombre is string && d.nombre.size() >= 3 && d.nombre.size() <= 40 &&
+        (!('tipo' in d) || d.tipo in ['gasto', 'ingreso']) &&
+        (!('fechaCreacion' in d) || d.fechaCreacion is string);
     }
 
     // Reglas para la colección de transacciones financieras
@@ -78,27 +101,30 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid;
 
-      // CREACIÓN: Solo el usuario autenticado puede crear su propio bolsillo
+      // CREACIÓN: Solo el usuario autenticado puede crear su propio bolsillo, con la estructura del modelo
       allow create: if request.auth != null &&
         request.resource.data.creadoPor == request.auth.uid &&
-        request.resource.data.nombre is string &&
-        request.resource.data.meta is number &&
-        request.resource.data.meta > 0 &&
-        request.resource.data.montoAcumulado is number &&
-        request.resource.data.montoAcumulado >= 0;
+        esBolsilloValido(request.resource.data);
 
-      // ACTUALIZACIÓN: Inmutabilidad de creadoPor y validación de tipos
+      // ACTUALIZACIÓN: creadoPor y fecha no cambian; solo se tocan nombre, meta y monto acumulado
       allow update: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid &&
-        request.resource.data.creadoPor == resource.data.creadoPor &&
-        request.resource.data.meta is number &&
-        request.resource.data.meta > 0 &&
-        request.resource.data.montoAcumulado is number &&
-        request.resource.data.montoAcumulado >= 0;
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nombre', 'meta', 'montoAcumulado']) &&
+        esBolsilloValido(request.resource.data);
 
       // ELIMINACIÓN: Solo el propietario puede eliminar su bolsillo
       allow delete: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid;
+    }
+
+    // Un abono de préstamo: { monto, fecha }, con el monto que sube el total (tolerancia de 1 centavo)
+    function esAbonoValido(abono, incremento) {
+      return abono is map &&
+        abono.keys().hasOnly(['monto', 'fecha']) &&
+        abono.keys().hasAll(['monto', 'fecha']) &&
+        abono.monto is number && abono.monto > 0 &&
+        math.abs(abono.monto - incremento) < 0.01 &&
+        abono.fecha is timestamp;
     }
 
     // Reglas para la colección de préstamos a terceros (Tarea 8.2 / HU-08 - CA-8.8)
@@ -131,6 +157,14 @@ service cloud.firestore {
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['abonos', 'totalAbonado', 'estado']) &&
         request.resource.data.abonos is list &&
         request.resource.data.abonos.size() == resource.data.abonos.size() + 1 &&
+        // Tarea 14.1: los abonos anteriores no se pueden reescribir y el nuevo abono
+        // debe ser { monto, fecha } con un monto igual a lo que sube totalAbonado.
+        (resource.data.abonos.size() == 0 ||
+          request.resource.data.abonos[0:resource.data.abonos.size()] == resource.data.abonos) &&
+        esAbonoValido(
+          request.resource.data.abonos[resource.data.abonos.size()],
+          request.resource.data.totalAbonado - resource.data.totalAbonado
+        ) &&
         request.resource.data.totalAbonado is number &&
         request.resource.data.totalAbonado > resource.data.totalAbonado &&
         request.resource.data.totalAbonado <= resource.data.monto &&
@@ -164,6 +198,8 @@ service cloud.firestore {
         request.resource.data.miembros == [request.auth.uid] &&
         request.resource.data.nombres is map &&
         request.resource.data.nombres.keys().hasOnly([request.auth.uid]) &&
+        request.resource.data.nombres[request.auth.uid] is string &&
+        request.resource.data.nombres[request.auth.uid].size() <= 60 &&
         request.resource.data.nombre is string &&
         request.resource.data.nombre.size() >= 3 &&
         request.resource.data.nombre.size() <= 40 &&
@@ -175,6 +211,12 @@ service cloud.firestore {
       allow update: if request.auth != null &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['miembros', 'nombres']) &&
         request.resource.data.nombres.diff(resource.data.nombres).affectedKeys().hasOnly([request.auth.uid]) &&
+        // Tarea 14.1: el nombre visible que se agrega es texto de máximo 60 caracteres
+        (
+          !(request.auth.uid in request.resource.data.nombres) ||
+          (request.resource.data.nombres[request.auth.uid] is string &&
+           request.resource.data.nombres[request.auth.uid].size() <= 60)
+        ) &&
         (
           (
             !(request.auth.uid in resource.data.miembros) &&
@@ -224,12 +266,12 @@ service cloud.firestore {
       allow read, delete: if request.auth != null && resource.data.uid == request.auth.uid;
       allow create: if request.auth != null &&
         request.resource.data.uid == request.auth.uid &&
-        request.resource.data.nombre is string &&
-        request.resource.data.nombre.size() >= 3 &&
-        request.resource.data.nombre.size() <= 40;
+        esCategoriaValida(request.resource.data);
+      // Tarea 14.1: el dueño no cambia y la categoría editada sigue siendo válida
       allow update: if request.auth != null &&
         resource.data.uid == request.auth.uid &&
-        request.resource.data.uid == request.auth.uid;
+        request.resource.data.uid == request.auth.uid &&
+        esCategoriaValida(request.resource.data);
     }
 
     // Por defecto, denegar cualquier acceso no especificado a la base de datos
