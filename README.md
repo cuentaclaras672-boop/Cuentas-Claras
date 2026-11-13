@@ -169,7 +169,16 @@ export const firebaseConfig = {
 };
 ```
 
-5. Publicar las reglas de seguridad: en la consola, **Firestore Database → Reglas**, pegar el contenido de [`firestore.rules`](firestore.rules) y pulsar **Publicar**. Mientras no se publiquen, la consola sigue usando las reglas anteriores y las colecciones nuevas responden `permission-denied`.
+5. Publicar las reglas de seguridad con la CLI de Firebase (el proyecto ya está definido en [`.firebaserc`](.firebaserc)):
+
+```bash
+npx firebase-tools login
+npx firebase-tools deploy --only firestore:rules
+```
+
+También se puede pegar el contenido de [`firestore.rules`](firestore.rules) en **Firestore Database → Reglas** y pulsar **Publicar**. Mientras no se publiquen, la consola sigue usando las reglas anteriores y las colecciones nuevas responden `permission-denied`. La auditoría de seguridad de las reglas (Sprint 5) está en [`docs/auditoria-seguridad-sprint5.md`](docs/auditoria-seguridad-sprint5.md).
+
+6. Desplegar en **Firebase Hosting** ([`firebase.json`](firebase.json)): `npx firebase-tools deploy --only hosting`. La app queda en https://bdcuentasclaras-b1814.web.app. Los pasos completos, incluidos los dominios autorizados y la restricción de la API key, están en [`docs/guia-despliegue.md`](docs/guia-despliegue.md).
 
 ---
 
@@ -198,7 +207,9 @@ Para ejecutar la suite integral de pruebas unitarias, de integración y de segur
 ```bash
 node tests/runner.js
 ```
-Ejecuta las 9 suites automatizadas de los Sprints 2, 3 y 4, verificando el 100% de los criterios de aceptación (CA) sin dependencias externas.
+Ejecuta las 10 suites automatizadas de los Sprints 2 a 5, verificando el 100% de los criterios de aceptación (CA) sin dependencias externas.
+
+Las pruebas de penetración de `firestore.rules` corren contra el emulador local de Firebase (requieren Java); ver [`tests/emulador/README.md`](tests/emulador/README.md).
 
 > [!IMPORTANT]
 > **Condición de Entrada a la Sustentación (Lineamientos de la Asignatura):** El software debe correr localmente y sin errores de consola. De lo contrario, de acuerdo con la normativa innegociable de la cátedra TIC42695, la sustentación no se califica.
