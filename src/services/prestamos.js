@@ -34,6 +34,7 @@ import {
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db, traducirErrorFirestore } from "./firestore.js";
+import { asegurarConexion } from "./conexion.js";
 
 const COLECCION_PRESTAMOS = "prestamos";
 
@@ -102,6 +103,8 @@ function prestamoDesdeDocumento(id, data) {
  */
 export async function registrarPrestamo(prestamo) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!prestamo || typeof prestamo !== "object") {
       throw new TypeError("Se requieren los datos del préstamo.");
     }
@@ -161,6 +164,8 @@ export async function registrarPrestamo(prestamo) {
  */
 export async function registrarAbonoPrestamo(idPrestamo, montoAbono, usuarioId, fechaAbono = new Date()) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!idPrestamo || typeof idPrestamo !== "string") {
       throw new Error("Identificador de préstamo inválido.");
     }
@@ -172,6 +177,8 @@ export async function registrarAbonoPrestamo(idPrestamo, montoAbono, usuarioId, 
 
     const docRef = doc(db, COLECCION_PRESTAMOS, idPrestamo);
 
+    // Tarea 14.3: aquí no se usa conReintentos. Si la confirmación del servidor se pierde después de
+    // guardar, un reintento registraría el abono dos veces; mejor avisar y que el usuario revise.
     return await runTransaction(db, async (transaccion) => {
       const snap = await transaccion.get(docRef);
       if (!snap.exists()) {
@@ -217,6 +224,8 @@ export async function registrarAbonoPrestamo(idPrestamo, montoAbono, usuarioId, 
  */
 export async function eliminarPrestamo(idPrestamo, usuarioId = null) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!idPrestamo || typeof idPrestamo !== "string") {
       throw new Error("Identificador de préstamo inválido para eliminación.");
     }

@@ -23,6 +23,7 @@ import {
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db, firebaseConfig } from "./firebase.js";
+import { asegurarConexion } from "./conexion.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
 
@@ -74,6 +75,8 @@ export function traducirErrorFirestore(error) {
  */
 export async function registrarTransaccion(transaccion, hogarId = null) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!(transaccion instanceof Transaccion)) {
       throw new TypeError("El objeto a registrar debe ser una instancia válida de Transaccion.");
     }
@@ -111,6 +114,8 @@ export async function registrarTransaccion(transaccion, hogarId = null) {
  */
 export async function eliminarTransaccion(idTransaccion, usuarioId = null) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!idTransaccion || typeof idTransaccion !== 'string') {
       throw new Error("Identificador de transacción inválido para eliminación.");
     }
@@ -269,6 +274,8 @@ export function calcularTotales(listaTransacciones = []) {
  */
 export async function registrarBolsillo(bolsillo) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!(bolsillo instanceof Bolsillo)) {
       throw new TypeError("El objeto a registrar debe ser una instancia válida de Bolsillo.");
     }
@@ -298,6 +305,8 @@ export async function registrarBolsillo(bolsillo) {
  */
 export async function eliminarBolsillo(idBolsillo, usuarioId = null) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!idBolsillo || typeof idBolsillo !== 'string') {
       throw new Error("Identificador de bolsillo inválido para eliminación.");
     }
@@ -329,6 +338,8 @@ export async function eliminarBolsillo(idBolsillo, usuarioId = null) {
  */
 export async function abonarFondosBolsillo(idBolsillo, montoAbono, usuarioId = null) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!idBolsillo || typeof idBolsillo !== 'string') {
       throw new Error("Identificador de bolsillo inválido.");
     }

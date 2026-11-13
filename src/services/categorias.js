@@ -17,6 +17,7 @@ import {
   where 
 } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
 import { traducirErrorFirestore } from './firestore.js';
+import { asegurarConexion } from './conexion.js';
 
 /**
  * Servicio para registrar una categoría personalizada por usuario (HU-12).
@@ -35,6 +36,8 @@ export async function guardarCategoria(nombre, tipo = 'gasto') {
   }
 
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     const docRef = await addDoc(collection(db, "categorias"), {
       uid: user.uid,
       nombre: nombreLimpio,
@@ -83,6 +86,8 @@ export async function actualizarCategoria(idCategoria, nuevosDatos) {
   if (!user) throw new Error("Usuario no autenticado");
 
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     const categoriaRef = doc(db, "categorias", idCategoria);
     await updateDoc(categoriaRef, nuevosDatos);
     return true;
@@ -103,6 +108,8 @@ export async function eliminarCategoria(idCategoria) {
   if (!user) throw new Error("Usuario no autenticado");
 
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     const categoriaRef = doc(db, "categorias", idCategoria);
     await deleteDoc(categoriaRef);
     return true;

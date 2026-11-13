@@ -29,6 +29,7 @@ import {
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db, traducirErrorFirestore } from "./firestore.js";
+import { asegurarConexion, conReintentos } from "./conexion.js";
 
 const COLECCION_HOGARES = "hogares";
 
@@ -118,6 +119,8 @@ export async function obtenerHogarDelUsuario(usuarioId) {
  */
 export async function crearHogar(nombre, usuario, generarCodigo) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     const { uid, nombre: nombreUsuario } = validarUsuario(usuario);
     const nombreHogar = typeof nombre === "string" ? nombre.trim() : "";
 
@@ -147,12 +150,12 @@ export async function crearHogar(nombre, usuario, generarCodigo) {
         fecha: Timestamp.now()
       };
 
-      const creado = await runTransaction(db, async (transaccion) => {
+      const creado = await conReintentos(() => runTransaction(db, async (transaccion) => {
         const existente = await transaccion.get(docRef);
         if (existente.exists()) return false;
         transaccion.set(docRef, datos);
         return true;
-      });
+      }));
 
       if (creado) return hogarDesdeDocumento(codigo, datos);
     }
@@ -174,6 +177,8 @@ export async function crearHogar(nombre, usuario, generarCodigo) {
  */
 export async function unirseAHogar(codigo, usuario) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     const { uid, nombre: nombreUsuario } = validarUsuario(usuario);
     const codigoNormalizado = normalizarCodigo(codigo);
 
@@ -186,7 +191,7 @@ export async function unirseAHogar(codigo, usuario) {
 
     const docRef = doc(db, COLECCION_HOGARES, codigoNormalizado);
 
-    return await runTransaction(db, async (transaccion) => {
+    return await conReintentos(() => runTransaction(db, async (transaccion) => {
       const snap = await transaccion.get(docRef);
       if (!snap.exists()) {
         throw new Error("No existe ningún hogar con ese código. Revisa que esté bien escrito.");
@@ -207,7 +212,7 @@ export async function unirseAHogar(codigo, usuario) {
       };
       transaccion.update(docRef, actualizacion);
       return hogarDesdeDocumento(snap.id, { ...data, ...actualizacion });
-    });
+    }));
   } catch (error) {
     console.error("[HogaresService.unirseAHogar] Error:", error.message);
     throw new Error(traducirErrorFirestore(error));
@@ -224,13 +229,15 @@ export async function unirseAHogar(codigo, usuario) {
  */
 export async function salirDelHogar(hogarId, usuarioId) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     if (!hogarId || typeof hogarId !== "string") {
       throw new Error("Identificador de hogar inválido.");
     }
 
     const docRef = doc(db, COLECCION_HOGARES, hogarId);
 
-    await runTransaction(db, async (transaccion) => {
+    await conReintentos(() => runTransaction(db, async (transaccion) => {
       const snap = await transaccion.get(docRef);
       if (!snap.exists()) return;
 
@@ -251,7 +258,7 @@ export async function salirDelHogar(hogarId, usuarioId) {
         miembros: miembros.filter((m) => m !== usuarioId),
         nombres
       });
-    });
+    }));
   } catch (error) {
     console.error("[HogaresService.salirDelHogar] Error:", error.message);
     throw new Error(traducirErrorFirestore(error));

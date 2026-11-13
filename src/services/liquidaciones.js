@@ -29,6 +29,7 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db, traducirErrorFirestore } from "./firestore.js";
+import { asegurarConexion, conReintentos } from "./conexion.js";
 import { MAX_MIEMBROS_HOGAR } from "./hogares.js";
 import { AMBITO_TRANSACCION, TIPO_TRANSACCION } from "../models/Transaccion.js";
 
@@ -259,6 +260,8 @@ export function escucharLiquidacion(hogarId, periodo, onActualizacion, onError) 
  */
 export async function marcarLiquidacionSaldada(hogar, periodo, transferencias, usuarioId) {
   try {
+    // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
+    asegurarConexion();
     validarHogarId(hogar?.id);
     rangoDelPeriodo(periodo);
     const miembros = Array.isArray(hogar.miembros) ? hogar.miembros : [];
@@ -270,7 +273,7 @@ export async function marcarLiquidacionSaldada(hogar, periodo, transferencias, u
     const id = idLiquidacion(hogar.id, periodo);
     const docRef = doc(db, COLECCION_LIQUIDACIONES, id);
 
-    await runTransaction(db, async (transaccion) => {
+    await conReintentos(() => runTransaction(db, async (transaccion) => {
       const existente = await transaccion.get(docRef);
       if (existente.exists()) {
         throw new Error("Este mes ya fue marcado como saldado.");
@@ -282,7 +285,7 @@ export async function marcarLiquidacionSaldada(hogar, periodo, transferencias, u
         saldadaPor: usuarioId,
         fecha: serverTimestamp()
       });
-    });
+    }));
 
     return id;
   } catch (error) {
