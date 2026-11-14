@@ -80,7 +80,20 @@
 
 ---
 
-## 5. Definición de Terminado (DoD) para Sprint 6
+## 5. Resumen de Cargas de Trabajo (Sprint 6)
+
+| Integrante | Tareas Asignadas | SP Estimados | Estado Inicial (14/11/2026) |
+|---|---|:---:|---|
+| **Daniel Felipe Cortes** | Tareas **16.1**, **16.2**, **16.3** (co-responsable), **17.1** (soporte técnico) | 4 SP | `16.1` y `16.2` adelantadas · `16.3` en curso |
+| **Juan Diego Peraza Amado** | Tareas **16.3** (co-responsable), **17.1** (demo y guion Corte III) | 3 SP | En curso |
+| **Jorman Palacios Murillo** | Tarea **16.4** (UAT desktop/móvil y vista PDF en producción) | 2 SP | Planificada (16–20 nov) |
+| **Yerson Niño Guerrero** | Tarea **16.4** (verificación CSV y datos en entorno desplegado) | 2 SP | Planificada (16–20 nov) |
+| **Fabián Eduardo Córdoba** | Tarea **17.2** (auditoría QA final, retrospectiva y cierre semestral) | 2 SP | Planificada (21–27 nov) |
+| **Total Sprint 6** | **6 tareas técnicas (`16.1`–`16.4`, `17.1`–`17.2`)** | **13 SP** | **2 adelantadas · 4 por ejecutar** |
+
+---
+
+## 6. Definición de Terminado (DoD) para Sprint 6
 
 1. Reglas de Firestore y Firebase Hosting desplegados y verificados con cuenta de usuario real.
 2. Cero errores de consola en entorno local (`npx serve .`) y en entorno público (`https://bdcuentasclaras-b1814.web.app`).

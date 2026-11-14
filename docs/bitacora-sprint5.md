@@ -88,7 +88,14 @@ El Sprint 5 consolidó la fase de endurecimiento de seguridad, resiliencia ante 
 
 ## 4. Burndown del Sprint 5 (Medido en Tareas Técnicas)
 
-Total de tareas comprometidas en Sprint 5 Planning: **6 tareas técnicas** (`14.1`, `14.2`, `14.3`, `15.1`, `15.2`, `15.3`).
+Total de tareas comprometidas en Sprint 5 Planning: **6 tareas base** (`14.1`, `14.2`, `14.3`, `15.1`, `15.2`, `15.3`) más el anexo de configuración CLI **14.4** adelantado por Daniel Cortes (cierre en servidor vinculado a Tarea 16.3).
+
+### Distribución y Trazabilidad de Responsables en Sprint 5
+- **Daniel Felipe Cortes:** Tareas `14.1` (auditoría `firestore.rules` y emulador), `14.3` (módulo `conexion.js` y reintentos) y `14.4` (preparación CLI para despliegue de reglas).
+- **Fabián Eduardo Córdoba:** Tarea `14.2` (diseño QA de carga/estrés y supervisión del runner maestro en `tests/runner.js`).
+- **Yerson Niño Guerrero:** Tarea `15.1` (especificación RFC 4180 para exportación CSV).
+- **Jorman Palacios Murillo:** Tarea `15.2` (diseño UI de botones de exportación y limpieza en impresión).
+- **Juan Diego Peraza Amado:** Tarea `15.3` (`@media print` en `public/style.css`), implementación/consolidación en `main` de `14.2`, `15.1` y `15.2` (`exportador.js`, `pruebas-exportador.test.js`, `pruebas-seguridad-carga.test.js`) y `normalizarFecha()` (Ancla 1).
 
 | Semana | Corte | Ideal (restantes) | Planificado (restantes) | Real (restantes) |
 |:---:|:---:|:---:|:---:|:---:|

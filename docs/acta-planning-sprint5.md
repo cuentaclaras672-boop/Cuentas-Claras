@@ -61,6 +61,7 @@
 | **14.1** | Auditoría estricta de vectores de inyección y bypass en `firestore.rules` | Daniel Cortes | 31 oct - 04 nov |
 | **14.2** | Suite de pruebas de carga y estrés concurrente `tests/pruebas-seguridad-carga.test.js` | Fabián Córdoba | 03 nov - 08 nov |
 | **14.3** | Pruebas de degradación elegante y reconexión automática en `src/services/conexion.js` | Daniel Cortes | 07 nov - 11 nov |
+| **14.4** | *(Anexo operativo agregado en ejecución)* Configuración CLI para publicar `firestore.rules` (`firebase.json`, `.firebaserc` y `docs/guia-despliegue.md`) | Daniel Cortes | 12 nov - 13 nov |
 
 ---
 
@@ -89,10 +90,10 @@
 |---|---|:---:|
 | **Juan Diego Peraza Amado** | Tarea 15.3, validación de Product Goal y release | 3 SP |
 | **Fabián Eduardo Córdoba** | Tarea 14.2, facilitación de ceremonias y control QA | 4 SP |
-| **Daniel Felipe Cortes** | Tareas 14.1, 14.3 (seguridad y resiliencia) | 4 SP |
+| **Daniel Felipe Cortes** | Tareas 14.1, 14.3, 14.4 (seguridad, resiliencia y preparación CLI de reglas) | 4 SP |
 | **Jorman Palacios Murillo** | Tarea 15.2 (interfaz de exportación) | 2 SP |
 | **Yerson Niño Guerrero** | Tarea 15.1 (formateo y lógica de exportación) | 3 SP |
-| **Total Sprint 5** | **6 tareas técnicas** | **13 SP** |
+| **Total Sprint 5** | **6 tareas base + 1 anexo operativo (`14.4`)** | **13 SP** |
 
 ---
 

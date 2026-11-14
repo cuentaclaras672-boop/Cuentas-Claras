@@ -20,6 +20,12 @@ El Sprint 6 inicia hoy **14 de noviembre de 2026** con dos tareas de infraestruc
 | **Hito Parcial Corte III** | 21 de noviembre de 2026 | ⏳ Próximo hito |
 | **Fecha de Cierre Semestral** | 27 de noviembre de 2026 | ⏳ Planificado |
 
+### Responsables Asignados por Tarea (Sprint 6)
+- **Daniel Felipe Cortes:** Tareas `16.1` (`.firebaserc` / `firebase.json` — adelantada), `16.2` (`docs/guia-despliegue.md` — adelantada), `16.3` (publicación de reglas/Hosting y restricciones Google Cloud) y apoyo en `17.1`.
+- **Juan Diego Peraza Amado:** Co-responsable de `16.3` (auditoría Dynamic Links / validación de consola) y líder de `17.1` (guion y demo técnica del Parcial Corte III).
+- **Jorman Palacios Murillo y Yerson Niño Guerrero:** Tarea `16.4` (pruebas UAT en URL pública `bdcuentasclaras-b1814.web.app`, vista PDF y verificación de CSV en producción).
+- **Fabián Eduardo Córdoba:** Tarea `17.2` (auditoría final QA, retrospectiva de cierre y acta final del Sprint 6).
+
 ---
 
 ## 2. Registro Cronológico de Daily Scrums

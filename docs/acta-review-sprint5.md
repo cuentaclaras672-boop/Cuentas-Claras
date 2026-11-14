@@ -52,6 +52,19 @@
 - **Ancla 2 (Homogeneidad Firebase SDK `10.13.0`):** Se verificó que todos los servicios en `src/services/` importan la versión `10.13.0` y se incorporó el control permanente en `docs/definition-of-done.md`.
 - **Adelanto hacia Sprint 6:** Durante este cierre quedaron además adelantados `.firebaserc`, `firebase.json` y `docs/guia-despliegue.md` para agilizar la salida a producción en Firebase Hosting.
 
+### 3.4 Matriz de Tareas, Integrantes y Trazabilidad en Repositorio
+
+| Tarea / Compromiso | Descripción | Responsable Asignado (Scrum) | Ejecución y Trazabilidad en Git | Estado |
+|:---:|---|---|---|:---:|
+| **14.1** | Endurecimiento de `firestore.rules` (6 colecciones) y auditoría en emulador (46 casos) | Daniel Felipe Cortes | Autoría directa en `origin/main` (`82b0c90`, 13 nov) | ✅ Terminada |
+| **14.2** | Batería de auditoría estática, 50 ops concurrentes y latencia `< 500 ms` | Fabián Eduardo Córdoba *(QA Lead)* | Criterios QA certificados; suite integrada en `runner.js` por Juan Diego Peraza (`19a0dda`, 14 nov) | ✅ Terminada |
+| **14.3** | Resiliencia de red, `conReintentos()` en 5 servicios y `pruebas-resiliencia.test.js` | Daniel Felipe Cortes | Autoría directa en `origin/main` (`a1f7ccd`, 13 nov) | ✅ Terminada |
+| **14.4** | Preparación CLI para publicación de reglas (`firebase.json`, `.firebaserc`, `guia-despliegue.md`) | Daniel Felipe Cortes | Config/guía publicada (`79315bd`, `2f0638f`); ejecución en Consola Firebase continuada en **16.3** | ✅ Prep. lista |
+| **15.1** | Módulo puro de exportación CSV RFC 4180 + BOM UTF-8 (`src/utils/exportador.js` y tests) | Yerson Niño Guerrero *(Diseño)* | Especificado en Planning; implementado y probado en `main` por Juan Diego Peraza (`32612ff`, `19a0dda`) | ✅ Terminada |
+| **15.2** | Controles `#btn-exportar-csv` / `#btn-imprimir-reporte` conectados a filtros activos | Jorman Palacios Murillo *(Diseño UI)* | Especificado en Planning; integrado en HTML/JS por Juan Diego Peraza (`32612ff`) | ✅ Terminada |
+| **15.3** | Hoja de estilo `@media print` (`public/style.css`) y banner `.only-print` | Juan Diego Peraza Amado | Autoría directa en `origin/main` (`32612ff`, 14 nov) | ✅ Terminada |
+| **Ancla 1 y 2** | Normalización `normalizarFecha()` y regla Firebase SDK `10.13.0` en DoD | Daniel Cortes / Juan Diego Peraza | Implementado y verificado por Juan Diego Peraza (`1f7d4c3`, `0f9a2f6`) | ✅ Terminada |
+
 ---
 
 ## 4. Métricas de Entrega y Calidad (Sprint 5)
