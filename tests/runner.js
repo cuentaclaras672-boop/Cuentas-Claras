@@ -1,7 +1,7 @@
 /**
  * @file runner.js
  * @description Suite Maestra y Ejecutor de Pruebas Automatizadas de Calidad (QA).
- * Permite certificar el 100% de los criterios de aceptación de los Sprints 2, 3 y 4.
+ * Permite certificar el 100% de los criterios de aceptación de los Sprints 2, 3, 4 y 5.
  * Responsable: Fabián Córdoba <cuentaclaras672@gmail.com> (Scrum Master / QA Lead).
  * 
  * Uso:
@@ -18,6 +18,8 @@ import { ejecutarPruebasGrafica } from "./pruebas-grafica.test.js";
 import { ejecutarPruebasLiquidaciones } from "./pruebas-liquidaciones.test.js";
 import { ejecutarPruebasCategorias } from "./pruebas-categorias.test.js";
 import { ejecutarPruebasResiliencia } from "./pruebas-resiliencia.test.js";
+import { ejecutarPruebasSeguridadCarga } from "./pruebas-seguridad-carga.test.js";
+import { ejecutarPruebasExportador } from "./pruebas-exportador.test.js";
 
 async function ejecutarTodasLasPruebas() {
   console.log("===============================================================");
@@ -35,7 +37,9 @@ async function ejecutarTodasLasPruebas() {
     { nombre: "Sprint 3 - Tarea 10.3: Gráfica de Gastos y Divisa (HU-10)", fn: ejecutarPruebasGrafica },
     { nombre: "Sprint 4 - Tarea 11.4 / 13.1: Cuadre del Hogar y Control de Descripción (HU-11 / HU-13)", fn: ejecutarPruebasLiquidaciones },
     { nombre: "Sprint 4 - Tarea 12.4: Categorías Personalizadas por Usuario (HU-12)", fn: ejecutarPruebasCategorias },
-    { nombre: "Sprint 5 - Tarea 14.3: Degradación Elegante y Reconexión (HU-14)", fn: ejecutarPruebasResiliencia }
+    { nombre: "Sprint 5 - Tarea 14.3: Degradación Elegante y Reconexión (HU-14)", fn: ejecutarPruebasResiliencia },
+    { nombre: "Sprint 5 - Tarea 14.2: Blindaje de Reglas, Estrés (50 ops) y Fechas (HU-14)", fn: ejecutarPruebasSeguridadCarga },
+    { nombre: "Sprint 5 - Tarea 15.1: Exportación CSV RFC 4180 y BOM UTF-8 (HU-15)", fn: ejecutarPruebasExportador }
   ];
 
   let exitosas = 0;
