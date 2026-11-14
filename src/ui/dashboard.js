@@ -17,8 +17,9 @@ import { crearHogar, unirseAHogar, salirDelHogar } from "../services/hogares.js"
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION, CATEGORIAS_GASTO, CATEGORIAS_INGRESO, MAX_DESCRIPCION } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
 import { Hogar } from "../models/Hogar.js";
-import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMontoCOP, fechaLocalISO } from "../utils/formateo.js?v=5";
+import { formatearMoneda, formatearFecha, formatearTRM, escaparHTML, parsearMontoCOP, fechaLocalISO, normalizarFecha } from "../utils/formateo.js?v=6";
 import { consultarTRM } from "../services/indicadores.js?v=5";
+import { generarCSVTransacciones, nombreArchivoCSV } from "../utils/exportador.js";
 import { agruparGastosPorCategoria } from "../utils/estadisticas.js";
 import { 
   escucharGastosCompartidosDelPeriodo, 
@@ -402,6 +403,70 @@ export function inicializarDashboardUI(usuario) {
     });
   }
 
+  // CA-15.1 / CA-15.2: Exportar el subconjunto filtrado actual a CSV (RFC 4180)
+  const btnExportarCSV = document.getElementById("btn-exportar-csv");
+  if (btnExportarCSV) {
+    btnExportarCSV.addEventListener("click", () => {
+      const filtradas = obtenerTransaccionesFiltradas();
+      if (filtradas.length === 0) {
+        mostrarToast("No hay transacciones para exportar con los filtros actuales.", "advertencia");
+        return;
+      }
+
+      try {
+        const contenidoCSV = generarCSVTransacciones(filtradas);
+        const blob = new Blob([contenidoCSV], { type: "text/csv;charset=utf-8;" });
+        const url = URL.createObjectURL(blob);
+        const enlace = document.createElement("a");
+        enlace.href = url;
+        enlace.download = nombreArchivoCSV();
+        document.body.appendChild(enlace);
+        enlace.click();
+        document.body.removeChild(enlace);
+        URL.revokeObjectURL(url);
+
+        mostrarToast(
+          `Reporte CSV exportado (${filtradas.length} ${filtradas.length === 1 ? "registro" : "registros"}).`,
+          "exito"
+        );
+      } catch (error) {
+        mostrarToast(`No se pudo generar el CSV: ${error.message}`, "error");
+      }
+    });
+  }
+
+  // CA-15.3: Imprimir reporte financiero o guardar como PDF mediante hoja de estilo @media print
+  const btnImprimirReporte = document.getElementById("btn-imprimir-reporte");
+  if (btnImprimirReporte) {
+    btnImprimirReporte.addEventListener("click", () => {
+      const elUsuarioPrint = document.getElementById("print-usuario-reporte");
+      const elFechaPrint = document.getElementById("print-fecha-generacion");
+      const elFiltrosPrint = document.getElementById("print-resumen-filtros");
+
+      if (elUsuarioPrint && usuarioActual) {
+        elUsuarioPrint.textContent = usuarioActual.displayName || usuarioActual.email || "Usuario";
+      }
+      if (elFechaPrint) {
+        elFechaPrint.textContent = formatearFecha(new Date());
+      }
+      if (elFiltrosPrint) {
+        const criterios = [];
+        if (filtroTipoActual !== "TODOS") criterios.push(`Tipo: ${filtroTipoActual}`);
+        if (filtroAmbitoActual !== "TODOS") criterios.push(`Ámbito: ${filtroAmbitoActual}`);
+        if (filtroCategoriaActual !== "TODAS") criterios.push(`Categoría: ${filtroCategoriaActual}`);
+        if (filtroFechaDesdeActual || filtroFechaHastaActual) {
+          criterios.push(`Rango: ${filtroFechaDesdeActual || "..."} a ${filtroFechaHastaActual || "..."}`);
+        }
+        if (filtroBusquedaTexto) criterios.push(`Búsqueda: "${filtroBusquedaTexto}"`);
+        elFiltrosPrint.textContent = criterios.length
+          ? `${criterios.join(" | ")} (${divisaActiva})`
+          : `Todos los movimientos (${divisaActiva})`;
+      }
+
+      window.print();
+    });
+  }
+
   // =========================================================================
   // MANEJADORES PARA BOLSILLOS DE AHORRO CON METAS (Tarea 4.3 - Jorman Palacios)
   // =========================================================================
@@ -535,7 +600,7 @@ function renderizarGraficaCategorias(transaccionesFiltradas) {
  */
 function aplicarEstadoConexion() {
   const sinConexion = !hayConexion();
-  document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo").forEach((btn) => {
+  document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo, #btn-crear-categoria, #btn-salir-hogar, #btn-marcar-saldado").forEach((btn) => {
     // No reactivar un botón que está ocupado guardando ("Registrando...", "Creando...")
     if (!sinConexion && btn.dataset.ocupado === "true") return;
     btn.disabled = sinConexion;
@@ -752,16 +817,9 @@ function obtenerTransaccionesFiltradas() {
 
     // CA-5.3: Filtro por rango de fechas (desde / hasta)
     if (filtroFechaDesdeActual || filtroFechaHastaActual) {
-      let fechaObj = t.fecha;
-      if (fechaObj && typeof fechaObj.toDate === "function") {
-        fechaObj = fechaObj.toDate();
-      } else if (fechaObj && fechaObj.seconds) {
-        fechaObj = new Date(fechaObj.seconds * 1000);
-      } else if (!(fechaObj instanceof Date)) {
-        fechaObj = new Date(fechaObj);
-      }
+      const fechaObj = normalizarFecha(t.fecha);
 
-      if (!isNaN(fechaObj.getTime())) {
+      if (fechaObj) {
         const fechaIso = fechaLocalISO(fechaObj);
         if (filtroFechaDesdeActual && fechaIso < filtroFechaDesdeActual) return false;
         if (filtroFechaHastaActual && fechaIso > filtroFechaHastaActual) return false;
@@ -886,7 +944,7 @@ function renderizarListaTransacciones() {
             <button 
               type="button" 
               data-id="${t.id}" 
-              class="btn-eliminar-transaccion p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+              class="btn-eliminar-transaccion no-print p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
               title="Eliminar transacción"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -894,7 +952,7 @@ function renderizarListaTransacciones() {
               </svg>
             </button>
           ` : `
-            <span class="p-1.5 text-slate-500 cursor-not-allowed" title="Solo el creador (${escaparHTML(nombreAutor)}) puede eliminar este registro">
+            <span class="no-print p-1.5 text-slate-500 cursor-not-allowed" title="Solo el creador (${escaparHTML(nombreAutor)}) puede eliminar este registro">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
@@ -1098,7 +1156,7 @@ function renderizarListaBolsillos() {
               type="button" 
               data-id="${b.id}" 
               data-nombre="${escaparHTML(b.nombre)}"
-              class="btn-eliminar-bolsillo p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+              class="btn-eliminar-bolsillo no-print p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
               title="Eliminar bolsillo (sus fondos vuelven automáticamente al saldo disponible)"
             >
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1141,7 +1199,7 @@ function renderizarListaBolsillos() {
           type="button" 
           data-id="${b.id}" 
           data-nombre="${escaparHTML(b.nombre)}"
-          class="btn-abonar-bolsillo w-full py-2 px-3 bg-slate-700/60 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold rounded-xl border border-slate-600/40 transition-colors flex items-center justify-center gap-1.5"
+          class="btn-abonar-bolsillo no-print w-full py-2 px-3 bg-slate-700/60 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-semibold rounded-xl border border-slate-600/40 transition-colors flex items-center justify-center gap-1.5"
         >
           <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -1399,9 +1457,10 @@ function renderizarCuadreHogar(cargando = false) {
     <p class="text-[11px] font-medium text-slate-300 mb-2">Transferencias para quedar a paz y salvo</p>
     ${transferencias}
     <button id="btn-marcar-saldado" type="button"
-      class="mt-4 w-full sm:w-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors">
+      class="no-print mt-4 w-full sm:w-auto px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-xs font-semibold text-white transition-colors">
       Marcar mes como saldado
     </button>`;
+  aplicarEstadoConexion();
 }
 
 /**

@@ -33,3 +33,95 @@ body {
 button, a, input, select {
   transition: all 0.15s ease-in-out;
 }
+
+/* Elementos visibles únicamente al imprimir o exportar a PDF */
+.only-print {
+  display: none;
+}
+
+/* Hoja de estilo para impresión y exportación a PDF (HU-15 / Tarea 15.3) */
+@media print {
+  @page {
+    size: letter portrait;
+    margin: 1.4cm;
+  }
+
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  html,
+  body {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    font-size: 11pt !important;
+    line-height: 1.4 !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .only-print {
+    display: block !important;
+  }
+
+  #app-view {
+    display: block !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  section,
+  article,
+  .rounded-2xl,
+  .rounded-xl {
+    background-color: #ffffff !important;
+    background-image: none !important;
+    border-color: #cbd5e1 !important;
+    color: #0f172a !important;
+    break-inside: avoid;
+  }
+
+  .grid {
+    display: block !important;
+  }
+
+  section,
+  article {
+    margin-bottom: 12pt !important;
+    width: 100% !important;
+  }
+
+  /* Preservar legibilidad de KPIs e indicadores en blanco y negro */
+  h1, h2, h3, h4, p, span, td, th, label {
+    color: #0f172a !important;
+  }
+
+  #resumen-ingresos,
+  .text-emerald-400,
+  .text-emerald-300 {
+    color: #047857 !important;
+  }
+
+  #resumen-gastos,
+  .text-rose-400,
+  .text-rose-300 {
+    color: #be123c !important;
+  }
+
+  #resumen-balance,
+  .text-indigo-400,
+  .text-indigo-300 {
+    color: #1e293b !important;
+  }
+
+  #lista-transacciones > li,
+  #lista-transacciones > div {
+    border-bottom: 1px solid #e2e8f0 !important;
+    break-inside: avoid;
+    background: #ffffff !important;
+  }
+}
