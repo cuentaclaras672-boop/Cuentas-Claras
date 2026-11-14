@@ -47,6 +47,8 @@ Para que una Historia de Usuario, funcionalidad o tarea se considere **TERMINADA
 ### 2.4 Calidad de Código y Mantenibilidad
 - [x] **Documentación JSDoc:** Todas las funciones, métodos y clases cuentan con tipado `@param`, `@returns`, `@throws` y descripciones claras.
 - [x] **Código Limpio:** Nombres descriptivos en español, sin números mágicos y sin `console.log` de depuración en producción.
+- [x] **Homogeneidad del SDK de Firebase (Acuerdo Retrospectiva Sprint 4 — Ancla 2):** Todos los módulos en `src/services/` deben importar exactamente la misma versión unificada del CDN de Firebase (`10.13.0`), evitando conflictos entre múltiples instancias de App o Firestore.
+- [x] **Normalización Transversal de Fechas (Acuerdo Retrospectiva Sprint 4 — Ancla 1):** Toda conversión de marcas temporales de Firestore (`Timestamp` con `.toDate()`, `{ seconds }`, `Date` o cadenas ISO) debe delegarse en `normalizarFecha()` de `src/utils/formateo.js`.
 - [x] **Facilidad de Sustentación:** Código estructurado de forma que cualquier cambio en vivo solicitado por el docente evaluador pueda ubicarse y ejecutarse en menos de 2 minutos.
 
 ### 2.5 Pruebas y Verificación en Vivo

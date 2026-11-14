@@ -46,10 +46,12 @@ El backlog del producto se encuentra organizado, estimado en Story Points (escal
 | **HU-11** | **Cuadre Mensual y Liquidación del Hogar:** algoritmo de compensación y transferencias mínimas. | 8 SP | Refuerzo #1 y #2 | 4 | ✅ **Terminado (Done - S4)** |
 | **HU-12** | **Categorías Personalizadas por Usuario:** creación, edición y aislamiento estricto por UID. | 5 SP | Refuerzo #1 y #2 | 4 | ✅ **Terminado (Done - S4)** |
 | **HU-13** | **Control de Integridad y Límite de Descripción:** tope de 120 caracteres y contador en tiempo real. | 3 SP | Condición #5 (Manejo de Errores) | 4 | ✅ **Terminado (Done - S4)** |
-| **HU-14** | **Auditoría de Seguridad y Pruebas de Carga:** estrés concurrente y resiliencia en Firestore. | 8 SP | Refuerzo #2 y #5 | 5 | 🚀 **En Ejecución (S5)** |
-| **HU-15** | **Exportación de Reportes del Hogar:** descarga de CSV estructurado y vista de impresión PDF. | 5 SP | Refuerzo #4 (Portabilidad) | 5 | 🚀 **En Ejecución (S5)** |
+| **HU-14** | **Auditoría de Seguridad y Pruebas de Carga:** reglas endurecidas en 6 colecciones, 50 ops concurrentes y resiliencia. | 8 SP | Refuerzo #2 y #5 | 5 | ✅ **Terminado (Done - S5)** |
+| **HU-15** | **Exportación de Reportes del Hogar:** descarga de CSV RFC 4180 y vista de impresión PDF (`@media print`). | 5 SP | Refuerzo #4 (Portabilidad) | 5 | ✅ **Terminado (Done - S5)** |
+| **HU-16** | **Despliegue en Firebase Hosting y Hardening Operativo:** `firebase.json`, reglas en servidor y API Key acotada. | 8 SP | Refuerzo #2, #6 y #7 | 6 | 🚀 **En Ejecución (S6)** |
+| **HU-17** | **Preparación de Sustentación y Auditoría de Cierre:** ensayos UAT Corte III y cierre documental semestral. | 5 SP | Refuerzo #6 y #7 | 6 | 🚀 **En Ejecución (S6)** |
 
-> **Total acumulado de velocidad:** 68 Story Points completados de 68 comprometidos hasta Sprint 4 (100% efectividad). Sprint 5 en curso con 13 SP planificados.
+> **Total acumulado de velocidad:** 81 Story Points completados de 81 comprometidos hasta Sprint 5 (100% efectividad). Sprint 6 en ejecución desde el 14 de noviembre de 2026 (13 SP planificados; Tareas 16.1 y 16.2 adelantadas).
 
 ### 📅 Cronograma Oficial de Sprints (Docente: Vilma Yenny Bohórquez)
 
@@ -59,8 +61,8 @@ El backlog del producto se encuentra organizado, estimado en Story Points (escal
 | **Sprint 2** | 19/09/2026 – 02/10/2026 | Daily en vivo (26/09) · Sustentación Sprint 2 (03/10) | ✅ **100% Finalizado (21 SP)** |
 | **Sprint 3** | 03/10/2026 – 16/10/2026 | Receso (05-12 oct) · **PARCIAL Corte II, Review, Sustentación y Retro (17/10)** | ✅ **100% Finalizado (16 SP)** |
 | **Sprint 4** | 17/10/2026 – 30/10/2026 | Sprint Review y Retrospectiva Sprint 4 (30/10/2026) | ✅ **100% Finalizado (16 SP)** |
-| **Sprint 5** | 31/10/2026 – 13/11/2026 | Auditoría de seguridad, pruebas de carga y reportes | 🚀 **En Ejecución / Arranque (13 SP)** |
-| **Sprint 6** | 14/11/2026 – 27/11/2026 | **Parcial Corte III y Sustentación Final (21/11/2026)** | ⏳ Planificado |
+| **Sprint 5** | 31/10/2026 – 13/11/2026 | Auditoría de seguridad, pruebas de carga y exportación CSV/PDF | ✅ **100% Finalizado (13 SP)** |
+| **Sprint 6** | 14/11/2026 – 27/11/2026 | **Parcial Corte III y Sustentación Final (21/11/2026)** | 🚀 **En Ejecución (13 SP)** |
 
 ---
 
@@ -71,10 +73,10 @@ El backlog del producto se encuentra organizado, estimado en Story Points (escal
 | **1** | **Persistencia Real** | Almacenamiento persistente en Cloud Firestore para transacciones, bolsillos, préstamos y liquidaciones. Prohibido `localStorage` para balances. Sincronización en tiempo real (`onSnapshot`) y transacciones atómicas (`runTransaction`). | [`src/services/firestore.js`](src/services/firestore.js)<br>[`src/services/prestamos.js`](src/services/prestamos.js)<br>[`src/services/liquidaciones.js`](src/services/liquidaciones.js)<br>[`src/services/categorias.js`](src/services/categorias.js) | [`tests/pruebas-bolsillos.test.js`](tests/pruebas-bolsillos.test.js)<br>[`tests/pruebas-prestamos.test.js`](tests/pruebas-prestamos.test.js)<br>[`tests/pruebas-liquidaciones.test.js`](tests/pruebas-liquidaciones.test.js) |
 | **2** | **Sesión o Control de Acceso** | Autenticación con Firebase Auth SDK v10 (email y contraseña), aislamiento estricto por UID y privacidad de movimientos compartidos en el hogar mediante reglas de backend en `firestore.rules`. | [`src/services/auth.js`](src/services/auth.js)<br>[`src/services/hogares.js`](src/services/hogares.js)<br>[`firestore.rules`](firestore.rules) | [`tests/pruebas-hogares.test.js`](tests/pruebas-hogares.test.js) (Pruebas de aislamiento y prueba negativa) |
 | **3** | **Integración Externa** | Consumo asíncrono vía `fetch` de API pública de indicadores económicos (TRM del dólar oficial) con estrategia de failover (3 endpoints), timeout de 5 s y fallback referencial offline. | [`src/services/indicadores.js`](src/services/indicadores.js) | [`tests/pruebas-indicadores.test.js`](tests/pruebas-indicadores.test.js) (Simulación de caída de red) |
-| **4** | **Consulta con Filtrado** | Historial interactivo con búsqueda en tiempo real insensible a tildes, filtros combinados por ámbito, tipo, categoría y rango de fechas, más gráfica de gastos reactiva a los filtros y cuadre mensual. | [`src/ui/dashboard.js`](src/ui/dashboard.js)<br>[`src/utils/estadisticas.js`](src/utils/estadisticas.js)<br>[`src/utils/cuadre.js`](src/utils/cuadre.js) | [`tests/pruebas-filtros.test.js`](tests/pruebas-filtros.test.js)<br>[`tests/pruebas-grafica.test.js`](tests/pruebas-grafica.test.js)<br>[`tests/pruebas-liquidaciones.test.js`](tests/pruebas-liquidaciones.test.js) |
-| **5** | **Manejo de Errores Visible** | Captura defensiva de fallos con `try/catch`, proyectados en pantalla mediante notificaciones flotantes contextuales (Toasts), validaciones en rojo por campo, límite de 120 caracteres en vivo y banner persistente ante pérdida de conexión a Internet. | [`src/ui/notificaciones.js`](src/ui/notificaciones.js)<br>[`src/services/conexion.js`](src/services/conexion.js)<br>[`src/models/Transaccion.js`](src/models/Transaccion.js) | [`tests/pruebas-conexion.test.js`](tests/pruebas-conexion.test.js)<br>[`tests/pruebas-liquidaciones.test.js`](tests/pruebas-liquidaciones.test.js) |
-| **6** | **Repositorio de Código** | Repositorio formal en GitHub con trazabilidad de commits semánticos, ramas de trabajo, contribuciones individuales y suite de pruebas automatizadas con ejecutor maestro (`tests/runner.js`). | Control de versiones Git / GitHub | [`tests/runner.js`](tests/runner.js) (8 suites · 100% PASS) |
-| **7** | **Documentación Técnica** | Documentación exhaustiva en `README.md` junto con los artefactos formales de gestión ágil en la carpeta `docs/` (Actas de Planning, Bitácoras de seguimiento, Dailies, DoD/DoR, Registro de IA e Informes de QA). | [`README.md`](README.md)<br>[`docs/`](docs/) | [`docs/informe-pruebas-sprint3.md`](docs/informe-pruebas-sprint3.md)<br>[`docs/informe-pruebas-sprint4.md`](docs/informe-pruebas-sprint4.md) |
+| **4** | **Consulta con Filtrado** | Historial interactivo con búsqueda en tiempo real insensible a tildes, filtros combinados por ámbito, tipo, categoría y rango de fechas, gráfica reactiva, cuadre mensual y exportación CSV RFC 4180 / vista PDF del subconjunto filtrado. | [`src/ui/dashboard.js`](src/ui/dashboard.js)<br>[`src/utils/estadisticas.js`](src/utils/estadisticas.js)<br>[`src/utils/cuadre.js`](src/utils/cuadre.js)<br>[`src/utils/exportador.js`](src/utils/exportador.js) | [`tests/pruebas-filtros.test.js`](tests/pruebas-filtros.test.js)<br>[`tests/pruebas-grafica.test.js`](tests/pruebas-grafica.test.js)<br>[`tests/pruebas-liquidaciones.test.js`](tests/pruebas-liquidaciones.test.js)<br>[`tests/pruebas-exportador.test.js`](tests/pruebas-exportador.test.js) |
+| **5** | **Manejo de Errores Visible** | Captura defensiva de fallos con `try/catch`, Toasts flotantes contextuales, reintentos transitorios automáticos (`conReintentos`), validaciones por campo, límite de 120 caracteres en vivo y banner offline que protege escrituras en red caída. | [`src/ui/notificaciones.js`](src/ui/notificaciones.js)<br>[`src/services/conexion.js`](src/services/conexion.js)<br>[`src/models/Transaccion.js`](src/models/Transaccion.js) | [`tests/pruebas-conexion.test.js`](tests/pruebas-conexion.test.js)<br>[`tests/pruebas-liquidaciones.test.js`](tests/pruebas-liquidaciones.test.js)<br>[`tests/pruebas-resiliencia.test.js`](tests/pruebas-resiliencia.test.js) |
+| **6** | **Repositorio de Código** | Repositorio formal en GitHub con trazabilidad de commits semánticos, contribuciones individuales, configuración declarativa de Hosting y suite maestra de pruebas (`tests/runner.js`). | Control de versiones Git / GitHub<br>[`firebase.json`](firebase.json) | [`tests/runner.js`](tests/runner.js) (12 suites · 100% PASS)<br>[`tests/emulador/auditoria-reglas.mjs`](tests/emulador/auditoria-reglas.mjs) |
+| **7** | **Documentación Técnica** | Documentación exhaustiva en `README.md` junto con los artefactos formales de gestión ágil en `docs/` (Actas de Planning y Review S1–S6, Bitácoras, Dailies, Retrospectivas, DoD/DoR, Auditoría de Seguridad, Guía de Despliegue e Informes QA). | [`README.md`](README.md)<br>[`docs/`](docs/) | [`docs/informe-pruebas-sprint4.md`](docs/informe-pruebas-sprint4.md)<br>[`docs/informe-pruebas-sprint5.md`](docs/informe-pruebas-sprint5.md) |
 
 ---
 
@@ -110,9 +112,10 @@ cuentas-claras/
 │   │   ├── dashboard.js    # Renderizado reactivo de métricas, filtros, bolsillos y Mi Hogar (HU-09 / HU-13)
 │   │   └── notificaciones.js # Notificaciones flotantes (Toasts) para errores visibles
 │   ├── utils/              # CAPA TRANSVERSAL
-│   │   ├── formateo.js     # Formato de divisa (COP), fechas y parseo seguro
+│   │   ├── formateo.js     # Formato de divisa (COP/USD), normalizarFecha y parseo seguro
 │   │   ├── estadisticas.js # Agregación de gastos y cálculo de porcentajes (HU-10)
-│   │   └── cuadre.js       # Cálculo de balances y transferencias mínimas del hogar (HU-11)
+│   │   ├── cuadre.js       # Cálculo de balances y transferencias mínimas del hogar (HU-11)
+│   │   └── exportador.js   # Exportación CSV estándar RFC 4180 con BOM UTF-8 (HU-15)
 │   └── app.js              # Orquestador del ciclo de vida de la aplicación
 ├── docs/                   # Documentación de Gestión Ágil (Scrum)
 │   ├── acta-planning.md    # Acta de Planning y Backlog Sprint 1
@@ -120,21 +123,27 @@ cuentas-claras/
 │   ├── acta-planning-sprint3.md # Acta de Planning y Backlog Sprint 3
 │   ├── acta-planning-sprint4.md # Acta de Planning y Backlog Sprint 4 (17/10/2026)
 │   ├── acta-planning-sprint5.md # Acta de Planning y Backlog Sprint 5 (31/10/2026)
+│   ├── acta-planning-sprint6.md # Acta de Planning y Backlog Sprint 6 (14/11/2026)
 │   ├── acta-review-sprint2.md   # Acta formal de Sprint Review Sprint 2 (03/10/2026)
 │   ├── acta-review-sprint3.md   # Acta formal de Sprint Review Sprint 3 (17/10/2026)
 │   ├── acta-review-sprint4.md   # Acta formal de Sprint Review Sprint 4 (30/10/2026)
+│   ├── acta-review-sprint5.md   # Acta formal de Sprint Review Sprint 5 (13/11/2026)
+│   ├── auditoria-seguridad-sprint5.md # Evidencia de auditoría de reglas en emulador (HU-14)
+│   ├── guia-despliegue.md  # Guía operativa Firebase Hosting, Rules y API Key (HU-16)
 │   ├── bitacora-sprint1.md # Bitácora de seguimiento y Dailies Sprint 1
 │   ├── bitacora-sprint2.md # Bitácora de seguimiento y Dailies Sprint 2
 │   ├── bitacora-sprint3.md # Bitácora de seguimiento y Dailies Sprint 3
 │   ├── bitacora-sprint4.md # Bitácora de seguimiento y Dailies Sprint 4
-│   ├── bitacora-sprint5.md # Bitácora de seguimiento y Dailies Sprint 5 (31/10/2026)
+│   ├── bitacora-sprint5.md # Bitácora de seguimiento, Burndown y Retrospectiva Sprint 5
+│   ├── bitacora-sprint6.md # Bitácora de seguimiento y Kick-off Sprint 6 (14/11/2026)
 │   ├── informe-pruebas-sprint2.md # Certificación formal de pruebas QA Sprint 2
 │   ├── informe-pruebas-sprint3.md # Certificación formal de pruebas QA Sprint 3
 │   ├── informe-pruebas-sprint4.md # Certificación formal de pruebas QA Sprint 4
+│   ├── informe-pruebas-sprint5.md # Certificación formal de pruebas QA Sprint 5
 │   ├── definition-of-done.md # Criterios de calidad Definition of Done (DoD) y DoR
 │   └── sprint-goals.md     # Metas consolidadas y cronograma oficial de los Sprints
 ├── tests/                  # SUITE AUTOMATIZADA DE PRUEBAS DE CALIDAD (QA)
-│   ├── runner.js           # Orquestador maestro de pruebas (8 suites · 100% PASS)
+│   ├── runner.js           # Orquestador maestro de pruebas (12 suites · 100% PASS)
 │   ├── pruebas-bolsillos.test.js # Pruebas Tarea 4.4 (HU-04)
 │   ├── pruebas-filtros.test.js   # Pruebas Tarea 5.4 (HU-05)
 │   ├── pruebas-indicadores.test.js # Pruebas Tarea 6.4 (HU-06)
@@ -142,7 +151,15 @@ cuentas-claras/
 │   ├── pruebas-prestamos.test.js # Pruebas Tarea 8.4 (HU-08)
 │   ├── pruebas-hogares.test.js   # Pruebas Tarea 9.4 (HU-09)
 │   ├── pruebas-grafica.test.js   # Pruebas Tarea 10.3 (HU-10)
-│   └── pruebas-liquidaciones.test.js # Pruebas Tareas 11.4 y 13.1 (HU-11 / HU-13)
+│   ├── pruebas-liquidaciones.test.js # Pruebas Tareas 11.4 y 13.1 (HU-11 / HU-13)
+│   ├── pruebas-categorias.test.js # Pruebas Tarea 12.4 (HU-12)
+│   ├── pruebas-resiliencia.test.js # Pruebas Tarea 14.3: resiliencia y reintentos (HU-14)
+│   ├── pruebas-seguridad-carga.test.js # Pruebas Tarea 14.2: auditoría reglas, 50 ops y fechas
+│   ├── pruebas-exportador.test.js # Pruebas Tarea 15.1: exportación CSV RFC 4180 (HU-15)
+│   └── emulador/           # Pruebas reales de firestore.rules en Emulador (46 casos)
+├── firebase.json           # Configuración de Firebase Hosting y Firestore Rules
+├── .firebaserc             # Alias de proyecto Firebase (bdcuentasclaras-b1814)
+├── firestore.rules         # Reglas de seguridad en servidor (6 colecciones + deny-all)
 ├── .gitignore              # Exclusiones de Git (node_modules, .env, credenciales locales)
 └── README.md               # Documentación general del proyecto
 ```
@@ -207,7 +224,7 @@ Para ejecutar la suite integral de pruebas unitarias, de integración y de segur
 ```bash
 node tests/runner.js
 ```
-Ejecuta las 10 suites automatizadas de los Sprints 2 a 5, verificando el 100% de los criterios de aceptación (CA) sin dependencias externas.
+Ejecuta las 12 suites automatizadas de los Sprints 2 a 5, verificando el 100% de los criterios de aceptación (CA) sin dependencias externas.
 
 Las pruebas de penetración de `firestore.rules` corren contra el emulador local de Firebase (requieren Java); ver [`tests/emulador/README.md`](tests/emulador/README.md).
 
