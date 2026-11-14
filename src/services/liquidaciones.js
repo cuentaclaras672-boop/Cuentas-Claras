@@ -32,6 +32,7 @@ import { db, traducirErrorFirestore } from "./firestore.js";
 import { asegurarConexion, conReintentos } from "./conexion.js";
 import { MAX_MIEMBROS_HOGAR } from "./hogares.js";
 import { AMBITO_TRANSACCION, TIPO_TRANSACCION } from "../models/Transaccion.js";
+import { normalizarFecha } from "../utils/formateo.js";
 
 const COLECCION_LIQUIDACIONES = "liquidaciones";
 const COLECCION_TRANSACCIONES = "transacciones";
@@ -145,7 +146,7 @@ function liquidacionDesdeDocumento(id, data) {
     periodo: data.periodo,
     transferencias: data.transferencias || [],
     saldadaPor: data.saldadaPor,
-    fecha: data.fecha && typeof data.fecha.toDate === "function" ? data.fecha.toDate() : new Date()
+    fecha: normalizarFecha(data.fecha) || new Date()
   };
 }
 
@@ -180,16 +181,7 @@ export function escucharGastosCompartidosDelPeriodo(hogarId, periodo, onActualiz
       const gastos = [];
       snapshot.forEach((docSnap) => {
         const data = docSnap.data();
-        let fecha = null;
-        if (data.fecha && typeof data.fecha.toDate === "function") {
-          fecha = data.fecha.toDate();
-        } else if (data.fecha instanceof Date) {
-          fecha = data.fecha;
-        } else if (data.fecha && data.fecha.seconds) {
-          fecha = new Date(data.fecha.seconds * 1000);
-        } else if (data.fecha) {
-          fecha = new Date(data.fecha);
-        }
+        const fecha = normalizarFecha(data.fecha);
         if (data.tipo !== TIPO_TRANSACCION.GASTO || !fecha || fecha < inicio || fecha >= fin) return;
         gastos.push({
           id: docSnap.id,

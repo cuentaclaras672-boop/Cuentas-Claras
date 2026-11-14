@@ -37,6 +37,33 @@ export function formatearTRM(valor) {
 }
 
 /**
+ * Normaliza fechas heterogéneas provenientes de Firestore o la interfaz web
+ * (Date nativo, Firebase Timestamp con .toDate(), objeto serializado { seconds },
+ * cadena ISO o milisegundos epoch) a una instancia válida de Date o null.
+ * @param {Date|string|number|object|null|undefined} valor - Fecha de entrada.
+ * @returns {Date|null} Instancia válida de Date o null si no es convertible.
+ */
+export function normalizarFecha(valor) {
+  if (valor === null || valor === undefined || valor === '') return null;
+
+  let fecha = null;
+  if (valor instanceof Date) {
+    fecha = valor;
+  } else if (typeof valor.toDate === 'function') {
+    fecha = valor.toDate();
+  } else if (typeof valor === 'object' && typeof valor.seconds === 'number') {
+    fecha = new Date(valor.seconds * 1000);
+  } else if (typeof valor === 'string' || typeof valor === 'number') {
+    fecha = new Date(valor);
+  }
+
+  if (!(fecha instanceof Date) || isNaN(fecha.getTime())) {
+    return null;
+  }
+  return fecha;
+}
+
+/**
  * Convierte una fecha (Date, string ISO o Firebase Timestamp) a formato legible en español.
  * Ejemplo: "25 sep. 2026, 12:30 p. m."
  * @param {Date|string|number|object} fecha - Objeto fecha o timestamp.
@@ -45,18 +72,8 @@ export function formatearTRM(valor) {
 export function formatearFecha(fecha) {
   if (!fecha) return 'Fecha no disponible';
 
-  let objetoFecha;
-
-  // Soporte para Firebase Firestore Timestamp (posee método .toDate())
-  if (fecha && typeof fecha.toDate === 'function') {
-    objetoFecha = fecha.toDate();
-  } else if (fecha instanceof Date) {
-    objetoFecha = fecha;
-  } else {
-    objetoFecha = new Date(fecha);
-  }
-
-  if (isNaN(objetoFecha.getTime())) {
+  const objetoFecha = normalizarFecha(fecha);
+  if (!objetoFecha) {
     return 'Fecha inválida';
   }
 
