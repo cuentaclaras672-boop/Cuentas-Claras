@@ -18,6 +18,8 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js';
 import { traducirErrorFirestore } from './firestore.js';
 import { asegurarConexion } from './conexion.js';
+import { obtenerClaveUsuario } from './claves.js';
+import { cifrarValor, descifrarValor } from '../utils/cifrado.js';
 
 /**
  * Servicio para registrar una categoría personalizada por usuario (HU-12).
@@ -38,9 +40,11 @@ export async function guardarCategoria(nombre, tipo = 'gasto') {
   try {
     // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
     asegurarConexion();
+    // El nombre de la categoría se guarda cifrado con la clave personal del usuario
+    const clave = await obtenerClaveUsuario(user.uid);
     const docRef = await addDoc(collection(db, "categorias"), {
       uid: user.uid,
-      nombre: nombreLimpio,
+      nombre: await cifrarValor(clave, nombreLimpio, "nombre"),
       tipo: tipo,
       fechaCreacion: new Date().toISOString()
     });
@@ -63,10 +67,16 @@ export async function obtenerCategorias() {
   try {
     const q = query(collection(db, "categorias"), where("uid", "==", user.uid));
     const querySnapshot = await getDocs(q);
+    const clave = await obtenerClaveUsuario(user.uid);
     const categorias = [];
-    querySnapshot.forEach((docSnap) => {
-      categorias.push({ id: docSnap.id, ...docSnap.data() });
-    });
+    for (const docSnap of querySnapshot.docs) {
+      const data = docSnap.data();
+      try {
+        categorias.push({ id: docSnap.id, ...data, nombre: await descifrarValor(clave, data.nombre, "nombre") });
+      } catch (errorDescifrado) {
+        console.warn(`[CategoriasService] Categoría omitida id=${docSnap.id}:`, errorDescifrado.message);
+      }
+    }
     return categorias;
   } catch (error) {
     console.error("[CategoriasService.obtenerCategorias] Error:", error.message);
@@ -89,7 +99,15 @@ export async function actualizarCategoria(idCategoria, nuevosDatos) {
     // Tarea 14.3 (CA-14.3): sin conexión se rechaza antes de tocar Firestore
     asegurarConexion();
     const categoriaRef = doc(db, "categorias", idCategoria);
-    await updateDoc(categoriaRef, nuevosDatos);
+    const datos = { ...nuevosDatos };
+    if (typeof datos.nombre === "string") {
+      const nombreLimpio = datos.nombre.trim();
+      if (nombreLimpio.length < 3 || nombreLimpio.length > 40) {
+        throw new Error("El nombre de la categoría debe tener entre 3 y 40 caracteres.");
+      }
+      datos.nombre = await cifrarValor(await obtenerClaveUsuario(user.uid), nombreLimpio, "nombre");
+    }
+    await updateDoc(categoriaRef, datos);
     return true;
   } catch (error) {
     console.error("[CategoriasService.actualizarCategoria] Error:", error.message);

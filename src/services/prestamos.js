@@ -7,18 +7,19 @@
  * Estructura de cada documento en `prestamos/{idAutomatico}`:
  * | Campo          | Tipo      | Regla                                                   |
  * |----------------|-----------|---------------------------------------------------------|
- * | deudor         | string    | 3 a 60 caracteres                                       |
+ * | deudor         | cifrado   | 3 a 60 caracteres                                       |
  * | monto          | number    | monto prestado, mayor que 0                             |
  * | fecha          | timestamp | fecha del préstamo                                      |
- * | nota           | string    | opcional, hasta 200 caracteres ("" si no hay)           |
+ * | nota           | cifrado   | opcional, hasta 200 caracteres ("" si no hay)           |
  * | abonos         | array     | lista de { monto: number, fecha: timestamp }            |
  * | totalAbonado   | number    | suma de los abonos, entre 0 y monto                     |
  * | estado         | string    | 'PENDIENTE' o 'SALDADO' (SALDADO cuando totalAbonado == monto) |
  * | creadoPor      | string    | UID del usuario que prestó el dinero                    |
  *
- * `totalAbonado` y `estado` se guardan (además de la lista de abonos) para que las reglas de
- * Firestore puedan verificar en el servidor que ningún abono supere el saldo pendiente (CA-8.4)
- * y para poder filtrar por estado (CA-8.6) sin recorrer los abonos.
+ * Los campos marcados "cifrado" (textos) se guardan con AES-256-GCM y la clave personal del usuario
+ * (ver src/services/claves.js). Los montos quedan en claro a propósito: así las reglas de Firestore siguen
+ * verificando en el servidor que ningún abono supere el saldo pendiente (CA-8.4), y `totalAbonado` y
+ * `estado` permiten filtrar por estado (CA-8.6) sin recorrer los abonos.
  */
 
 import {
@@ -33,8 +34,23 @@ import {
   runTransaction,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { db, traducirErrorFirestore } from "./firestore.js";
+import { db, traducirErrorFirestore, procesadorEnOrden, convertirDocumentos } from "./firestore.js";
 import { asegurarConexion } from "./conexion.js";
+import { obtenerClaveUsuario } from "./claves.js";
+import { cifrarCampos, descifrarCampos } from "../utils/cifrado.js";
+
+/** Campos de texto del préstamo que se guardan cifrados (los montos quedan en claro para las reglas). */
+export const CAMPOS_CIFRADOS_PRESTAMO = Object.freeze(["deudor", "nota"]);
+
+/**
+ * Descifra los textos de un préstamo. Los datos antiguos sin cifrar pasan igual.
+ * @param {CryptoKey} clave
+ * @param {object} data
+ * @returns {Promise<object>}
+ */
+export function descifrarPrestamo(clave, data) {
+  return descifrarCampos(clave, data, CAMPOS_CIFRADOS_PRESTAMO);
+}
 
 const COLECCION_PRESTAMOS = "prestamos";
 
@@ -140,7 +156,10 @@ export async function registrarPrestamo(prestamo) {
       creadoPor: datos.creadoPor
     };
 
-    const docRef = await addDoc(collection(db, COLECCION_PRESTAMOS), payload);
+    const clave = await obtenerClaveUsuario(datos.creadoPor);
+    const payloadCifrado = await cifrarCampos(clave, payload, CAMPOS_CIFRADOS_PRESTAMO);
+
+    const docRef = await addDoc(collection(db, COLECCION_PRESTAMOS), payloadCifrado);
     return docRef.id;
   } catch (error) {
     console.error("[PrestamosService.registrarPrestamo] Error:", error.message);
@@ -247,6 +266,23 @@ export async function eliminarPrestamo(idPrestamo, usuarioId = null) {
 }
 
 /**
+ * Validación al leer: descarta un préstamo con datos imposibles (p. ej. escrito por un cliente modificado).
+ * Revisa que el total abonado coincida con la suma de los abonos y no supere el monto prestado.
+ * @param {object} p - Préstamo ya descifrado.
+ * @throws {Error} Si los datos no son coherentes.
+ */
+export function validarPrestamoLeido(p) {
+  const deudor = typeof p.deudor === "string" ? p.deudor.trim() : "";
+  if (deudor.length < 3 || deudor.length > 60) throw new Error("Deudor inválido.");
+  if (!(Number(p.monto) > 0)) throw new Error("Monto inválido.");
+  const suma = redondear((p.abonos || []).reduce((t, a) => t + (Number(a.monto) || 0), 0));
+  const total = Number(p.totalAbonado) || 0;
+  if (Math.abs(suma - total) >= 0.01 || total > Number(p.monto) + 0.001) {
+    throw new Error("El total abonado no coincide con los abonos o supera el monto.");
+  }
+}
+
+/**
  * Escucha en tiempo real los préstamos del usuario, ordenados del más reciente al más antiguo.
  * Por defecto entrega objetos planos (ver `prestamoDesdeDocumento`); cuando exista el modelo
  * `Prestamo` (Tarea 8.1) se puede pasar `Prestamo.desdeFirestore` como fábrica.
@@ -267,21 +303,26 @@ export function escucharPrestamos(usuarioId, onActualizacion, onError, fabrica =
 
   const q = query(collection(db, COLECCION_PRESTAMOS), where("creadoPor", "==", usuarioId));
 
-  return onSnapshot(
-    q,
-    (snapshot) => {
-      const prestamos = [];
-      snapshot.forEach((docItem) => {
-        try {
-          prestamos.push(fabrica(docItem.id, docItem.data()));
-        } catch (errorParseo) {
-          console.warn(`[PrestamosService] Préstamo omitido id=${docItem.id}:`, errorParseo.message);
-        }
-      });
+  const procesador = procesadorEnOrden(async (snapshot, sigueVigente) => {
+    const clave = await obtenerClaveUsuario(usuarioId);
+    const pares = await convertirDocumentos(
+      snapshot,
+      async (id, data) => {
+        const prestamo = fabrica(id, await descifrarPrestamo(clave, data));
+        validarPrestamoLeido(prestamo);
+        return prestamo;
+      },
+      "PrestamosService.escucharPrestamos"
+    );
+    if (!sigueVigente()) return;
+    const prestamos = pares.map(([, prestamo]) => prestamo);
+    prestamos.sort((a, b) => aFecha(b.fecha).getTime() - aFecha(a.fecha).getTime());
+    onActualizacion(prestamos);
+  }, onError);
 
-      prestamos.sort((a, b) => aFecha(b.fecha).getTime() - aFecha(a.fecha).getTime());
-      onActualizacion(prestamos);
-    },
+  const desuscribir = onSnapshot(
+    q,
+    (snapshot) => procesador.alRecibir(snapshot),
     (error) => {
       console.error("[PrestamosService.escucharPrestamos] Error en tiempo real:", error);
       if (typeof onError === "function") {
@@ -289,6 +330,11 @@ export function escucharPrestamos(usuarioId, onActualizacion, onError, fabrica =
       }
     }
   );
+
+  return () => {
+    procesador.cancelar();
+    desuscribir();
+  };
 }
 
 /**

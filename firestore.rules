@@ -15,32 +15,50 @@ service cloud.firestore {
       return request.auth.uid in get(/databases/$(database)/documents/hogares/$(hogarId)).data.miembros;
     }
 
+    // ------------------------------------------------------------------------------------------
+    // CIFRADO DE TEXTOS (AES-256-GCM en el navegador, ver src/utils/cifrado.js y docs/cifrado-datos.md)
+    // Los textos sensibles llegan cifrados con el formato enc:v1:<iv>:<datos>. El servidor no puede leerlos,
+    // así que su largo (3 a 120 caracteres, etc.) lo validan los modelos del cliente antes de cifrar y otra
+    // vez al leer. Aquí se exige que vengan cifrados y que no superen el tamaño que tendría el texto más
+    // largo permitido una vez cifrado (8 * caracteres + 48). Los MONTOS quedan en claro a propósito, para
+    // que estas reglas sigan validando el dinero en el servidor.
+    // ------------------------------------------------------------------------------------------
+    function esCifrado(v, largoMaximo) {
+      return v is string && v.size() <= largoMaximo &&
+        v.matches('^enc:v1:[A-Za-z0-9+/]{16}:[A-Za-z0-9+/]+={0,2}$');
+    }
+
+    // Una clave AES-256 en base64 (32 bytes = 44 caracteres)
+    function esClaveAes(v) {
+      return v is string && v.matches('^[A-Za-z0-9+/]{43}=$');
+    }
+
     // Estructura válida de un documento de /transacciones (espejo de src/models/Transaccion.js).
-    // Rechaza campos de más, tipos incorrectos y descripciones fuera de 3 a 120 caracteres.
+    // Rechaza campos de más y tipos incorrectos. descripcion (máx. 120), categoria y nombreUsuario (máx. 100)
+    // llegan cifrados; monto, tipo, ambito, creadoPor, fecha y hogarId en claro.
     // hogarId es opcional (HU-09): null o el ID del hogar del autor.
     function esTransaccionValida(d) {
       return d.keys().hasOnly(['descripcion', 'monto', 'tipo', 'ambito', 'categoria',
                                'creadoPor', 'nombreUsuario', 'fecha', 'hogarId']) &&
         d.keys().hasAll(['descripcion', 'monto', 'tipo', 'ambito', 'categoria',
                          'creadoPor', 'fecha']) &&
-        d.descripcion is string &&
-        d.descripcion.size() >= 3 && d.descripcion.size() <= 120 &&
+        esCifrado(d.descripcion, 1008) &&
         d.monto is number && d.monto > 0 && d.monto <= 1000000000000 &&
         d.tipo in ['INGRESO', 'GASTO'] &&
         d.ambito in ['PERSONAL', 'COMPARTIDO'] &&
-        d.categoria is string && d.categoria.size() > 0 &&
+        esCifrado(d.categoria, 528) &&
         d.creadoPor is string &&
-        (!('nombreUsuario' in d) || (d.nombreUsuario is string && d.nombreUsuario.size() <= 100)) &&
+        (!('nombreUsuario' in d) || esCifrado(d.nombreUsuario, 848)) &&
         d.fecha is timestamp &&
         (d.get('hogarId', null) == null || d.hogarId is string);
     }
 
     // Estructura válida de un bolsillo (espejo de src/models/Bolsillo.js). Tarea 14.1:
-    // antes no se limitaban los campos ni el largo del nombre.
+    // antes no se limitaban los campos ni el largo del nombre. El nombre (máx. 40) llega cifrado.
     function esBolsilloValido(d) {
       return d.keys().hasOnly(['nombre', 'meta', 'montoAcumulado', 'creadoPor', 'fecha']) &&
         d.keys().hasAll(['nombre', 'meta', 'montoAcumulado', 'creadoPor', 'fecha']) &&
-        d.nombre is string && d.nombre.size() >= 3 && d.nombre.size() <= 40 &&
+        esCifrado(d.nombre, 368) &&
         d.meta is number && d.meta > 0 && d.meta <= 1000000000000 &&
         d.montoAcumulado is number && d.montoAcumulado >= 0 &&
         d.creadoPor is string &&
@@ -48,12 +66,12 @@ service cloud.firestore {
     }
 
     // Estructura válida de una categoría personalizada (espejo de src/services/categorias.js). Tarea 14.1:
-    // antes la actualización aceptaba cualquier campo y cualquier nombre.
+    // antes la actualización aceptaba cualquier campo y cualquier nombre. El nombre (máx. 40) llega cifrado.
     function esCategoriaValida(d) {
       return d.keys().hasOnly(['uid', 'nombre', 'tipo', 'fechaCreacion']) &&
         d.keys().hasAll(['uid', 'nombre']) &&
         d.uid is string &&
-        d.nombre is string && d.nombre.size() >= 3 && d.nombre.size() <= 40 &&
+        esCifrado(d.nombre, 368) &&
         (!('tipo' in d) || d.tipo in ['gasto', 'ingreso']) &&
         (!('fechaCreacion' in d) || d.fechaCreacion is string);
     }
@@ -133,18 +151,16 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid;
 
-      // CREACIÓN: Préstamo propio, con deudor y monto válidos, sin abonos y en estado PENDIENTE
+      // CREACIÓN: Préstamo propio, con deudor y monto válidos, sin abonos y en estado PENDIENTE.
+      // deudor (3 a 60) y nota (máx. 200) llegan cifrados; los montos, en claro.
       allow create: if request.auth != null &&
         request.resource.data.keys().hasOnly(['deudor', 'monto', 'fecha', 'nota', 'abonos', 'totalAbonado', 'estado', 'creadoPor']) &&
         request.resource.data.creadoPor == request.auth.uid &&
-        request.resource.data.deudor is string &&
-        request.resource.data.deudor.size() >= 3 &&
-        request.resource.data.deudor.size() <= 60 &&
+        esCifrado(request.resource.data.deudor, 528) &&
         request.resource.data.monto is number &&
         request.resource.data.monto > 0 &&
         request.resource.data.fecha is timestamp &&
-        request.resource.data.nota is string &&
-        request.resource.data.nota.size() <= 200 &&
+        esCifrado(request.resource.data.nota, 1648) &&
         request.resource.data.abonos == [] &&
         request.resource.data.totalAbonado == 0 &&
         request.resource.data.estado == 'PENDIENTE';
@@ -272,6 +288,41 @@ service cloud.firestore {
         resource.data.uid == request.auth.uid &&
         request.resource.data.uid == request.auth.uid &&
         esCategoriaValida(request.resource.data);
+    }
+
+    // Llavero personal de cifrado (src/services/claves.js): solo su dueño lo lee.
+    // La clave personal se crea una vez y nunca cambia; después solo se agregan copias de claves de hogar.
+    match /clavesUsuario/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+
+      allow create: if request.auth != null && request.auth.uid == uid &&
+        request.resource.data.keys().hasOnly(['clave', 'hogares']) &&
+        request.resource.data.keys().hasAll(['clave', 'hogares']) &&
+        esClaveAes(request.resource.data.clave) &&
+        request.resource.data.hogares == {};
+
+      allow update: if request.auth != null && request.auth.uid == uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hogares']) &&
+        request.resource.data.hogares is map &&
+        request.resource.data.hogares.size() <= 20 &&
+        request.resource.data.hogares.diff(resource.data.hogares).changedKeys().size() == 0 &&
+        request.resource.data.hogares.diff(resource.data.hogares).removedKeys().size() == 0;
+
+      // Sin delete: borrar la clave dejaría ilegibles los datos cifrados con ella.
+    }
+
+    // Clave compartida de cada hogar (ID = código del hogar): solo la leen sus miembros.
+    // La crea el primer miembro que la necesita y nunca cambia ni se borra.
+    match /clavesHogar/{codigo} {
+      allow read: if request.auth != null && esMiembroDelHogar(codigo);
+
+      allow create: if request.auth != null &&
+        codigo.matches('^[A-Z0-9]{6}$') &&
+        esMiembroDelHogar(codigo) &&
+        request.resource.data.keys().hasOnly(['clave', 'creadoPor']) &&
+        request.resource.data.keys().hasAll(['clave', 'creadoPor']) &&
+        esClaveAes(request.resource.data.clave) &&
+        request.resource.data.creadoPor == request.auth.uid;
     }
 
     // Por defecto, denegar cualquier acceso no especificado a la base de datos

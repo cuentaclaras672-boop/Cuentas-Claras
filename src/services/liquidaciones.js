@@ -28,7 +28,8 @@ import {
   runTransaction,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
-import { db, traducirErrorFirestore } from "./firestore.js";
+import { db, traducirErrorFirestore, procesadorEnOrden, convertirDocumentos, descifrarTransaccion } from "./firestore.js";
+
 import { asegurarConexion, conReintentos } from "./conexion.js";
 import { MAX_MIEMBROS_HOGAR } from "./hogares.js";
 import { AMBITO_TRANSACCION, TIPO_TRANSACCION } from "../models/Transaccion.js";
@@ -139,7 +140,7 @@ function validarTransferencias(transferencias, miembros) {
  * @param {object} data - Datos del documento.
  * @returns {{ id: string, hogarId: string, periodo: string, transferencias: Array, saldadaPor: string, fecha: Date }}
  */
-function liquidacionDesdeDocumento(id, data) {
+async function liquidacionDesdeDocumento(id, data) {
   return {
     id,
     hogarId: data.hogarId,
@@ -175,26 +176,30 @@ export function escucharGastosCompartidosDelPeriodo(hogarId, periodo, onActualiz
     where("ambito", "==", AMBITO_TRANSACCION.COMPARTIDO)
   );
 
-  return onSnapshot(
+  const procesador = procesadorEnOrden(async (snapshot, sigueVigente) => {
+    const pares = await convertirDocumentos(snapshot, async (id, crudo) => {
+      const fecha = normalizarFecha(crudo.fecha);
+      // tipo y fecha están en claro: se filtra antes de descifrar para no trabajar de más
+      if (crudo.tipo !== TIPO_TRANSACCION.GASTO || !fecha || fecha < inicio || fecha >= fin) return null;
+      const data = await descifrarTransaccion(crudo);
+      return {
+        id,
+        creadoPor: data.creadoPor,
+        nombreUsuario: data.nombreUsuario || "Conviviente",
+        descripcion: data.descripcion,
+        monto: Number(data.monto) || 0,
+        fecha
+      };
+    }, "LiquidacionesService.escucharGastosCompartidosDelPeriodo");
+    if (!sigueVigente()) return;
+    const gastos = pares.map(([, gasto]) => gasto).filter(Boolean);
+    gastos.sort((a, b) => b.fecha - a.fecha);
+    onActualizacion(gastos);
+  }, onError);
+
+  const desuscribir = onSnapshot(
     q,
-    (snapshot) => {
-      const gastos = [];
-      snapshot.forEach((docSnap) => {
-        const data = docSnap.data();
-        const fecha = normalizarFecha(data.fecha);
-        if (data.tipo !== TIPO_TRANSACCION.GASTO || !fecha || fecha < inicio || fecha >= fin) return;
-        gastos.push({
-          id: docSnap.id,
-          creadoPor: data.creadoPor,
-          nombreUsuario: data.nombreUsuario || "Conviviente",
-          descripcion: data.descripcion,
-          monto: Number(data.monto) || 0,
-          fecha
-        });
-      });
-      gastos.sort((a, b) => b.fecha - a.fecha);
-      onActualizacion(gastos);
-    },
+    (snapshot) => procesador.alRecibir(snapshot),
     (error) => {
       console.error("[LiquidacionesService.escucharGastosCompartidosDelPeriodo] Error en tiempo real:", error);
       if (typeof onError === "function") {
@@ -202,6 +207,11 @@ export function escucharGastosCompartidosDelPeriodo(hogarId, periodo, onActualiz
       }
     }
   );
+
+  return () => {
+    procesador.cancelar();
+    desuscribir();
+  };
 }
 
 /**
@@ -222,11 +232,14 @@ export function escucharLiquidacion(hogarId, periodo, onActualizacion, onError) 
 
   const docRef = doc(db, COLECCION_LIQUIDACIONES, idLiquidacion(hogarId, periodo));
 
-  return onSnapshot(
+  const procesador = procesadorEnOrden(async (snap, sigueVigente) => {
+    const liquidacion = snap.exists() ? await liquidacionDesdeDocumento(snap.id, snap.data()) : null;
+    if (sigueVigente()) onActualizacion(liquidacion);
+  }, onError);
+
+  const desuscribir = onSnapshot(
     docRef,
-    (snap) => {
-      onActualizacion(snap.exists() ? liquidacionDesdeDocumento(snap.id, snap.data()) : null);
-    },
+    (snap) => procesador.alRecibir(snap),
     (error) => {
       console.error("[LiquidacionesService.escucharLiquidacion] Error en tiempo real:", error);
       if (typeof onError === "function") {
@@ -234,6 +247,11 @@ export function escucharLiquidacion(hogarId, periodo, onActualizacion, onError) 
       }
     }
   );
+
+  return () => {
+    procesador.cancelar();
+    desuscribir();
+  };
 }
 
 /**

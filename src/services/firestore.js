@@ -26,6 +26,8 @@ import { db, firebaseConfig } from "./firebase.js";
 import { asegurarConexion } from "./conexion.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
+import { obtenerClaveUsuario, obtenerClaveHogar } from "./claves.js";
+import { cifrarCampos, descifrarCampos, tieneCamposCifrados } from "../utils/cifrado.js";
 
 // ============================================================================
 // RE-EXPORTACIÓN PARA COMPATIBILIDAD
@@ -35,6 +37,90 @@ export { db, firebaseConfig };
 
 const COLECCION_TRANSACCIONES = "transacciones";
 const COLECCION_BOLSILLOS = "bolsillos";
+
+// ============================================================================
+// CIFRADO DE CAMPOS (AES-256-GCM, ver src/utils/cifrado.js y src/services/claves.js)
+// ============================================================================
+
+/**
+ * Campos de texto de una transacción que se guardan cifrados. El monto queda en claro a propósito, para que
+ * las reglas del servidor sigan validándolo (monto > 0 y tope); tipo, ambito, creadoPor, fecha y hogarId
+ * también, porque Firestore los usa en las consultas (where) y en las reglas de seguridad.
+ */
+export const CAMPOS_CIFRADOS_TRANSACCION = Object.freeze(["descripcion", "categoria", "nombreUsuario"]);
+
+/** Campos de un bolsillo que se guardan cifrados. meta y montoAcumulado quedan en claro para las reglas. */
+export const CAMPOS_CIFRADOS_BOLSILLO = Object.freeze(["nombre"]);
+
+/**
+ * Elige la clave de una transacción: los movimientos COMPARTIDOS de un hogar usan la clave del hogar
+ * (todos los miembros los leen); los demás, la clave personal del autor.
+ * @param {object} data - Datos en claro de la transacción (ambito, hogarId).
+ * @param {string} [lectorUid] - Usuario que cifra o descifra.
+ * @returns {Promise<CryptoKey>}
+ */
+export function claveDeTransaccion(data, lectorUid) {
+  if (data.ambito === AMBITO_TRANSACCION.COMPARTIDO && data.hogarId) {
+    return obtenerClaveHogar(data.hogarId, lectorUid);
+  }
+  return obtenerClaveUsuario(lectorUid);
+}
+
+/**
+ * Descifra los campos de una transacción leída de Firestore. Los datos antiguos sin cifrar pasan igual.
+ * @param {object} data - Documento tal como está en Firestore.
+ * @param {string} [lectorUid] - Usuario que lee.
+ * @returns {Promise<object>} Documento con los campos en claro.
+ */
+export async function descifrarTransaccion(data, lectorUid) {
+  if (!tieneCamposCifrados(data, CAMPOS_CIFRADOS_TRANSACCION)) return data;
+  return descifrarCampos(await claveDeTransaccion(data, lectorUid), data, CAMPOS_CIFRADOS_TRANSACCION);
+}
+
+/**
+ * Convierte un snapshot de consulta en una lista de entidades, descifrando cada documento.
+ * Los documentos que no se pueden descifrar o validar se omiten con un aviso en consola.
+ * @param {import("firebase/firestore").QuerySnapshot} snapshot
+ * @param {function(string, object): Promise<*>} convertir - Recibe (id, data) y devuelve la entidad.
+ * @param {string} etiqueta - Nombre para el aviso en consola.
+ * @returns {Promise<Array<[string, *]>>} Pares [id, entidad].
+ */
+export async function convertirDocumentos(snapshot, convertir, etiqueta) {
+  const pares = await Promise.all(snapshot.docs.map(async (docItem) => {
+    try {
+      return [docItem.id, await convertir(docItem.id, docItem.data())];
+    } catch (errorParseo) {
+      console.warn(`[${etiqueta}] Registro omitido id=${docItem.id}:`, errorParseo.message);
+      return null;
+    }
+  }));
+  return pares.filter(Boolean);
+}
+
+/**
+ * Envuelve el callback de un onSnapshot que necesita trabajo asíncrono (descifrar). Si llega un snapshot
+ * nuevo antes de terminar el anterior, el resultado viejo se descarta; tras desuscribirse no se emite nada.
+ * @param {function(*, function(): boolean): Promise<void>} procesar - Recibe el snapshot y una función que
+ *   indica si el resultado sigue vigente.
+ * @param {function(Error): void} [onError] - Callback si el descifrado falla.
+ * @returns {{ alRecibir: function(*): void, cancelar: function(): void }}
+ */
+export function procesadorEnOrden(procesar, onError) {
+  let version = 0;
+  let cancelado = false;
+  return {
+    alRecibir(snapshot) {
+      const actual = ++version;
+      procesar(snapshot, () => !cancelado && actual === version).catch((error) => {
+        console.error("[FirestoreService] Error al descifrar los datos:", error);
+        if (!cancelado && typeof onError === "function") onError(new Error("No se pudieron descifrar los datos."));
+      });
+    },
+    cancelar() {
+      cancelado = true;
+    }
+  };
+}
 
 /**
  * Mapea códigos de error de Cloud Firestore a mensajes claros en español.
@@ -93,7 +179,11 @@ export async function registrarTransaccion(transaccion, hogarId = null) {
       datosPayload.hogarId = hogarId;
     }
 
-    const docRef = await addDoc(collection(db, COLECCION_TRANSACCIONES), datosPayload);
+    // Se cifran los campos sensibles antes de que salgan del navegador
+    const clave = await claveDeTransaccion(datosPayload, transaccion.creadoPor);
+    const payloadCifrado = await cifrarCampos(clave, datosPayload, CAMPOS_CIFRADOS_TRANSACCION);
+
+    const docRef = await addDoc(collection(db, COLECCION_TRANSACCIONES), payloadCifrado);
     return docRef.id;
   } catch (error) {
     const mensaje = traducirErrorFirestore(error);
@@ -200,20 +290,20 @@ export function escucharTransacciones(usuarioId, onActualizacion, onError, hogar
     onActualizacion(transacciones);
   };
 
+  const procesadores = consultas.map((_, indice) => procesadorEnOrden(async (snapshot, sigueVigente) => {
+    const pares = await convertirDocumentos(
+      snapshot,
+      async (id, data) => Transaccion.desdeFirestore(id, await descifrarTransaccion(data, usuarioId)),
+      "FirestoreService.escucharTransacciones"
+    );
+    if (!sigueVigente()) return;
+    resultados[indice] = new Map(pares);
+    emitir();
+  }, onError));
+
   const desuscripciones = consultas.map((q, indice) => onSnapshot(
     q,
-    (snapshot) => {
-      const mapa = new Map();
-      snapshot.forEach((docItem) => {
-        try {
-          mapa.set(docItem.id, Transaccion.desdeFirestore(docItem.id, docItem.data()));
-        } catch (errorParseo) {
-          console.warn(`[FirestoreService] Registro omitido id=${docItem.id} por datos inválidos:`, errorParseo.message);
-        }
-      });
-      resultados[indice] = mapa;
-      emitir();
-    },
+    (snapshot) => procesadores[indice].alRecibir(snapshot),
     (error) => {
       const mensaje = traducirErrorFirestore(error);
       console.error("[FirestoreService.escucharTransacciones] Error en tiempo real:", error);
@@ -228,7 +318,10 @@ export function escucharTransacciones(usuarioId, onActualizacion, onError, hogar
     }
   ));
 
-  return () => desuscripciones.forEach((desuscribir) => desuscribir());
+  return () => {
+    procesadores.forEach((p) => p.cancelar());
+    desuscripciones.forEach((desuscribir) => desuscribir());
+  };
 }
 
 /**
@@ -287,7 +380,10 @@ export async function registrarBolsillo(bolsillo) {
       fecha: Timestamp.fromDate(bolsillo.fecha)
     };
 
-    const docRef = await addDoc(collection(db, COLECCION_BOLSILLOS), payload);
+    const clave = await obtenerClaveUsuario(bolsillo.creadoPor);
+    const payloadCifrado = await cifrarCampos(clave, payload, CAMPOS_CIFRADOS_BOLSILLO);
+
+    const docRef = await addDoc(collection(db, COLECCION_BOLSILLOS), payloadCifrado);
     return docRef.id;
   } catch (error) {
     const mensaje = traducirErrorFirestore(error);
@@ -360,7 +456,8 @@ export async function abonarFondosBolsillo(idBolsillo, montoAbono, usuarioId = n
       throw new Error("No tienes autorización para modificar este bolsillo.");
     }
 
-    // increment() suma en el servidor: si dos abonos llegan al mismo tiempo, no se pierde ninguno
+    // increment() suma en el servidor: si dos abonos llegan al mismo tiempo, no se pierde ninguno.
+    // El monto está en claro (solo se cifra el nombre), así las reglas siguen exigiendo montoAcumulado >= 0.
     await updateDoc(docRef, { montoAcumulado: increment(Number(montoAbono)) });
   } catch (error) {
     const mensaje = traducirErrorFirestore(error);
@@ -390,28 +487,34 @@ export function escucharBolsillos(usuarioId, onActualizacion, onError) {
     where("creadoPor", "==", usuarioId)
   );
 
-  return onSnapshot(
+  const procesador = procesadorEnOrden(async (snapshot, sigueVigente) => {
+    const clave = await obtenerClaveUsuario(usuarioId);
+    const pares = await convertirDocumentos(
+      snapshot,
+      async (id, data) => {
+        // Se valida al leer: un bolsillo con datos inválidos (p. ej. escrito por un cliente modificado) se omite
+        const bolsillo = Bolsillo.desdeFirestore(id, await descifrarCampos(clave, data, CAMPOS_CIFRADOS_BOLSILLO));
+        bolsillo.validar();
+        return bolsillo;
+      },
+      "FirestoreService.escucharBolsillos"
+    );
+    if (!sigueVigente()) return;
+    const bolsillos = pares.map(([, entidad]) => entidad);
+
+    // Ordenar por fecha descendente
+    bolsillos.sort((a, b) => {
+      const tA = a.fecha instanceof Date ? a.fecha.getTime() : new Date(a.fecha).getTime();
+      const tB = b.fecha instanceof Date ? b.fecha.getTime() : new Date(b.fecha).getTime();
+      return tB - tA;
+    });
+
+    onActualizacion(bolsillos);
+  }, onError);
+
+  const desuscribir = onSnapshot(
     q,
-    (snapshot) => {
-      const bolsillos = [];
-      snapshot.forEach((docItem) => {
-        try {
-          const entidad = Bolsillo.desdeFirestore(docItem.id, docItem.data());
-          bolsillos.push(entidad);
-        } catch (errorParseo) {
-          console.warn(`[FirestoreService] Bolsillo omitido id=${docItem.id}:`, errorParseo.message);
-        }
-      });
-
-      // Ordenar por fecha descendente
-      bolsillos.sort((a, b) => {
-        const tA = a.fecha instanceof Date ? a.fecha.getTime() : new Date(a.fecha).getTime();
-        const tB = b.fecha instanceof Date ? b.fecha.getTime() : new Date(b.fecha).getTime();
-        return tB - tA;
-      });
-
-      onActualizacion(bolsillos);
-    },
+    (snapshot) => procesador.alRecibir(snapshot),
     (error) => {
       const mensaje = traducirErrorFirestore(error);
       console.error("[FirestoreService.escucharBolsillos] Error en tiempo real:", error);
@@ -420,6 +523,11 @@ export function escucharBolsillos(usuarioId, onActualizacion, onError) {
       }
     }
   );
+
+  return () => {
+    procesador.cancelar();
+    desuscribir();
+  };
 }
 
 /**

@@ -17,6 +17,7 @@ import {
   updateProfile
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-auth.js";
 import { auth, firebaseConfig } from "./firebase.js";
+import { limpiarClavesEnMemoria } from "./claves.js";
 
 // ============================================================================
 // RE-EXPORTACIÓN PARA COMPATIBILIDAD
@@ -151,6 +152,8 @@ export async function iniciarSesion(email, password) {
 export async function cerrarSesion() {
   try {
     await signOut(auth);
+    // Las claves de cifrado descifradas no deben quedar en memoria después de salir
+    limpiarClavesEnMemoria();
   } catch (error) {
     const mensaje = traducirErrorAuth(error);
     console.error("[AuthService.cerrarSesion] Error:", error.message);
