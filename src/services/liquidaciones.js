@@ -144,12 +144,23 @@ function validarTransferencias(transferencias, miembros) {
 async function liquidacionDesdeDocumento(id, data) {
   // Las transferencias se guardan como un solo valor cifrado con la clave del hogar
   const clave = await obtenerClaveHogar(data.hogarId);
-  const transferencias = await descifrarValor(clave, data.transferencias, "transferencias");
+  const crudo = await descifrarValor(clave, data.transferencias, "transferencias");
+  const lista = crudo === undefined || crudo === null ? [] : crudo;
+  if (!Array.isArray(lista) || lista.length > MAX_TRANSFERENCIAS) {
+    throw new Error("Lista de transferencias inválida tras descifrar.");
+  }
+  const transferencias = lista.map((t) => {
+    const monto = redondear(Number(t?.monto));
+    if (!t || typeof t.de !== "string" || typeof t.para !== "string" || t.de === t.para || !Number.isFinite(monto) || monto <= 0) {
+      throw new Error("Transferencia de liquidación inválida tras descifrar.");
+    }
+    return { de: t.de, para: t.para, monto };
+  });
   return {
     id,
     hogarId: data.hogarId,
     periodo: data.periodo,
-    transferencias: transferencias || [],
+    transferencias,
     saldadaPor: data.saldadaPor,
     fecha: normalizarFecha(data.fecha) || new Date()
   };

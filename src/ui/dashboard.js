@@ -28,7 +28,15 @@ import {
   periodoDe 
 } from "../services/liquidaciones.js";
 import { calcularCuadreMes } from "../utils/cuadre.js";
-import { guardarCategoria, obtenerCategorias } from "../services/categorias.js";
+import { guardarCategoria, obtenerCategorias, actualizarCategoria, eliminarCategoria } from "../services/categorias.js";
+import {
+  registrarPrestamo,
+  registrarAbonoPrestamo,
+  eliminarPrestamo,
+  filtrarPrestamosPorEstado,
+  calcularTotalPorCobrar,
+  ESTADO_PRESTAMO
+} from "../services/prestamos.js";
 import { mostrarToast } from "./notificaciones.js";
 import { escucharConexion, hayConexion } from "../services/conexion.js";
 
@@ -36,6 +44,8 @@ let usuarioActual = null;
 let hogarActual = null;
 let transaccionesEnMemoria = [];
 let bolsillosEnMemoria = [];
+let prestamosEnMemoria = [];
+let filtroEstadoPrestamoActual = "TODOS";
 let filtroBusquedaTexto = "";
 let filtroTipoActual = "TODOS";
 let filtroAmbitoActual = "TODOS";
@@ -109,6 +119,7 @@ export function inicializarDashboardUI(usuario) {
       renderizarTarjetasResumen();
       renderizarListaTransacciones();
       renderizarListaBolsillos();
+      renderizarListaPrestamos();
       mostrarToast("Visualizando saldos en Pesos Colombianos (COP)", "info", 2000);
     });
 
@@ -119,6 +130,7 @@ export function inicializarDashboardUI(usuario) {
       renderizarTarjetasResumen();
       renderizarListaTransacciones();
       renderizarListaBolsillos();
+      renderizarListaPrestamos();
       mostrarToast(`Saldos convertidos a Dólares (USD) a tasa oficial TRM ($${tasaTRM.toLocaleString('es-CO')})`, "info", 3000);
     });
   }
@@ -235,7 +247,7 @@ export function inicializarDashboardUI(usuario) {
     });
   }
 
-  // Botón para crear nueva categoría personalizada (HU-12 / Tarea 12.3)
+  // Botones para crear, editar y eliminar categoría personalizada (HU-12 / CA-12.1 y CA-12.3)
   const btnCrearCategoria = document.getElementById("btn-crear-categoria");
   if (btnCrearCategoria) {
     btnCrearCategoria.addEventListener("click", async () => {
@@ -249,9 +261,63 @@ export function inicializarDashboardUI(usuario) {
       }
       try {
         await guardarCategoria(nombre, tipo);
-        mostrarToast(`Categoría "${nombre}" creada exitosamente.`, "exito");
+        mostrarToast(`Categoría "${nombre}" creada y cifrada exitosamente.`, "exito");
         await cargarCategoriasUsuario();
         if (selectCategoria) selectCategoria.value = nombre;
+      } catch (error) {
+        mostrarToast(error.message, "error");
+      }
+    });
+  }
+
+  const buscarCategoriaPersonalizadaSeleccionada = () => {
+    const nombreActual = selectCategoria?.value || "";
+    const tipoActual = selectTipo?.value === TIPO_TRANSACCION.INGRESO ? "ingreso" : "gasto";
+    return categoriasPersonalizadas.find((c) => c.nombre === nombreActual && c.tipo === tipoActual) || null;
+  };
+
+  const btnEditarCategoria = document.getElementById("btn-editar-categoria");
+  if (btnEditarCategoria) {
+    btnEditarCategoria.addEventListener("click", async () => {
+      const catPropia = buscarCategoriaPersonalizadaSeleccionada();
+      if (!catPropia) {
+        mostrarToast("Selecciona primero una categoría personalizada creada por ti para renombrarla.", "alerta");
+        return;
+      }
+      const nuevoTexto = prompt(`Renombrar la categoría personalizada "${catPropia.nombre}" (3 a 40 caracteres):`, catPropia.nombre);
+      if (!nuevoTexto) return;
+      const nombreLimpio = nuevoTexto.trim();
+      if (nombreLimpio === catPropia.nombre) return;
+      if (nombreLimpio.length < 3 || nombreLimpio.length > 40) {
+        mostrarToast("El nombre de la categoría debe tener entre 3 y 40 caracteres.", "alerta");
+        return;
+      }
+      try {
+        await actualizarCategoria(catPropia.id, { nombre: nombreLimpio });
+        mostrarToast(`Categoría actualizada a "${nombreLimpio}".`, "exito");
+        await cargarCategoriasUsuario();
+        if (selectCategoria) selectCategoria.value = nombreLimpio;
+      } catch (error) {
+        mostrarToast(error.message, "error");
+      }
+    });
+  }
+
+  const btnEliminarCategoria = document.getElementById("btn-eliminar-categoria");
+  if (btnEliminarCategoria) {
+    btnEliminarCategoria.addEventListener("click", async () => {
+      const catPropia = buscarCategoriaPersonalizadaSeleccionada();
+      if (!catPropia) {
+        mostrarToast("Solo puedes eliminar categorías personalizadas creadas por ti (las predefinidas son fijas).", "alerta");
+        return;
+      }
+      if (!confirm(`¿Confirmas que deseas eliminar tu categoría personalizada "${catPropia.nombre}"?`)) {
+        return;
+      }
+      try {
+        await eliminarCategoria(catPropia.id);
+        mostrarToast(`Categoría "${catPropia.nombre}" eliminada.`, "info");
+        await cargarCategoriasUsuario();
       } catch (error) {
         mostrarToast(error.message, "error");
       }
@@ -521,6 +587,67 @@ export function inicializarDashboardUI(usuario) {
   }
 
   // =========================================================================
+  // MANEJADORES PARA PRÉSTAMOS A TERCEROS CON ABONOS (Tarea 8.3 - HU-08 / HU-18)
+  // =========================================================================
+  const btnTogglePrestamo = document.getElementById("btn-toggle-form-prestamo");
+  const btnCancelarPrestamo = document.getElementById("btn-cancelar-prestamo");
+  const contenedorFormPrestamo = document.getElementById("contenedor-form-prestamo");
+  const formPrestamo = document.getElementById("form-prestamo");
+  const selectFiltroEstadoPrestamo = document.getElementById("filtro-estado-prestamo");
+
+  if (btnTogglePrestamo && contenedorFormPrestamo) {
+    btnTogglePrestamo.addEventListener("click", () => {
+      contenedorFormPrestamo.classList.toggle("hidden");
+      if (!contenedorFormPrestamo.classList.contains("hidden")) {
+        document.getElementById("prestamo-deudor")?.focus();
+      }
+    });
+  }
+
+  if (btnCancelarPrestamo && contenedorFormPrestamo) {
+    btnCancelarPrestamo.addEventListener("click", () => {
+      contenedorFormPrestamo.classList.add("hidden");
+      formPrestamo?.reset();
+    });
+  }
+
+  if (selectFiltroEstadoPrestamo) {
+    selectFiltroEstadoPrestamo.addEventListener("change", (e) => {
+      filtroEstadoPrestamoActual = e.target.value;
+      renderizarListaPrestamos();
+    });
+  }
+
+  if (formPrestamo) {
+    formPrestamo.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const inputDeudor = document.getElementById("prestamo-deudor");
+      const inputMonto = document.getElementById("prestamo-monto");
+      const inputNota = document.getElementById("prestamo-nota");
+      const btnSubmit = formPrestamo.querySelector("button[type='submit']");
+
+      try {
+        cambiarEstadoBoton(btnSubmit, true, "Guardando...");
+        const deudor = (inputDeudor?.value || "").trim();
+        await registrarPrestamo({
+          deudor,
+          monto: Number(inputMonto?.value),
+          fecha: new Date(),
+          nota: (inputNota?.value || "").trim(),
+          creadoPor: usuarioActual.uid
+        });
+        mostrarToast(`Préstamo a "${deudor}" registrado y cifrado en Firestore.`, "exito");
+        formPrestamo.reset();
+        contenedorFormPrestamo?.classList.add("hidden");
+      } catch (error) {
+        mostrarToast(error.message, "error");
+      } finally {
+        cambiarEstadoBoton(btnSubmit, false, "Guardar Préstamo");
+      }
+    });
+  }
+
+  // =========================================================================
   // MANEJADORES DE RESILIENCIA Y CONEXIÓN (Tarea 7.1 / HU-07 - Condición #5)
   // =========================================================================
   const bannerOffline = document.getElementById("banner-offline");
@@ -600,13 +727,24 @@ function renderizarGraficaCategorias(transaccionesFiltradas) {
  */
 function aplicarEstadoConexion() {
   const sinConexion = !hayConexion();
-  document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo, #btn-crear-categoria, #btn-salir-hogar, #btn-marcar-saldado").forEach((btn) => {
+  document.querySelectorAll("button[type='submit'], .btn-eliminar-transaccion, .btn-eliminar-bolsillo, .btn-abonar-bolsillo, .btn-eliminar-prestamo, .btn-abonar-prestamo, #btn-crear-categoria, #btn-editar-categoria, #btn-eliminar-categoria, #btn-salir-hogar, #btn-marcar-saldado").forEach((btn) => {
     // No reactivar un botón que está ocupado guardando ("Registrando...", "Creando...")
     if (!sinConexion && btn.dataset.ocupado === "true") return;
     btn.disabled = sinConexion;
     btn.classList.toggle("opacity-50", sinConexion);
     btn.classList.toggle("cursor-not-allowed", sinConexion);
   });
+}
+
+/**
+ * Actualiza la lista de préstamos en memoria y refresca el DOM (HU-08 / CA-8.7).
+ * @param {object[]} lista - Lista de préstamos devuelta por Firestore.
+ * @returns {void}
+ */
+export function actualizarPrestamosUI(lista) {
+  prestamosEnMemoria = Array.isArray(lista) ? lista : [];
+  renderizarTarjetasResumen();
+  renderizarListaPrestamos();
 }
 
 /**
@@ -753,8 +891,9 @@ function actualizarAvisoAmbito() {
  * Renderiza las tarjetas de balance general, saldo disponible, ingresos, gastos y fondos en bolsillos.
  */
 function renderizarTarjetasResumen() {
-  const { totalIngresos, totalGastos, balanceNeto, totalCompartido } = calcularTotales(transaccionesEnMemoria);
+  const { totalIngresos, totalGastos, balanceNeto } = calcularTotales(transaccionesEnMemoria);
   const totalBolsillos = calcularTotalBolsillos(bolsillosEnMemoria);
+  const totalPorCobrar = calcularTotalPorCobrar(prestamosEnMemoria);
   const saldoDisponible = balanceNeto - totalBolsillos;
 
   const elBalance = document.getElementById("resumen-balance");
@@ -762,6 +901,7 @@ function renderizarTarjetasResumen() {
   const elIngresos = document.getElementById("resumen-ingresos");
   const elGastos = document.getElementById("resumen-gastos");
   const elBolsillos = document.getElementById("resumen-bolsillos");
+  const elPorCobrar = document.getElementById("resumen-por-cobrar");
 
   const esUSD = divisaActiva === "USD";
   const divisor = esUSD ? tasaTRM : 1;
@@ -782,6 +922,7 @@ function renderizarTarjetasResumen() {
   if (elIngresos) elIngresos.textContent = formatearMoneda(totalIngresos / divisor, divisaLabel, decimales);
   if (elGastos) elGastos.textContent = formatearMoneda(totalGastos / divisor, divisaLabel, decimales);
   if (elBolsillos) elBolsillos.textContent = formatearMoneda(totalBolsillos / divisor, divisaLabel, decimales);
+  if (elPorCobrar) elPorCobrar.textContent = formatearMoneda(totalPorCobrar / divisor, divisaLabel, decimales);
 }
 
 /**
@@ -1268,6 +1409,185 @@ function renderizarListaBolsillos() {
       try {
         await abonarFondosBolsillo(id, montoAbono, usuarioActual?.uid);
         mostrarToast(`Se transfirieron exitosamente $ ${montoAbono.toLocaleString("es-CO")} al bolsillo "${nombre}".`, "exito");
+      } catch (error) {
+        mostrarToast(error.message, "error");
+      }
+    });
+  });
+
+  aplicarEstadoConexion();
+}
+
+/**
+ * Renderiza las tarjetas de préstamos a terceros con progreso de abonos, filtro de estado y acciones
+ * (Tarea 8.3 / HU-08 y HU-18).
+ * @returns {void}
+ */
+function renderizarListaPrestamos() {
+  const contenedor = document.getElementById("lista-prestamos");
+  if (!contenedor) return;
+
+  const filtrados = filtrarPrestamosPorEstado(prestamosEnMemoria, filtroEstadoPrestamoActual);
+
+  if (filtrados.length === 0) {
+    const mensajeVacio = prestamosEnMemoria.length === 0
+      ? "No tienes préstamos a terceros registrados aún"
+      : `No hay préstamos en estado "${filtroEstadoPrestamoActual}"`;
+    contenedor.innerHTML = `
+      <div class="col-span-full text-center py-10 bg-slate-800/30 border border-dashed border-slate-700/60 rounded-2xl">
+        <svg class="w-10 h-10 mx-auto mb-2 text-cyan-400/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+        </svg>
+        <p class="text-sm font-semibold text-slate-300">${mensajeVacio}</p>
+        <p class="text-xs text-slate-500 mt-1">Registra el dinero que prestas a amigos o familiares para hacer seguimiento a sus abonos.</p>
+      </div>
+    `;
+    return;
+  }
+
+  const esUSD = divisaActiva === "USD";
+  const divisor = esUSD ? tasaTRM : 1;
+  const decimales = esUSD ? 2 : 0;
+  const divisaLabel = divisaActiva;
+
+  contenedor.innerHTML = filtrados.map((p) => {
+    const montoTotal = Number(p.monto) || 0;
+    const abonado = Number(p.totalAbonado) || 0;
+    const pendiente = Math.max(0, Number(p.saldoPendiente ?? (montoTotal - abonado)));
+    const esSaldado = p.estado === ESTADO_PRESTAMO.SALDADO || pendiente <= 0;
+    const porcentaje = montoTotal > 0 ? Math.min(100, Math.round((abonado / montoTotal) * 100)) : 0;
+    const ultimosAbonos = Array.isArray(p.abonos) ? p.abonos.slice(-3) : [];
+
+    return `
+      <div class="p-5 bg-slate-800/60 hover:bg-slate-800/90 border border-slate-700/60 hover:border-slate-600 rounded-2xl transition-all shadow-sm flex flex-col justify-between space-y-4">
+        <div>
+          <div class="flex items-start justify-between gap-2">
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 class="font-semibold text-white text-sm leading-tight">${escaparHTML(p.deudor)}</h3>
+                <span class="px-2 py-0.5 text-[10px] font-semibold rounded-full ${
+                  esSaldado
+                    ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                    : "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30"
+                }">
+                  ${esSaldado ? "SALDADO" : "PENDIENTE"}
+                </span>
+              </div>
+              <p class="text-[11px] text-slate-400 mt-0.5">Prestado: ${formatearMoneda(montoTotal / divisor, divisaLabel, decimales)} • ${formatearFecha(p.fecha)}</p>
+              ${p.nota ? `<p class="text-xs text-slate-300 mt-1 italic">"${escaparHTML(p.nota)}"</p>` : ""}
+            </div>
+
+            <button
+              type="button"
+              data-id="${p.id}"
+              data-deudor="${escaparHTML(p.deudor)}"
+              class="btn-eliminar-prestamo no-print p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors"
+              title="Eliminar registro de préstamo"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="mt-4 space-y-1.5">
+            <div class="flex justify-between items-center text-xs">
+              <span class="text-slate-400 font-medium">Recuperado (${(p.abonos || []).length} ${(p.abonos || []).length === 1 ? "abono" : "abonos"})</span>
+              <span class="font-bold ${esSaldado ? "text-emerald-400" : "text-cyan-300"}">${porcentaje}%</span>
+            </div>
+            <div class="w-full bg-slate-900/80 rounded-full h-2.5 overflow-hidden p-0.5 border border-slate-700/50">
+              <div
+                class="h-full rounded-full transition-all duration-500 ${esSaldado ? "bg-emerald-500" : "bg-gradient-to-r from-cyan-500 to-indigo-500"}"
+                style="width: ${porcentaje}%"
+              ></div>
+            </div>
+          </div>
+
+          <div class="mt-3.5 flex justify-between items-baseline pt-3 border-t border-slate-700/40">
+            <div>
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider">Abonado</p>
+              <p class="text-sm font-bold text-emerald-400">${formatearMoneda(abonado / divisor, divisaLabel, decimales)}</p>
+            </div>
+            <div class="text-right">
+              <p class="text-[10px] text-slate-400 uppercase tracking-wider">Por Cobrar</p>
+              <p class="text-sm font-bold ${esSaldado ? "text-slate-400" : "text-cyan-300"}">
+                ${esSaldado ? "¡Deuda saldada! ✓" : formatearMoneda(pendiente / divisor, divisaLabel, decimales)}
+              </p>
+            </div>
+          </div>
+
+          ${ultimosAbonos.length > 0 ? `
+            <div class="mt-3 pt-2 border-t border-slate-800 space-y-1">
+              <p class="text-[10px] font-medium text-slate-400 uppercase tracking-wider">Últimos abonos</p>
+              ${ultimosAbonos.map((a) => `
+                <div class="flex justify-between text-[11px] text-slate-300">
+                  <span>+ ${formatearMoneda((Number(a.monto) || 0) / divisor, divisaLabel, decimales)}</span>
+                  <span class="text-slate-500">${formatearFecha(a.fecha)}</span>
+                </div>
+              `).join("")}
+            </div>
+          ` : ""}
+        </div>
+
+        ${!esSaldado ? `
+          <button
+            type="button"
+            data-id="${p.id}"
+            data-deudor="${escaparHTML(p.deudor)}"
+            data-pendiente="${pendiente}"
+            class="btn-abonar-prestamo no-print w-full py-2 px-3 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-200 hover:text-white text-xs font-semibold rounded-xl border border-cyan-500/30 transition-colors flex items-center justify-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            <span>Registrar Abono</span>
+          </button>
+        ` : ""}
+      </div>
+    `;
+  }).join("");
+
+  contenedor.querySelectorAll(".btn-eliminar-prestamo").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const deudor = btn.getAttribute("data-deudor");
+      if (confirm(`¿Confirmas que deseas eliminar el préstamo de "${deudor}"?`)) {
+        try {
+          await eliminarPrestamo(id, usuarioActual?.uid);
+          mostrarToast(`Préstamo de "${deudor}" eliminado.`, "info");
+        } catch (error) {
+          mostrarToast(error.message, "error");
+        }
+      }
+    });
+  });
+
+  contenedor.querySelectorAll(".btn-abonar-prestamo").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const id = btn.getAttribute("data-id");
+      const deudor = btn.getAttribute("data-deudor");
+      const pendiente = Number(btn.getAttribute("data-pendiente")) || 0;
+
+      const inputAbono = prompt(
+        `Registrar abono de "${deudor}":\nSaldo pendiente por cobrar: $ ${pendiente.toLocaleString("es-CO")} COP\n\nIngresa el valor del abono ($ COP):`
+      );
+      if (!inputAbono) return;
+
+      let montoAbono;
+      try {
+        montoAbono = parsearMontoCOP(inputAbono);
+      } catch (error) {
+        mostrarToast(error.message, "error");
+        return;
+      }
+
+      try {
+        const res = await registrarAbonoPrestamo(id, montoAbono, usuarioActual?.uid);
+        if (res.estado === ESTADO_PRESTAMO.SALDADO) {
+          mostrarToast(`¡Préstamo de "${deudor}" saldado en su totalidad!`, "exito");
+        } else {
+          mostrarToast(`Abono registrado. Saldo pendiente: $ ${res.saldoPendiente.toLocaleString("es-CO")}.`, "exito");
+        }
       } catch (error) {
         mostrarToast(error.message, "error");
       }

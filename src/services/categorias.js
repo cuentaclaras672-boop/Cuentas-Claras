@@ -72,7 +72,13 @@ export async function obtenerCategorias() {
     for (const docSnap of querySnapshot.docs) {
       const data = docSnap.data();
       try {
-        categorias.push({ id: docSnap.id, ...data, nombre: await descifrarValor(clave, data.nombre, "nombre") });
+        const nombre = await descifrarValor(clave, data.nombre, "nombre");
+        const nombreLimpio = typeof nombre === "string" ? nombre.trim() : "";
+        const tipo = data.tipo === "ingreso" ? "ingreso" : data.tipo === "gasto" ? "gasto" : "";
+        if (nombreLimpio.length < 3 || nombreLimpio.length > 40 || !tipo) {
+          throw new Error("Categoría con datos fuera de rango tras descifrar.");
+        }
+        categorias.push({ id: docSnap.id, ...data, nombre: nombreLimpio, tipo });
       } catch (errorDescifrado) {
         console.warn(`[CategoriasService] Categoría omitida id=${docSnap.id}:`, errorDescifrado.message);
       }

@@ -1,0 +1,11 @@
+{
+  "name": "cuentas-claras",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Plataforma Web para la Gestión de Finanzas Compartidas en el Hogar (Scrum - TIC42695)",
+  "scripts": {
+    "start": "npx serve .",
+    "test": "node tests/runner.js"
+  }
+}

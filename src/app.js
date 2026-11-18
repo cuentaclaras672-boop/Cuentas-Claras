@@ -9,13 +9,15 @@
 import { suscribirEstadoAuth } from "./services/auth.js";
 import { escucharTransacciones, escucharBolsillos } from "./services/firestore.js";
 import { escucharHogarDelUsuario } from "./services/hogares.js";
+import { escucharPrestamos } from "./services/prestamos.js";
 import { inicializarAuthUI } from "./ui/ui-auth.js";
-import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI, actualizarHogarUI } from "./ui/dashboard.js?v=9";
+import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI, actualizarHogarUI, actualizarPrestamosUI } from "./ui/dashboard.js?v=10";
 import { mostrarToast } from "./ui/notificaciones.js";
 
 let desuscribirTransacciones = null;
 let desuscribirBolsillos = null;
 let desuscribirHogar = null;
+let desuscribirPrestamos = null;
 let idHogarActivo = null;
 
 /**
@@ -56,6 +58,10 @@ function iniciarAplicacion() {
       if (typeof desuscribirHogar === "function") {
         desuscribirHogar();
         desuscribirHogar = null;
+      }
+      if (typeof desuscribirPrestamos === "function") {
+        desuscribirPrestamos();
+        desuscribirPrestamos = null;
       }
 
       // Conectar listener de Hogar en tiempo real (HU-09 / Tarea 9.2 y 9.3)
@@ -100,6 +106,17 @@ function iniciarAplicacion() {
           mostrarToast(`Error en bolsillos de ahorro: ${error.message}`, "error");
         }
       );
+
+      // Conectar listener en tiempo real para préstamos a terceros con cifrado AES-256-GCM (HU-08 / HU-18)
+      desuscribirPrestamos = escucharPrestamos(
+        usuario.uid,
+        (listaPrestamos) => {
+          actualizarPrestamosUI(listaPrestamos);
+        },
+        (error) => {
+          mostrarToast(`Error en préstamos: ${error.message}`, "error");
+        }
+      );
     } else {
       // Estado: Sin sesión activa (Visitante / Logout)
       if (typeof desuscribirTransacciones === "function") {
@@ -114,6 +131,10 @@ function iniciarAplicacion() {
         desuscribirHogar();
         desuscribirHogar = null;
       }
+      if (typeof desuscribirPrestamos === "function") {
+        desuscribirPrestamos();
+        desuscribirPrestamos = null;
+      }
 
       idHogarActivo = null;
 
@@ -121,6 +142,7 @@ function iniciarAplicacion() {
       actualizarDashboard([]);
       actualizarBolsillosUI([]);
       actualizarHogarUI(null);
+      actualizarPrestamosUI([]);
 
       if (vistaDashboard) vistaDashboard.classList.add("hidden");
       if (vistaAuth) vistaAuth.classList.remove("hidden");

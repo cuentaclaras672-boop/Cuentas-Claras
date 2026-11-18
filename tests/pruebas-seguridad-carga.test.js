@@ -62,7 +62,7 @@ function crearAlmacenTransaccionalMock(saldoInicial = 200000) {
 export async function ejecutarPruebasSeguridadCarga() {
   console.log("Iniciando pruebas de la Tarea 14.2: Auditoría de Reglas, Estrés (50 ops) y Fechas...");
 
-  // 1. CA-14.1: Auditoría estática de cobertura en firestore.rules (6 colecciones + catch-all)
+  // 1. CA-14.1 y HU-18: Auditoría estática de cobertura en firestore.rules (8 colecciones + cifrado + catch-all)
   const reglas = fs.readFileSync(RUTA_REGLAS, "utf8");
   const coleccionesEsperadas = [
     "transacciones",
@@ -70,7 +70,9 @@ export async function ejecutarPruebasSeguridadCarga() {
     "prestamos",
     "hogares",
     "liquidaciones",
-    "categorias"
+    "categorias",
+    "clavesUsuario",
+    "clavesHogar"
   ];
   for (const col of coleccionesEsperadas) {
     assert.ok(
@@ -81,6 +83,10 @@ export async function ejecutarPruebasSeguridadCarga() {
   assert.ok(
     reglas.includes("request.auth != null"),
     "firestore.rules debe requerir usuario autenticado."
+  );
+  assert.ok(
+    reglas.includes("function esCifrado(") && reglas.includes("function esNumeroCifrado(") && reglas.includes("function esClaveAes("),
+    "firestore.rules debe validar formato cifrado AES-256-GCM y formato de claves."
   );
   const bloqueLiquidacionesMatch = reglas.match(
     /match\s+\/liquidaciones\/\{liquidacionId\}\s*\{([\s\S]*?)\n\s*\}/
@@ -95,11 +101,19 @@ export async function ejecutarPruebasSeguridadCarga() {
     !/allow\s+(?:write|update|delete)\s*:/.test(bloqueLiquidaciones),
     "liquidaciones debe permanecer inmutable en firestore.rules (sin allow write/update/delete)."
   );
+  const bloqueClavesHogarMatch = reglas.match(
+    /match\s+\/clavesHogar\/\{codigo\}\s*\{([\s\S]*?)\n\s*\}/
+  );
+  assert.ok(bloqueClavesHogarMatch, "Debe existir bloque match /clavesHogar/{codigo}.");
+  assert.ok(
+    !/allow\s+(?:write|update|delete)\s*:/.test(bloqueClavesHogarMatch[1]),
+    "clavesHogar debe ser inmutable tras su creación (sin update ni delete)."
+  );
   assert.ok(
     /match \/\{document=\*\*\}[\s\S]*allow read, write: if false;/.test(reglas),
     "firestore.rules debe cerrar cualquier ruta no contemplada con deny-all."
   );
-  console.log("  -> [OK] Auditoría estática de 6 colecciones y catch-all deny-all en firestore.rules verificada.");
+  console.log("  -> [OK] Auditoría estática de 8 colecciones, reglas de cifrado AES-256-GCM y catch-all deny-all en firestore.rules verificada.");
 
   // 2. CA-14.2 & CA-14.4: Ráfaga de 50 operaciones concurrentes con fallos transitorios y latencia < 500 ms
   const inicio = performance.now();
