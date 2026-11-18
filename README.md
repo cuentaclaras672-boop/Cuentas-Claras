@@ -50,7 +50,7 @@ El backlog del producto se encuentra organizado, estimado en Story Points (escal
 | **HU-15** | **Exportación de Reportes del Hogar:** descarga de CSV RFC 4180 y vista de impresión PDF (`@media print`). | 5 SP | Refuerzo #4 (Portabilidad) | 5 | ✅ **Terminado (Done - S5)** |
 | **HU-16** | **Despliegue en Firebase Hosting y Hardening Operativo:** `firebase.json`, reglas en servidor y API Key acotada. | 8 SP | Refuerzo #2, #6 y #7 | 6 | 🚀 **En Ejecución (S6)** |
 | **HU-17** | **Preparación de Sustentación y Auditoría de Cierre:** ensayos UAT Corte III y cierre documental semestral. | 5 SP | Refuerzo #6 y #7 | 6 | 🚀 **En Ejecución (S6)** |
-| **HU-18** | **Seguridad de los Datos (Cifrado AES-256-GCM):** textos sensibles cifrados en el navegador antes de Firestore, montos en claro para las reglas, clave por usuario y por hogar. Ver `docs/cifrado-datos.md`. | 8 SP | Refuerzo #2 (Seguridad) | 6 | 🚀 **En Ejecución (S6)** |
+| **HU-18** | **Seguridad de los Datos (Cifrado AES-256-GCM):** textos y montos cifrados en el navegador antes de Firestore, clave por usuario y por hogar, validación al leer. Ver `docs/cifrado-datos.md`. | 8 SP | Refuerzo #2 (Seguridad) | 6 | 🚀 **En Ejecución (S6)** |
 
 > **Total acumulado de velocidad:** 81 Story Points completados de 81 comprometidos hasta Sprint 5 (100% efectividad). Sprint 6 en ejecución desde el 14 de noviembre de 2026 (13 SP planificados; Tareas 16.1 y 16.2 adelantadas).
 
@@ -115,7 +115,7 @@ cuentas-claras/
 │   │   └── notificaciones.js # Notificaciones flotantes (Toasts) para errores visibles
 │   ├── utils/              # CAPA TRANSVERSAL
 │   │   ├── formateo.js     # Formato de divisa (COP/USD), normalizarFecha y parseo seguro
-│   │   ├── cifrado.js      # Cifrado AES-256-GCM (Web Crypto) de los textos antes de Firestore
+│   │   ├── cifrado.js      # Cifrado AES-256-GCM (Web Crypto) de textos y montos antes de Firestore
 │   │   ├── estadisticas.js # Agregación de gastos y cálculo de porcentajes (HU-10)
 │   │   ├── cuadre.js       # Cálculo de balances y transferencias mínimas del hogar (HU-11)
 │   │   └── exportador.js   # Exportación CSV estándar RFC 4180 con BOM UTF-8 (HU-15)
@@ -132,7 +132,7 @@ cuentas-claras/
 │   ├── acta-review-sprint4.md   # Acta formal de Sprint Review Sprint 4 (30/10/2026)
 │   ├── acta-review-sprint5.md   # Acta formal de Sprint Review Sprint 5 (13/11/2026)
 │   ├── auditoria-seguridad-sprint5.md # Evidencia de auditoría de reglas en emulador (HU-14)
-│   ├── cifrado-datos.md    # Diseño del cifrado AES-256-GCM: textos cifrados, montos en claro, claves y límites
+│   ├── cifrado-datos.md    # Diseño del cifrado AES-256-GCM: qué se cifra, claves y límites
 │   ├── guia-despliegue.md  # Guía operativa Firebase Hosting, Rules y API Key (HU-16)
 │   ├── bitacora-sprint1.md # Bitácora de seguimiento y Dailies Sprint 1
 │   ├── bitacora-sprint2.md # Bitácora de seguimiento y Dailies Sprint 2
@@ -161,7 +161,7 @@ cuentas-claras/
 │   ├── pruebas-seguridad-carga.test.js # Pruebas Tarea 14.2: auditoría reglas, 50 ops y fechas
 │   ├── pruebas-exportador.test.js # Pruebas Tarea 15.1: exportación CSV RFC 4180 (HU-15)
 │   ├── pruebas-cifrado.test.js # Pruebas del cifrado AES-256-GCM y de los tamaños de las reglas
-│   └── emulador/           # Pruebas reales de firestore.rules en Emulador (79 casos)
+│   └── emulador/           # Pruebas reales de firestore.rules en Emulador (88 casos)
 ├── firebase.json           # Configuración de Firebase Hosting y Firestore Rules
 ├── .firebaserc             # Alias de proyecto Firebase (bdcuentasclaras-b1814)
 ├── firestore.rules         # Reglas de seguridad en servidor (8 colecciones + deny-all)

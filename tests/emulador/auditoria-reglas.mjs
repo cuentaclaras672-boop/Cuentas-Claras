@@ -70,11 +70,15 @@ await denegado(() => getDocs(collection(db, "coleccion_inventada")), "colección
 // ---------------------------------------------------------------------------
 A = await como("ana");
 const claveA = await K.obtenerClaveUsuario(A);
-const cifrar = (v, campo) => cifrarValor(claveA, v, campo);
 await fs.abonarFondosBolsillo(idBolsillo, 50000, A);
-ok((await getDoc(doc(db, "bolsillos", idBolsillo))).data().montoAcumulado === 50000, "app: abonar a un bolsillo");
+let crudo = (await getDoc(doc(db, "bolsillos", idBolsillo))).data();
+ok(estaCifrado(crudo.montoAcumulado) && await descifrarValor(claveA, crudo.montoAcumulado, "montoAcumulado") === 50000,
+  "app: abonar a un bolsillo (el saldo queda cifrado)");
+await Promise.all([fs.abonarFondosBolsillo(idBolsillo, 1000, A), fs.abonarFondosBolsillo(idBolsillo, 2000, A)]);
+crudo = (await getDoc(doc(db, "bolsillos", idBolsillo))).data();
+ok(await descifrarValor(claveA, crudo.montoAcumulado, "montoAcumulado") === 53000, "app: dos abonos simultáneos al bolsillo no se pierden");
 await C.actualizarCategoria(idCategoria, { nombre: "Mascotas y veterinaria" });
-let crudo = (await getDoc(doc(db, "categorias", idCategoria))).data();
+crudo = (await getDoc(doc(db, "categorias", idCategoria))).data();
 ok(estaCifrado(crudo.nombre) && await descifrarValor(claveA, crudo.nombre, "nombre") === "Mascotas y veterinaria",
   "app: renombrar categoría (el nombre queda cifrado)");
 ok((await C.obtenerCategorias()).some((c) => c.nombre === "Mascotas y veterinaria"), "app: listar categorías descifradas");
@@ -82,26 +86,31 @@ let r = await P.registrarAbonoPrestamo(idPrestamo, 30000, A);
 r = await P.registrarAbonoPrestamo(idPrestamo, 20000.5, A);
 ok(r.saldoPendiente === 49999.5, "app: dos abonos seguidos (con centavos)");
 crudo = (await getDoc(doc(db, "prestamos", idPrestamo))).data();
-ok(estaCifrado(crudo.deudor) && estaCifrado(crudo.nota) && crudo.monto === 100000 && crudo.totalAbonado === 50000.5,
-  "app: el préstamo guarda deudor y nota cifrados y los montos en claro");
-crudo = (await getDoc(doc(db, "bolsillos", idBolsillo))).data();
-ok(estaCifrado(crudo.nombre) && crudo.montoAcumulado === 50000, "app: el bolsillo guarda el nombre cifrado y el saldo en claro");
+ok(estaCifrado(crudo.deudor) && estaCifrado(crudo.monto) && estaCifrado(crudo.totalAbonado) && estaCifrado(crudo.abonos[0].monto),
+  "app: el préstamo se guarda con deudor, montos y abonos cifrados");
+let errorAbono = "";
+try { await P.registrarAbonoPrestamo(idPrestamo, 60000, A); } catch (e) { errorAbono = e.message; }
+ok(/supera el saldo pendiente/.test(errorAbono), "app: abono mayor que el saldo pendiente se rechaza");
 const hogar = await H.crearHogar("Casa Ana", { uid: A, nombre: "Ana" }, () => "AUD" + sufijo.slice(-3).toUpperCase().replace(/[^A-Z0-9]/g, "0"));
 ok(!!hogar.codigo, "app: crear hogar");
 
 // ---------------------------------------------------------------------------
 // 3. Bolsillos: inyección de campos y datos fuera de rango
 // ---------------------------------------------------------------------------
-const bolsilloBase = { nombre: await cifrar("Ahorro", "nombre"), meta: 1000, montoAcumulado: 0, creadoPor: A, fecha: Timestamp.now() };
-ok(!!(await addDoc(collection(db, "bolsillos"), bolsilloBase)).id, "bolsillo con nombre cifrado escrito directo");
-await denegado(() => addDoc(collection(db, "bolsillos"), { ...bolsilloBase, nombre: "Ahorro" }), "bolsillo con nombre sin cifrar");
+const bolsilloBase = {
+  nombre: await cifrarValor(claveA, "Ahorro", "nombre"), meta: await cifrarValor(claveA, 1000, "meta"),
+  montoAcumulado: await cifrarValor(claveA, 0, "montoAcumulado"), creadoPor: A, fecha: Timestamp.now()
+};
+ok(!!(await addDoc(collection(db, "bolsillos"), bolsilloBase)).id, "bolsillo cifrado válido escrito directo");
+await denegado(() => addDoc(collection(db, "bolsillos"), { ...bolsilloBase, nombre: "Ahorro", meta: 1000, montoAcumulado: 0 }), "bolsillo sin cifrar");
 await denegado(() => addDoc(collection(db, "bolsillos"), { ...bolsilloBase, esAdmin: true }), "bolsillo con campo extra");
 await denegado(() => addDoc(collection(db, "bolsillos"), { ...bolsilloBase, nombre: largo(5000) }), "bolsillo con nombre de 5000 caracteres");
 await denegado(() => addDoc(collection(db, "bolsillos"), { ...bolsilloBase, fecha: "ayer" }), "bolsillo con fecha que no es timestamp");
 await denegado(() => updateDoc(doc(db, "bolsillos", idBolsillo), { creadoPor: uids.beto }), "regalar el bolsillo a otro usuario");
 await denegado(() => updateDoc(doc(db, "bolsillos", idBolsillo), { fecha: Timestamp.fromDate(new Date(2000, 0, 1)) }), "cambiar la fecha de creación del bolsillo");
 await denegado(() => updateDoc(doc(db, "bolsillos", idBolsillo), { nombre: 12345 }), "nombre de bolsillo que no es texto");
-await denegado(() => updateDoc(doc(db, "bolsillos", idBolsillo), { montoAcumulado: -1 }), "monto acumulado negativo");
+await denegado(() => updateDoc(doc(db, "bolsillos", idBolsillo), { montoAcumulado: -1 }), "monto acumulado en claro (sin cifrar)");
+await denegado(() => updateDoc(doc(db, "bolsillos", idBolsillo), { montoAcumulado: "enc:v1:" + largo(16) + ":" + largo(5000) }), "monto acumulado cifrado gigante");
 
 // ---------------------------------------------------------------------------
 // 4. Categorías: la actualización antes aceptaba cualquier cosa
@@ -116,38 +125,53 @@ await denegado(() => addDoc(collection(db, "categorias"), { uid: A, nombre: "Ok 
 // 5. Préstamos: reescribir el historial de abonos
 // ---------------------------------------------------------------------------
 const snapP = (await getDoc(doc(db, "prestamos", idPrestamo))).data();
-await denegado(() => updateDoc(doc(db, "prestamos", idPrestamo), {
-  abonos: [{ monto: 1, fecha: Timestamp.now() }, snapP.abonos[1], { monto: 10, fecha: Timestamp.now() }],
-  totalAbonado: snapP.totalAbonado + 10, estado: "PENDIENTE"
+const cifrar = (v, campo) => cifrarValor(claveA, v, campo);
+const total10 = await cifrar(50010.5, "totalAbonado");
+await denegado(async () => updateDoc(doc(db, "prestamos", idPrestamo), {
+  abonos: [{ monto: await cifrar(1, "abonos.monto"), fecha: Timestamp.now() }, snapP.abonos[1], { monto: await cifrar(10, "abonos.monto"), fecha: Timestamp.now() }],
+  totalAbonado: total10, estado: "PENDIENTE"
 }), "cambiar un abono anterior al agregar uno nuevo");
 await denegado(() => updateDoc(doc(db, "prestamos", idPrestamo), {
-  abonos: [...snapP.abonos, { monto: 1, fecha: Timestamp.now() }],
-  totalAbonado: snapP.totalAbonado + 40000, estado: "PENDIENTE"
-}), "abono de 1 que sube el total en 40000");
-await denegado(() => updateDoc(doc(db, "prestamos", idPrestamo), {
-  abonos: [...snapP.abonos, { monto: 10, fecha: Timestamp.now(), basura: largo(10000) }],
-  totalAbonado: snapP.totalAbonado + 10, estado: "PENDIENTE"
+  abonos: [...snapP.abonos, { monto: 10, fecha: Timestamp.now() }],
+  totalAbonado: 50010.5, estado: "PENDIENTE"
+}), "abono con montos en claro (sin cifrar)");
+await denegado(async () => updateDoc(doc(db, "prestamos", idPrestamo), {
+  abonos: [...snapP.abonos, { monto: await cifrar(10, "abonos.monto"), fecha: Timestamp.now(), basura: largo(10000) }],
+  totalAbonado: total10, estado: "PENDIENTE"
 }), "abono con campos extra");
-await denegado(() => updateDoc(doc(db, "prestamos", idPrestamo), {
-  abonos: [...snapP.abonos, { monto: 10, fecha: "hoy" }],
-  totalAbonado: snapP.totalAbonado + 10, estado: "PENDIENTE"
+await denegado(async () => updateDoc(doc(db, "prestamos", idPrestamo), {
+  abonos: [...snapP.abonos, { monto: await cifrar(10, "abonos.monto"), fecha: "hoy" }],
+  totalAbonado: total10, estado: "PENDIENTE"
 }), "abono con fecha que no es timestamp");
+await denegado(async () => updateDoc(doc(db, "prestamos", idPrestamo), {
+  abonos: [...snapP.abonos, { monto: await cifrar(10, "abonos.monto"), fecha: Timestamp.now() }],
+  totalAbonado: total10, estado: "PERDONADO"
+}), "abono con un estado inventado");
+r = await P.registrarAbonoPrestamo(idPrestamo, 49999.5, A);
+ok(r.estado === "SALDADO" && r.saldoPendiente === 0, "app: el último abono deja el préstamo SALDADO");
+const snapSaldado = (await getDoc(doc(db, "prestamos", idPrestamo))).data();
+await denegado(async () => updateDoc(doc(db, "prestamos", idPrestamo), {
+  abonos: [...snapSaldado.abonos, { monto: await cifrar(10, "abonos.monto"), fecha: Timestamp.now() }],
+  totalAbonado: total10, estado: "PENDIENTE"
+}), "abonar (o reabrir) un préstamo ya SALDADO");
 await denegado(() => addDoc(collection(db, "prestamos"), {
   deudor: "Pedro", monto: 100, fecha: Timestamp.now(), nota: "", abonos: [], totalAbonado: 0, estado: "PENDIENTE", creadoPor: A
-}), "préstamo con deudor y nota sin cifrar");
+}), "préstamo sin cifrar");
 
 // ---------------------------------------------------------------------------
 // 6. Transacciones: textos y montos sin límite
 // ---------------------------------------------------------------------------
 const movPlano = { descripcion: "Mercado", monto: 1000, tipo: "GASTO", ambito: "PERSONAL", categoria: "Otros", creadoPor: A, fecha: Timestamp.now() };
-const mov = { ...movPlano, descripcion: await cifrar("Mercado", "descripcion"), categoria: await cifrar("Otros", "categoria") };
+const mov = {
+  ...movPlano,
+  descripcion: await cifrar("Mercado", "descripcion"), monto: await cifrar(1000, "monto"), categoria: await cifrar("Otros", "categoria")
+};
 const idMov = (await addDoc(collection(db, "transacciones"), mov)).id;
-ok(!!idMov, "transacción con textos cifrados escrita directo");
-await denegado(() => addDoc(collection(db, "transacciones"), movPlano), "transacción con textos sin cifrar (como antes)");
-await denegado(() => addDoc(collection(db, "transacciones"), { ...mov, monto: -5 }), "monto negativo (el servidor sigue validando el dinero)");
-await denegado(() => addDoc(collection(db, "transacciones"), { ...mov, descripcion: "enc:v1:<script>alert(1)</script>" }), "descripción con formato de cifrado falso");
+ok(!!idMov, "transacción cifrada válida escrita directo");
+await denegado(() => addDoc(collection(db, "transacciones"), movPlano), "transacción sin cifrar (como antes)");
 await denegado(() => addDoc(collection(db, "transacciones"), { ...mov, nombreUsuario: largo(5000) }), "nombre de autor de 5000 caracteres");
-await denegado(() => addDoc(collection(db, "transacciones"), { ...mov, monto: 1e15 }), "monto absurdo (1e15)");
+await denegado(() => addDoc(collection(db, "transacciones"), { ...mov, monto: 1e15 }), "monto absurdo en claro (1e15)");
+await denegado(() => addDoc(collection(db, "transacciones"), { ...mov, descripcion: "enc:v1:<script>alert(1)</script>" }), "descripción con formato de cifrado falso");
 await denegado(() => addDoc(collection(db, "transacciones"), { ...mov, creadoPor: uids.beto }), "transacción a nombre de otro");
 await denegado(() => updateDoc(doc(db, "transacciones", idMov), { hogarId: hogar.codigo }), "mover un movimiento a un hogar después de creado");
 
@@ -187,9 +211,9 @@ const idPersonal = await fs.registrarTransaccion(new Transaccion({
   categoria: "Otros", creadoPor: A, nombreUsuario: "Ana"
 }), hogar.codigo);
 crudo = (await getDoc(doc(db, "transacciones", idCompartido))).data();
-ok(["descripcion", "categoria", "nombreUsuario"].every((c) => estaCifrado(crudo[c])) && crudo.monto === 1500000 &&
+ok(["descripcion", "monto", "categoria", "nombreUsuario"].every((c) => estaCifrado(crudo[c])) &&
   crudo.tipo === "GASTO" && crudo.ambito === "COMPARTIDO" && crudo.hogarId === hogar.codigo,
-  "app: en Firestore los textos quedan cifrados (monto, tipo, ámbito y hogar en claro)");
+  "app: en Firestore la transacción queda cifrada (tipo, ámbito y hogar en claro)");
 const claveHogarA = await K.obtenerClaveHogar(hogar.codigo, A);
 await denegado(async () => setDoc(doc(db, "clavesHogar", hogar.codigo), { clave: "A".repeat(43) + "=", creadoPor: A }), "reemplazar la clave del hogar");
 await denegado(async () => updateDoc(doc(db, "clavesUsuario", A), { clave: "A".repeat(43) + "=" }), "cambiar la clave personal");
@@ -215,22 +239,24 @@ ok(/No se pudo descifrar/.test(errorClave), "con la clave personal de Beto no se
 
 const periodo = L.periodoDe(new Date());
 await L.marcarLiquidacionSaldada(unido, periodo, [{ de: B, para: A, monto: 750000 }], B);
+crudo = (await getDoc(doc(db, "liquidaciones", L.idLiquidacion(hogar.codigo, periodo)))).data();
+ok(estaCifrado(crudo.transferencias), "app: la liquidación guarda las transferencias cifradas");
 const liq = await new Promise((ok_, mal) => { const parar = L.escucharLiquidacion(hogar.codigo, periodo, (v) => { if (v) { parar(); ok_(v); } }, mal); });
-ok(liq.transferencias[0].monto === 750000 && liq.transferencias[0].para === A, "app: la liquidación se guarda y se lee");
+ok(liq.transferencias[0].monto === 750000 && liq.transferencias[0].para === A, "app: la liquidación se lee descifrada");
 
-// Alteración desde la consola: copiar la categoría cifrada en la descripción. Las reglas no pueden notarlo
+// Alteración desde la consola: copiar el monto cifrado en la descripción. Las reglas no pueden notarlo
 // (ambos tienen formato válido), pero AES-GCM sí: la app descarta el registro en vez de mostrar basura.
 K.limpiarClavesEnMemoria();
 A = await como("ana");
 const original = (await getDoc(doc(db, "transacciones", idPersonal))).data();
-await updateDoc(doc(db, "transacciones", idPersonal), { descripcion: original.categoria });
+await updateDoc(doc(db, "transacciones", idPersonal), { descripcion: original.monto });
 lista = await escuchar(A);
 ok(!lista.some((t) => t.id === idPersonal) && lista.some((t) => t.id === idCompartido),
   "dato alterado en la consola: AES-GCM lo detecta y la app lo omite");
 
 // ---------------------------------------------------------------------------
-// 9. Validación al leer: datos mal formados o cifrados con otra clave se omiten uno por uno
-//    (las reglas no ven el contenido cifrado, así que esto lo escribe un "cliente modificado")
+// 9. Validación al leer: con textos y montos cifrados el servidor no ve el contenido, así que un
+//    "cliente modificado" podría guardar datos imposibles. La app los omite uno por uno.
 // ---------------------------------------------------------------------------
 const claveAjena = await crypto.subtle.importKey("raw", crypto.getRandomValues(new Uint8Array(32)), "AES-GCM", false, ["encrypt"]);
 const primeraLista = (escucharFn) => new Promise((ok_, mal) => {
@@ -242,24 +268,35 @@ const leerPrestamos = () => primeraLista((ok_, mal) => P.escucharPrestamos(A, ok
 
 const idBolsilloCorto = (await addDoc(collection(db, "bolsillos"), { ...bolsilloBase, nombre: await cifrar("ab", "nombre") })).id;
 const idBolsilloAjeno = (await addDoc(collection(db, "bolsillos"), { ...bolsilloBase, nombre: await cifrarValor(claveAjena, "Viaje", "nombre") })).id;
+const idBolsilloNegativo = (await addDoc(collection(db, "bolsillos"), { ...bolsilloBase, montoAcumulado: await cifrar(-1, "montoAcumulado") })).id;
 let bolsillos = await leerBolsillos();
 ok(!bolsillos.some((b) => b.id === idBolsilloCorto), "al leer: bolsillo con nombre de 2 letras (cifrado) se omite");
 ok(!bolsillos.some((b) => b.id === idBolsilloAjeno), "al leer: bolsillo cifrado con otra clave se omite");
-ok(bolsillos.some((b) => b.id === idBolsillo && b.nombre === "Viaje"), "al leer: los demás bolsillos siguen apareciendo");
+ok(!bolsillos.some((b) => b.id === idBolsilloNegativo), "al leer: bolsillo con saldo negativo (cifrado) se omite");
+ok(bolsillos.some((b) => b.id === idBolsillo && b.montoAcumulado === 53000), "al leer: los demás bolsillos siguen apareciendo");
 
-const prestamoBase = { monto: 1000, fecha: Timestamp.now(), nota: await cifrar("", "nota"), abonos: [], totalAbonado: 0, estado: "PENDIENTE", creadoPor: A };
+const prestamoBase = {
+  deudor: await cifrar("Lucía", "deudor"), monto: await cifrar(1000, "monto"), fecha: Timestamp.now(), nota: await cifrar("", "nota"),
+  abonos: [], totalAbonado: await cifrar(0, "totalAbonado"), estado: "PENDIENTE", creadoPor: A
+};
 const idPrestamoCorto = (await addDoc(collection(db, "prestamos"), { ...prestamoBase, deudor: await cifrar("ab", "deudor") })).id;
 const idPrestamoAjeno = (await addDoc(collection(db, "prestamos"), { ...prestamoBase, deudor: await cifrarValor(claveAjena, "Pedro", "deudor") })).id;
-const idPrestamoBueno = (await addDoc(collection(db, "prestamos"), { ...prestamoBase, deudor: await cifrar("Lucía", "deudor") })).id;
+const idPrestamoNegativo = (await addDoc(collection(db, "prestamos"), { ...prestamoBase, monto: await cifrar(-1000, "monto") })).id;
+const idPrestamoTotalFalso = (await addDoc(collection(db, "prestamos"), { ...prestamoBase, totalAbonado: await cifrar(500, "totalAbonado") })).id;
+const idPrestamoBueno = (await addDoc(collection(db, "prestamos"), prestamoBase)).id;
 const prestamos = await leerPrestamos();
 ok(!prestamos.some((p) => p.id === idPrestamoCorto), "al leer: préstamo con deudor de 2 letras (cifrado) se omite");
 ok(!prestamos.some((p) => p.id === idPrestamoAjeno), "al leer: préstamo cifrado con otra clave se omite");
-ok(prestamos.some((p) => p.id === idPrestamoBueno && p.deudor === "Lucía"), "al leer: los demás préstamos siguen apareciendo");
+ok(!prestamos.some((p) => p.id === idPrestamoNegativo), "al leer: préstamo con monto negativo (cifrado) se omite");
+ok(!prestamos.some((p) => p.id === idPrestamoTotalFalso), "al leer: préstamo con total abonado que no cuadra con los abonos se omite");
+ok(prestamos.some((p) => p.id === idPrestamoBueno && p.deudor === "Lucía" && p.monto === 1000), "al leer: los demás préstamos siguen apareciendo");
 
 const idMovCorto = (await addDoc(collection(db, "transacciones"), { ...mov, descripcion: await cifrar("ab", "descripcion"), fecha: Timestamp.now() })).id;
+const idMovNegativo = (await addDoc(collection(db, "transacciones"), { ...mov, monto: await cifrar(-5, "monto"), fecha: Timestamp.now() })).id;
 lista = await escuchar(A);
 ok(!lista.some((t) => t.id === idMovCorto) && lista.some((t) => t.id === idCompartido),
   "al leer: movimiento con descripción de 2 letras (cifrada) se omite y el resto sigue");
+ok(!lista.some((t) => t.id === idMovNegativo), "al leer: movimiento con monto negativo (cifrado) se omite");
 
 console.log(fallos ? `\n${fallos} FALLOS` : "\nTODO PASA");
 process.exit(fallos ? 1 : 0);

@@ -8,18 +8,19 @@
  * | Campo          | Tipo      | Regla                                                   |
  * |----------------|-----------|---------------------------------------------------------|
  * | deudor         | cifrado   | 3 a 60 caracteres                                       |
- * | monto          | number    | monto prestado, mayor que 0                             |
+ * | monto          | cifrado   | monto prestado, mayor que 0                             |
  * | fecha          | timestamp | fecha del préstamo                                      |
  * | nota           | cifrado   | opcional, hasta 200 caracteres ("" si no hay)           |
- * | abonos         | array     | lista de { monto: number, fecha: timestamp }            |
- * | totalAbonado   | number    | suma de los abonos, entre 0 y monto                     |
+ * | abonos         | array     | lista de { monto: cifrado, fecha: timestamp }           |
+ * | totalAbonado   | cifrado   | suma de los abonos, entre 0 y monto                     |
  * | estado         | string    | 'PENDIENTE' o 'SALDADO' (SALDADO cuando totalAbonado == monto) |
  * | creadoPor      | string    | UID del usuario que prestó el dinero                    |
  *
- * Los campos marcados "cifrado" (textos) se guardan con AES-256-GCM y la clave personal del usuario
- * (ver src/services/claves.js). Los montos quedan en claro a propósito: así las reglas de Firestore siguen
- * verificando en el servidor que ningún abono supere el saldo pendiente (CA-8.4), y `totalAbonado` y
- * `estado` permiten filtrar por estado (CA-8.6) sin recorrer los abonos.
+ * Los campos marcados "cifrado" se guardan con AES-256-GCM y la clave personal del usuario
+ * (ver src/services/claves.js). Como el servidor ya no ve los montos, que un abono no supere el saldo
+ * pendiente (CA-8.4) se valida aquí, dentro de una transacción; las reglas verifican la estructura,
+ * que los abonos anteriores no se reescriban y que un préstamo SALDADO no reciba más abonos.
+ * `estado` sigue en claro para poder filtrar por estado (CA-8.6).
  */
 
 import {
@@ -37,19 +38,27 @@ import {
 import { db, traducirErrorFirestore, procesadorEnOrden, convertirDocumentos } from "./firestore.js";
 import { asegurarConexion } from "./conexion.js";
 import { obtenerClaveUsuario } from "./claves.js";
-import { cifrarCampos, descifrarCampos } from "../utils/cifrado.js";
+import { cifrarCampos, descifrarCampos, cifrarValor, descifrarValor } from "../utils/cifrado.js";
 
-/** Campos de texto del préstamo que se guardan cifrados (los montos quedan en claro para las reglas). */
-export const CAMPOS_CIFRADOS_PRESTAMO = Object.freeze(["deudor", "nota"]);
+/** Campos del préstamo que se guardan cifrados. */
+export const CAMPOS_CIFRADOS_PRESTAMO = Object.freeze(["deudor", "monto", "nota", "totalAbonado"]);
+
+/** Nombre con el que se autentica el monto de cada abono al cifrarlo. */
+const CAMPO_MONTO_ABONO = "abonos.monto";
 
 /**
- * Descifra los textos de un préstamo. Los datos antiguos sin cifrar pasan igual.
+ * Descifra un documento de préstamo (incluido el monto de cada abono). Los datos antiguos pasan igual.
  * @param {CryptoKey} clave
  * @param {object} data
  * @returns {Promise<object>}
  */
-export function descifrarPrestamo(clave, data) {
-  return descifrarCampos(clave, data, CAMPOS_CIFRADOS_PRESTAMO);
+export async function descifrarPrestamo(clave, data) {
+  const plano = await descifrarCampos(clave, data, CAMPOS_CIFRADOS_PRESTAMO);
+  plano.abonos = await Promise.all((data.abonos || []).map(async (a) => ({
+    ...a,
+    monto: await descifrarValor(clave, a.monto, CAMPO_MONTO_ABONO)
+  })));
+  return plano;
 }
 
 const COLECCION_PRESTAMOS = "prestamos";
@@ -195,6 +204,7 @@ export async function registrarAbonoPrestamo(idPrestamo, montoAbono, usuarioId, 
     }
 
     const docRef = doc(db, COLECCION_PRESTAMOS, idPrestamo);
+    const clave = await obtenerClaveUsuario(usuarioId);
 
     // Tarea 14.3: aquí no se usa conReintentos. Si la confirmación del servidor se pierde después de
     // guardar, un reintento registraría el abono dos veces; mejor avisar y que el usuario revise.
@@ -204,10 +214,10 @@ export async function registrarAbonoPrestamo(idPrestamo, montoAbono, usuarioId, 
         throw new Error("El préstamo especificado no existe.");
       }
 
-      const data = snap.data();
-      if (data.creadoPor !== usuarioId) {
+      if (snap.data().creadoPor !== usuarioId) {
         throw new Error("No tienes autorización para modificar este préstamo.");
       }
+      const data = await descifrarPrestamo(clave, snap.data());
 
       const pendiente = redondear(data.monto - (Number(data.totalAbonado) || 0));
       if (pendiente <= 0) {
@@ -220,9 +230,13 @@ export async function registrarAbonoPrestamo(idPrestamo, montoAbono, usuarioId, 
       const totalAbonado = redondear((Number(data.totalAbonado) || 0) + abono);
       const estado = totalAbonado >= data.monto ? ESTADO_PRESTAMO.SALDADO : ESTADO_PRESTAMO.PENDIENTE;
 
+      // Los abonos anteriores se reenvían tal como están guardados: las reglas exigen que no cambien
       transaccion.update(docRef, {
-        abonos: [...(data.abonos || []), { monto: abono, fecha: Timestamp.fromDate(aFecha(fechaAbono)) }],
-        totalAbonado,
+        abonos: [
+          ...(snap.data().abonos || []),
+          { monto: await cifrarValor(clave, abono, CAMPO_MONTO_ABONO), fecha: Timestamp.fromDate(aFecha(fechaAbono)) }
+        ],
+        totalAbonado: await cifrarValor(clave, totalAbonado, "totalAbonado"),
         estado
       });
 
@@ -267,7 +281,8 @@ export async function eliminarPrestamo(idPrestamo, usuarioId = null) {
 
 /**
  * Validación al leer: descarta un préstamo con datos imposibles (p. ej. escrito por un cliente modificado).
- * Revisa que el total abonado coincida con la suma de los abonos y no supere el monto prestado.
+ * Con los montos cifrados el servidor ya no puede revisarlos, así que aquí se comprueba que el total abonado
+ * coincida con la suma de los abonos y no supere el monto prestado.
  * @param {object} p - Préstamo ya descifrado.
  * @throws {Error} Si los datos no son coherentes.
  */
@@ -275,6 +290,7 @@ export function validarPrestamoLeido(p) {
   const deudor = typeof p.deudor === "string" ? p.deudor.trim() : "";
   if (deudor.length < 3 || deudor.length > 60) throw new Error("Deudor inválido.");
   if (!(Number(p.monto) > 0)) throw new Error("Monto inválido.");
+  if ((p.abonos || []).some((a) => !(Number(a.monto) > 0))) throw new Error("Abono inválido.");
   const suma = redondear((p.abonos || []).reduce((t, a) => t + (Number(a.monto) || 0), 0));
   const total = Number(p.totalAbonado) || 0;
   if (Math.abs(suma - total) >= 0.01 || total > Number(p.monto) + 0.001) {
@@ -308,9 +324,9 @@ export function escucharPrestamos(usuarioId, onActualizacion, onError, fabrica =
     const pares = await convertirDocumentos(
       snapshot,
       async (id, data) => {
-        const prestamo = fabrica(id, await descifrarPrestamo(clave, data));
-        validarPrestamoLeido(prestamo);
-        return prestamo;
+        const plano = await descifrarPrestamo(clave, data);
+        validarPrestamoLeido(plano);
+        return fabrica(id, plano);
       },
       "PrestamosService.escucharPrestamos"
     );

@@ -15,11 +15,10 @@ import {
   deleteDoc,
   doc,
   getDoc,
-  updateDoc,
-  increment,
   query,
   where,
   onSnapshot,
+  runTransaction,
   Timestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db, firebaseConfig } from "./firebase.js";
@@ -27,7 +26,7 @@ import { asegurarConexion } from "./conexion.js";
 import { Transaccion, TIPO_TRANSACCION, AMBITO_TRANSACCION } from "../models/Transaccion.js";
 import { Bolsillo } from "../models/Bolsillo.js";
 import { obtenerClaveUsuario, obtenerClaveHogar } from "./claves.js";
-import { cifrarCampos, descifrarCampos, tieneCamposCifrados } from "../utils/cifrado.js";
+import { cifrarCampos, descifrarCampos, cifrarValor, tieneCamposCifrados } from "../utils/cifrado.js";
 
 // ============================================================================
 // RE-EXPORTACIÓN PARA COMPATIBILIDAD
@@ -43,14 +42,13 @@ const COLECCION_BOLSILLOS = "bolsillos";
 // ============================================================================
 
 /**
- * Campos de texto de una transacción que se guardan cifrados. El monto queda en claro a propósito, para que
- * las reglas del servidor sigan validándolo (monto > 0 y tope); tipo, ambito, creadoPor, fecha y hogarId
- * también, porque Firestore los usa en las consultas (where) y en las reglas de seguridad.
+ * Campos de una transacción que se guardan cifrados. tipo, ambito, creadoPor, fecha y hogarId quedan
+ * en claro porque Firestore los usa en las consultas (where) y en las reglas de seguridad.
  */
-export const CAMPOS_CIFRADOS_TRANSACCION = Object.freeze(["descripcion", "categoria", "nombreUsuario"]);
+export const CAMPOS_CIFRADOS_TRANSACCION = Object.freeze(["descripcion", "monto", "categoria", "nombreUsuario"]);
 
-/** Campos de un bolsillo que se guardan cifrados. meta y montoAcumulado quedan en claro para las reglas. */
-export const CAMPOS_CIFRADOS_BOLSILLO = Object.freeze(["nombre"]);
+/** Campos de un bolsillo que se guardan cifrados (creadoPor y fecha quedan en claro). */
+export const CAMPOS_CIFRADOS_BOLSILLO = Object.freeze(["nombre", "meta", "montoAcumulado"]);
 
 /**
  * Elige la clave de una transacción: los movimientos COMPARTIDOS de un hogar usan la clave del hogar
@@ -445,20 +443,32 @@ export async function abonarFondosBolsillo(idBolsillo, montoAbono, usuarioId = n
     }
 
     const docRef = doc(db, COLECCION_BOLSILLOS, idBolsillo);
-    const snap = await getDoc(docRef);
+    const clave = await obtenerClaveUsuario(usuarioId || undefined);
 
-    if (!snap.exists()) {
-      throw new Error("El bolsillo especificado no existe en la base de datos.");
-    }
+    // Con el monto cifrado el servidor ya no puede sumar con increment(). La transacción lee el saldo,
+    // lo descifra, suma y lo vuelve a cifrar; si otro abono llega al mismo tiempo, Firestore la repite
+    // con el valor nuevo, así no se pierde ninguno.
+    await runTransaction(db, async (transaccion) => {
+      const snap = await transaccion.get(docRef);
+      if (!snap.exists()) {
+        throw new Error("El bolsillo especificado no existe en la base de datos.");
+      }
 
-    const data = snap.data();
-    if (usuarioId && data.creadoPor !== usuarioId) {
-      throw new Error("No tienes autorización para modificar este bolsillo.");
-    }
+      const data = snap.data();
+      if (usuarioId && data.creadoPor !== usuarioId) {
+        throw new Error("No tienes autorización para modificar este bolsillo.");
+      }
 
-    // increment() suma en el servidor: si dos abonos llegan al mismo tiempo, no se pierde ninguno.
-    // El monto está en claro (solo se cifra el nombre), así las reglas siguen exigiendo montoAcumulado >= 0.
-    await updateDoc(docRef, { montoAcumulado: increment(Number(montoAbono)) });
+      const actual = await descifrarCampos(clave, data, CAMPOS_CIFRADOS_BOLSILLO);
+      const nuevoMonto = Math.round(((Number(actual.montoAcumulado) || 0) + Number(montoAbono)) * 100) / 100;
+
+      // Se cifran los tres campos: si el bolsillo era de antes del cifrado, queda cifrado completo
+      transaccion.update(docRef, {
+        nombre: await cifrarValor(clave, actual.nombre, "nombre"),
+        meta: await cifrarValor(clave, Number(actual.meta), "meta"),
+        montoAcumulado: await cifrarValor(clave, nuevoMonto, "montoAcumulado")
+      });
+    });
   } catch (error) {
     const mensaje = traducirErrorFirestore(error);
     console.error("[FirestoreService.abonarFondosBolsillo] Error:", error.message);

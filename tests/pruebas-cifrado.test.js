@@ -80,19 +80,20 @@ export async function ejecutarPruebasCifrado() {
     ["nombre bolsillo/categoría (40)", peorTexto(40), 368],
     ["deudor (60)", peorTexto(60), 528],
     ["nota (200)", peorTexto(200), 1648],
-    ["texto con emojis (120)", "😀".repeat(60), 1008]
+    ["monto", -123456789012.12345, 100],
+    ["texto con emojis (120)", "😀".repeat(60), 1008],
+    ["transferencias (5)", Array.from({ length: 5 }, () => ({ de: "x".repeat(28), para: "y".repeat(28), monto: 999999999999.99 })), 4000]
   ];
   for (const [nombre, valor, maximo] of casos) {
     const largo = (await cifrarValor(clave, valor, "c")).length;
     assert.ok(largo <= maximo, `${nombre}: ${largo} caracteres supera el máximo de las reglas (${maximo})`);
   }
 
-  // 8. Las reglas exigen los mismos límites que se probaron arriba, y los montos siguen validándose en claro
+  // 8. Las reglas exigen los mismos límites que se probaron arriba
   const reglas = fs.readFileSync(new URL("../firestore.rules", import.meta.url), "utf8");
-  for (const limite of ["esCifrado(d.descripcion, 1008)", "esCifrado(d.categoria, 528)", "esCifrado(d.nombreUsuario, 848)", "esCifrado(d.nombre, 368)", "esCifrado(request.resource.data.deudor, 528)", "esCifrado(request.resource.data.nota, 1648)"]) {
+  for (const limite of ["esCifrado(d.descripcion, 1008)", "esCifrado(d.categoria, 528)", "esCifrado(d.nombreUsuario, 848)", "esCifrado(d.nombre, 368)", "esCifrado(v, 100)"]) {
     assert.ok(reglas.includes(limite), `firestore.rules debe contener ${limite}`);
   }
-  assert.ok(reglas.includes("d.monto is number && d.monto > 0"), "Las reglas deben seguir validando el monto en claro");
 
   console.log("  ✓ AES-256-GCM: ida y vuelta, IV aleatorio, clave/campo/alteración detectados, datos antiguos y tamaños de reglas.");
 }

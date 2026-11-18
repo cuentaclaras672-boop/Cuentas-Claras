@@ -12,7 +12,7 @@
  * |----------------|-----------|---------------------------------------------------------------|
  * | hogarId        | string    | código del hogar; quien guarda debe ser miembro               |
  * | periodo        | string    | mes liquidado, formato AAAA-MM                                |
- * | transferencias | array     | lista de { de: uid, para: uid, monto: number > 0 }, máximo 5  |
+ * | transferencias | cifrado   | lista de { de: uid, para: uid, monto: number > 0 }, máximo 5, cifrada entera con la clave del hogar |
  * | saldadaPor     | string    | UID del miembro que marcó el mes como saldado                 |
  * | fecha          | timestamp | hora del servidor al guardar                                  |
  *
@@ -29,7 +29,8 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.13.0/firebase-firestore.js";
 import { db, traducirErrorFirestore, procesadorEnOrden, convertirDocumentos, descifrarTransaccion } from "./firestore.js";
-
+import { obtenerClaveHogar } from "./claves.js";
+import { cifrarValor, descifrarValor } from "../utils/cifrado.js";
 import { asegurarConexion, conReintentos } from "./conexion.js";
 import { MAX_MIEMBROS_HOGAR } from "./hogares.js";
 import { AMBITO_TRANSACCION, TIPO_TRANSACCION } from "../models/Transaccion.js";
@@ -141,11 +142,14 @@ function validarTransferencias(transferencias, miembros) {
  * @returns {{ id: string, hogarId: string, periodo: string, transferencias: Array, saldadaPor: string, fecha: Date }}
  */
 async function liquidacionDesdeDocumento(id, data) {
+  // Las transferencias se guardan como un solo valor cifrado con la clave del hogar
+  const clave = await obtenerClaveHogar(data.hogarId);
+  const transferencias = await descifrarValor(clave, data.transferencias, "transferencias");
   return {
     id,
     hogarId: data.hogarId,
     periodo: data.periodo,
-    transferencias: data.transferencias || [],
+    transferencias: transferencias || [],
     saldadaPor: data.saldadaPor,
     fecha: normalizarFecha(data.fecha) || new Date()
   };
@@ -282,6 +286,8 @@ export async function marcarLiquidacionSaldada(hogar, periodo, transferencias, u
 
     const id = idLiquidacion(hogar.id, periodo);
     const docRef = doc(db, COLECCION_LIQUIDACIONES, id);
+    const clave = await obtenerClaveHogar(hogar.id, usuarioId);
+    const transferenciasCifradas = await cifrarValor(clave, transferenciasValidas, "transferencias");
 
     await conReintentos(() => runTransaction(db, async (transaccion) => {
       const existente = await transaccion.get(docRef);
@@ -291,7 +297,7 @@ export async function marcarLiquidacionSaldada(hogar, periodo, transferencias, u
       transaccion.set(docRef, {
         hogarId: hogar.id,
         periodo,
-        transferencias: transferenciasValidas,
+        transferencias: transferenciasCifradas,
         saldadaPor: usuarioId,
         fecha: serverTimestamp()
       });

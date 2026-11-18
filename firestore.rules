@@ -16,16 +16,20 @@ service cloud.firestore {
     }
 
     // ------------------------------------------------------------------------------------------
-    // CIFRADO DE TEXTOS (AES-256-GCM en el navegador, ver src/utils/cifrado.js y docs/cifrado-datos.md)
-    // Los textos sensibles llegan cifrados con el formato enc:v1:<iv>:<datos>. El servidor no puede leerlos,
-    // así que su largo (3 a 120 caracteres, etc.) lo validan los modelos del cliente antes de cifrar y otra
-    // vez al leer. Aquí se exige que vengan cifrados y que no superen el tamaño que tendría el texto más
-    // largo permitido una vez cifrado (8 * caracteres + 48). Los MONTOS quedan en claro a propósito, para
-    // que estas reglas sigan validando el dinero en el servidor.
+    // CIFRADO DE DATOS (AES-256-GCM en el navegador, ver src/utils/cifrado.js)
+    // Los textos y montos llegan cifrados con el formato enc:v1:<iv>:<datos>. El servidor no puede
+    // leerlos, así que ya no valida su contenido (largo de la descripción, monto > 0, etc.): eso lo
+    // hacen los modelos del cliente antes de cifrar. Aquí se exige que el campo SÍ venga cifrado y
+    // que no supere el tamaño que tendría el texto más largo permitido una vez cifrado
+    // (8 * caracteres + 48 para textos; 100 para números).
     // ------------------------------------------------------------------------------------------
     function esCifrado(v, largoMaximo) {
       return v is string && v.size() <= largoMaximo &&
         v.matches('^enc:v1:[A-Za-z0-9+/]{16}:[A-Za-z0-9+/]+={0,2}$');
+    }
+
+    function esNumeroCifrado(v) {
+      return esCifrado(v, 100);
     }
 
     // Una clave AES-256 en base64 (32 bytes = 44 caracteres)
@@ -34,8 +38,8 @@ service cloud.firestore {
     }
 
     // Estructura válida de un documento de /transacciones (espejo de src/models/Transaccion.js).
-    // Rechaza campos de más y tipos incorrectos. descripcion (máx. 120), categoria y nombreUsuario (máx. 100)
-    // llegan cifrados; monto, tipo, ambito, creadoPor, fecha y hogarId en claro.
+    // descripcion (máx. 120), monto, categoria y nombreUsuario (máx. 100) llegan cifrados.
+    // tipo, ambito, creadoPor, fecha y hogarId van en claro porque las consultas y las reglas los usan.
     // hogarId es opcional (HU-09): null o el ID del hogar del autor.
     function esTransaccionValida(d) {
       return d.keys().hasOnly(['descripcion', 'monto', 'tipo', 'ambito', 'categoria',
@@ -43,7 +47,7 @@ service cloud.firestore {
         d.keys().hasAll(['descripcion', 'monto', 'tipo', 'ambito', 'categoria',
                          'creadoPor', 'fecha']) &&
         esCifrado(d.descripcion, 1008) &&
-        d.monto is number && d.monto > 0 && d.monto <= 1000000000000 &&
+        esNumeroCifrado(d.monto) &&
         d.tipo in ['INGRESO', 'GASTO'] &&
         d.ambito in ['PERSONAL', 'COMPARTIDO'] &&
         esCifrado(d.categoria, 528) &&
@@ -54,13 +58,14 @@ service cloud.firestore {
     }
 
     // Estructura válida de un bolsillo (espejo de src/models/Bolsillo.js). Tarea 14.1:
-    // antes no se limitaban los campos ni el largo del nombre. El nombre (máx. 40) llega cifrado.
+    // antes no se limitaban los campos ni el largo del nombre. nombre (máx. 40), meta y montoAcumulado
+    // llegan cifrados.
     function esBolsilloValido(d) {
       return d.keys().hasOnly(['nombre', 'meta', 'montoAcumulado', 'creadoPor', 'fecha']) &&
         d.keys().hasAll(['nombre', 'meta', 'montoAcumulado', 'creadoPor', 'fecha']) &&
         esCifrado(d.nombre, 368) &&
-        d.meta is number && d.meta > 0 && d.meta <= 1000000000000 &&
-        d.montoAcumulado is number && d.montoAcumulado >= 0 &&
+        esNumeroCifrado(d.meta) &&
+        esNumeroCifrado(d.montoAcumulado) &&
         d.creadoPor is string &&
         d.fecha is timestamp;
     }
@@ -135,13 +140,12 @@ service cloud.firestore {
         resource.data.creadoPor == request.auth.uid;
     }
 
-    // Un abono de préstamo: { monto, fecha }, con el monto que sube el total (tolerancia de 1 centavo)
-    function esAbonoValido(abono, incremento) {
+    // Un abono de préstamo: { monto cifrado, fecha }
+    function esAbonoValido(abono) {
       return abono is map &&
         abono.keys().hasOnly(['monto', 'fecha']) &&
         abono.keys().hasAll(['monto', 'fecha']) &&
-        abono.monto is number && abono.monto > 0 &&
-        math.abs(abono.monto - incremento) < 0.01 &&
+        esNumeroCifrado(abono.monto) &&
         abono.fecha is timestamp;
     }
 
@@ -151,43 +155,35 @@ service cloud.firestore {
       allow read: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid;
 
-      // CREACIÓN: Préstamo propio, con deudor y monto válidos, sin abonos y en estado PENDIENTE.
-      // deudor (3 a 60) y nota (máx. 200) llegan cifrados; los montos, en claro.
+      // CREACIÓN: Préstamo propio, sin abonos y en estado PENDIENTE. deudor (3 a 60), monto, nota (máx. 200)
+      // y totalAbonado (0) llegan cifrados; su contenido lo valida src/services/prestamos.js.
       allow create: if request.auth != null &&
         request.resource.data.keys().hasOnly(['deudor', 'monto', 'fecha', 'nota', 'abonos', 'totalAbonado', 'estado', 'creadoPor']) &&
+        request.resource.data.keys().hasAll(['deudor', 'monto', 'fecha', 'nota', 'abonos', 'totalAbonado', 'estado', 'creadoPor']) &&
         request.resource.data.creadoPor == request.auth.uid &&
         esCifrado(request.resource.data.deudor, 528) &&
-        request.resource.data.monto is number &&
-        request.resource.data.monto > 0 &&
+        esNumeroCifrado(request.resource.data.monto) &&
         request.resource.data.fecha is timestamp &&
         esCifrado(request.resource.data.nota, 1648) &&
         request.resource.data.abonos == [] &&
-        request.resource.data.totalAbonado == 0 &&
+        esNumeroCifrado(request.resource.data.totalAbonado) &&
         request.resource.data.estado == 'PENDIENTE';
 
       // ACTUALIZACIÓN (registrar un abono): solo cambian abonos, totalAbonado y estado.
-      // Se agrega exactamente un abono, el total abonado nunca baja ni supera el monto prestado (CA-8.4)
-      // y el estado debe coincidir con el saldo: SALDADO solo cuando el pendiente llega a 0 (CA-8.5).
+      // Se agrega exactamente un abono, los anteriores no se pueden reescribir (Tarea 14.1) y un préstamo
+      // SALDADO ya no recibe abonos. Con los montos cifrados, que el abono no supere el saldo (CA-8.4) y que
+      // el estado coincida con el saldo (CA-8.5) lo calcula el servicio dentro de una transacción.
       allow update: if request.auth != null &&
         resource.data.creadoPor == request.auth.uid &&
+        resource.data.estado == 'PENDIENTE' &&
         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['abonos', 'totalAbonado', 'estado']) &&
         request.resource.data.abonos is list &&
         request.resource.data.abonos.size() == resource.data.abonos.size() + 1 &&
-        // Tarea 14.1: los abonos anteriores no se pueden reescribir y el nuevo abono
-        // debe ser { monto, fecha } con un monto igual a lo que sube totalAbonado.
         (resource.data.abonos.size() == 0 ||
           request.resource.data.abonos[0:resource.data.abonos.size()] == resource.data.abonos) &&
-        esAbonoValido(
-          request.resource.data.abonos[resource.data.abonos.size()],
-          request.resource.data.totalAbonado - resource.data.totalAbonado
-        ) &&
-        request.resource.data.totalAbonado is number &&
-        request.resource.data.totalAbonado > resource.data.totalAbonado &&
-        request.resource.data.totalAbonado <= resource.data.monto &&
-        (
-          (request.resource.data.totalAbonado == resource.data.monto && request.resource.data.estado == 'SALDADO') ||
-          (request.resource.data.totalAbonado < resource.data.monto && request.resource.data.estado == 'PENDIENTE')
-        );
+        esAbonoValido(request.resource.data.abonos[resource.data.abonos.size()]) &&
+        esNumeroCifrado(request.resource.data.totalAbonado) &&
+        request.resource.data.estado in ['PENDIENTE', 'SALDADO'];
 
       // ELIMINACIÓN: Solo el propietario puede eliminar su préstamo
       allow delete: if request.auth != null &&
@@ -270,8 +266,8 @@ service cloud.firestore {
         liquidacionId == request.resource.data.hogarId + '_' + request.resource.data.periodo &&
         esMiembroDelHogar(request.resource.data.hogarId) &&
         request.resource.data.saldadaPor == request.auth.uid &&
-        request.resource.data.transferencias is list &&
-        request.resource.data.transferencias.size() <= 5 &&
+        // Las transferencias (máximo 5, lo valida el servicio) llegan como una sola lista cifrada
+        esCifrado(request.resource.data.transferencias, 4000) &&
         request.resource.data.fecha == request.time;
 
       // Sin update ni delete: una liquidación guardada queda como registro del cuadre.
