@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cuentas Claras — Ceremonia Sprint Review (Sprints 4 y 5)</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --surface: #111827;
+      --card: #1e293b;
+      --border: #334155;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --emerald: #10b981;
+      --cyan: #06b6d4;
+      --indigo: #6366f1;
+      --amber: #f59e0b;
+      --rose: #f43f5e;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      min-height: 100vh;
+    }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 10px 24px;
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+    .badge-emerald { background: rgba(16,185,129,0.15); color: #6ee7b7; border: 1px solid rgba(16,185,129,0.35); }
+    .badge-cyan { background: rgba(6,182,212,0.15); color: #67e8f9; border: 1px solid rgba(6,182,212,0.35); }
+    .badge-indigo { background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.35); }
+    .badge-amber { background: rgba(245,158,11,0.15); color: #fcd34d; border: 1px solid rgba(245,158,11,0.35); }
+    .badge-rose { background: rgba(244,63,94,0.15); color: #fda4af; border: 1px solid rgba(244,63,94,0.35); }
+
+    .controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    button {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+    }
+    button:hover { background: #334155; }
+    button.primary { background: var(--indigo); border-color: var(--indigo); }
+    button.primary:hover { background: #4f46e5; }
+    .timer-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 10px;
+      border-radius: 8px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      font-size: 12.5px;
+      font-variant-numeric: tabular-nums;
+    }
+    .slide-tabs {
+      display: flex;
+      gap: 4px;
+      overflow-x: auto;
+      padding: 8px 24px;
+      background: #0f172a;
+      border-bottom: 1px solid var(--border);
+    }
+    .slide-tab {
+      white-space: nowrap;
+      padding: 5px 10px;
+      font-size: 11.5px;
+      border-radius: 6px;
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--muted);
+    }
+    .slide-tab.active {
+      background: rgba(99,102,241,0.2);
+      border-color: rgba(99,102,241,0.5);
+      color: #ffffff;
+    }
+
+    main { max-width: 1320px; margin: 24px auto 48px; padding: 0 24px; }
+    .slide {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    }
+    .slide.active { display: block; }
+    body.view-all .slide { display: block; margin-bottom: 28px; }
+
+    .slide-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+      margin-bottom: 22px;
+    }
+    .slide-header h1 { font-size: 26px; line-height: 1.2; }
+    .slide-header p.sub { color: var(--muted); font-size: 14px; margin-top: 4px; }
+    .grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+    .grid-5 { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+    @media (max-width: 960px) {
+      .grid-2, .grid-3, .grid-5 { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .card h3 { font-size: 15px; margin-bottom: 8px; color: #ffffff; }
+    .card p, .card li { font-size: 13.5px; color: #cbd5e1; }
+    .card ul { padding-left: 18px; }
+    .card li { margin-bottom: 5px; }
+    .kpi { font-size: 28px; font-weight: 800; color: #ffffff; margin: 4px 0; }
+    .accent-emerald { border-left: 4px solid var(--emerald); }
+    .accent-cyan { border-left: 4px solid var(--cyan); }
+    .accent-indigo { border-left: 4px solid var(--indigo); }
+    .accent-amber { border-left: 4px solid var(--amber); }
+    .accent-rose { border-left: 4px solid var(--rose); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+    th { background: #0f172a; color: #cbd5e1; font-size: 12px; text-transform: uppercase; letter-spacing: 0.04em; }
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      background: #0f172a;
+      color: #93c5fd;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #0f172a;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 13.5px;
+    }
+    .checklist-item input { margin-top: 4px; transform: scale(1.15); accent-color: var(--emerald); }
+    .checklist-item.done { opacity: 0.65; text-decoration: line-through; }
+    .speaker-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11.5px;
+      font-weight: 700;
+      background: rgba(6,182,212,0.18);
+      color: #67e8f9;
+      margin-bottom: 6px;
+    }
+    .quote {
+      background: #0f172a;
+      border-left: 4px solid var(--indigo);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-style: italic;
+      color: #e2e8f0;
+      font-size: 14px;
+    }
+
+    @media print {
+      @page { size: landscape; margin: 1cm; }
+      body { background: #ffffff; color: #0f172a; }
+      .no-print { display: none !important; }
+      main { max-width: 100%; margin: 0; padding: 0; }
+      .slide {
+        display: block !important;
+        background: #ffffff;
+        color: #0f172a;
+        border: 1px solid #cbd5e1;
+        box-shadow: none;
+        page-break-after: always;
+        margin-bottom: 0;
+        padding: 20px;
+      }
+      .slide:last-child { page-break-after: auto; }
+      .card, .quote, .checklist-item {
+        background: #f8fafc !important;
+        border-color: #cbd5e1 !important;
+        color: #0f172a !important;
+      }
+      .card h3, .kpi, h1, h2 { color: #0f172a !important; }
+      .card p, .card li, td, .sub { color: #334155 !important; }
+      th { background: #0f172a !important; color: #ffffff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      code { background: #e2e8f0 !important; color: #1e3a8a !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar no-print">
+    <div class="brand">
+      <span>🏠 Cuentas Claras</span>
+      <span class="badge badge-emerald">Sprint Review 4 &amp; 5</span>
+      <span class="badge badge-indigo">TIC42695 · 2026-2</span>
+    </div>
+    <div class="controls">
+      <div class="timer-box" title="Meta de duración del video: 45 a 60 minutos">
+        <span>⏱ Video:</span>
+        <strong id="timer-display">00:00</strong>
+        <span style="color:#94a3b8;">/ 52:00</span>
+        <button id="btn-timer-toggle" type="button">Iniciar</button>
+        <button id="btn-timer-reset" type="button">Reiniciar</button>
+      </div>
+      <button id="btn-prev" type="button">← Anterior</button>
+      <span id="slide-counter" style="font-size:12.5px;color:#cbd5e1;min-width:58px;text-align:center;">1 / 11</span>
+      <button id="btn-next" type="button" class="primary">Siguiente →</button>
+      <button id="btn-view-all" type="button">Ver todas</button>
+      <button id="btn-print" type="button">Imprimir / PDF</button>
+    </div>
+  </header>
+
+  <nav id="slide-tabs" class="slide-tabs no-print"></nav>
+
+  <main>
+    <!-- SLIDE 1 -->
+    <section class="slide active" data-title="1. Portada y Equipo">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-emerald">CEREMONIA SPRINT REVIEW · SPRINTS 4 Y 5</span>
+          <h1 style="margin-top:8px;">Cuentas Claras — Finanzas Compartidas en el Hogar</h1>
+          <p class="sub">Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Docente / Stakeholder: <strong>Vilma Yenny Bohórquez</strong></p>
+        </div>
+        <div style="text-align:right;">
+          <div class="badge badge-cyan">Corte: 13/11/2026</div>
+          <p class="sub" style="margin-top:6px;">Duración objetivo video: <strong>45–60 min</strong> (52 min)</p>
+        </div>
+      </div>
+
+      <div class="quote" style="margin-bottom:20px;">
+        <strong>Product Goal:</strong> Lograr que las parejas y usuarios individuales centralicen la gestión de sus compromisos financieros (gastos compartidos, metas de ahorro y control de préstamos a terceros), reduciendo el estrés y el tiempo de cuadre de cuentas a menos de 5 minutos semanales, y logrando un registro activo de al menos el 80% de sus movimientos financieros al finalizar las 16 semanas del semestre.
+      </div>
+
+      <h3 style="margin-bottom:10px;font-size:15px;">Integrantes del Grupo y Participación en la Ceremonia</h3>
+      <div class="grid-5">
+        <div class="card accent-indigo">
+          <span class="speaker-pill">Min 00–04 / 13–17 / 33–35 / 49–52</span>
+          <h3>Juan Diego Peraza Amado</h3>
+          <p><strong>Product Owner / Frontend</strong></p>
+          <p style="margin-top:6px;">S4: Categorías dinámicas (12.3). S5: <code>@media print</code> (15.3), <code>normalizarFecha()</code>, consolidación <code>main</code>.</p>
+        </div>
+        <div class="card accent-emerald">
+          <span class="speaker-pill">Min 02–04 / 24–28 / 35–40 / 47–49</span>
+          <h3>Fabián Eduardo Córdoba</h3>
+          <p><strong>Scrum Master / QA Lead</strong></p>
+          <p style="margin-top:6px;">S4: Suite liquidaciones (11.4, 13.2). S5: Carga 50 ops (14.2), runner 12/12 PASS, métricas y gráfica.</p>
+        </div>
+        <div class="card accent-cyan">
+          <span class="speaker-pill">Min 07–10 / 19–25 / 37–40</span>
+          <h3>Daniel Felipe Cortes</h3>
+          <p><strong>Dev / Infraestructura</strong></p>
+          <p style="margin-top:6px;">S4: <code>liquidaciones.js</code> (11.2), reglas (12.2). S5: Auditoría 46 casos (14.1), <code>conexion.js</code> (14.3), Hosting (14.4).</p>
+        </div>
+        <div class="card accent-amber">
+          <span class="speaker-pill">Min 10–13 / 16–19 / 30–33</span>
+          <h3>Jorman Palacios Murillo</h3>
+          <p><strong>Dev / UI &amp; UX</strong></p>
+          <p style="margin-top:6px;">S4: Panel cuadre mensual (11.3), contador 120 chars (13.1). S5: Botones exportación CSV/PDF (15.2).</p>
+        </div>
+        <div class="card accent-rose">
+          <span class="speaker-pill">Min 04–07 / 28–31 / 40–47</span>
+          <h3>Yerson Niño Guerrero</h3>
+          <p><strong>Dev / Dominio &amp; Datos</strong></p>
+          <p style="margin-top:6px;">S4: Algoritmo Greedy <code>cuadre.js</code> (11.1), <code>categorias.js</code> (12.1). S5: Exportador RFC 4180 (15.1).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 2 -->
+    <section class="slide" data-title="2. Objetivos S4 & S5">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-indigo">IMPACTO EN LOS OBJETIVOS PLANEADOS</span>
+          <h1>Sprint Goals (Sprint 4 y Sprint 5) vs. Product Goal</h1>
+          <p class="sub">Cumplimiento del 100% de lo comprometido en ambos sprints (29 Story Points adicionales · 81 SP acumulados)</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card accent-emerald">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span class="badge badge-emerald">SPRINT 4 · 17/10 – 30/10/2026</span>
+            <strong>16 / 16 SP · 3 / 3 HUs (100%)</strong>
+          </div>
+          <h3>Objetivo del Sprint 4</h3>
+          <p style="margin-bottom:10px;"><em>"Que los convivientes del hogar puedan cuadrar cuentas al final del mes sabiendo exactamente quién le debe a quién con transferencias mínimas y marcar el mes como saldado de forma atómica en Firestore, gestionando categorías personalizadas y garantizando la integridad de los datos financieros con descripciones controladas."</em></p>
+          <ul>
+            <li><strong>HU-11 (8 SP):</strong> Cuadre mensual y liquidación del hogar.</li>
+            <li><strong>HU-12 (5 SP):</strong> Categorías personalizadas por usuario.</li>
+            <li><strong>HU-13 (3 SP):</strong> Límite e integridad de descripción (120 chars).</li>
+            <li><strong>Valor al Product Goal:</strong> Resuelve directamente *"quién puso qué"* en menos de 5 minutos.</li>
+          </ul>
+        </div>
+
+        <div class="card accent-cyan">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+            <span class="badge badge-cyan">SPRINT 5 · 31/10 – 13/11/2026</span>
+            <strong>13 / 13 SP · 2 / 2 HUs (100%)</strong>
+          </div>
+          <h3>Objetivo del Sprint 5</h3>
+          <p style="margin-bottom:10px;"><em>"Realizar la auditoría de seguridad integral, pruebas de resiliencia y pruebas de carga sobre Cloud Firestore y Firebase Auth, incorporando la exportación de reportes financieros del hogar (formato estructurado CSV / PDF imprimible) para garantizar la robustez del sistema de cara al cierre de semestre."</em></p>
+          <ul>
+            <li><strong>HU-14 (8 SP):</strong> Auditoría 6 colecciones, 46 casos emulador, 50 ops concurrentes, <code>conexion.js</code>.</li>
+            <li><strong>HU-15 (5 SP):</strong> Exportación CSV RFC 4180 + vista imprimible <code>@media print</code>.</li>
+            <li><strong>Acuerdos Retro S4:</strong> <code>normalizarFecha()</code> transversal + regla SDK <code>10.13.0</code> en DoD.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="grid-3" style="margin-top:18px;">
+        <div class="card"><span class="sub">Avance Acumulado (S1–S5)</span><div class="kpi">15 / 17 HUs</div><p>88.24% de la totalidad del proyecto</p></div>
+        <div class="card"><span class="sub">Esfuerzo Ejecutado</span><div class="kpi">81 / 94 SP</div><p>86.17% del esfuerzo · 100% eficacia S1–S5</p></div>
+        <div class="card"><span class="sub">Certificación QA</span><div class="kpi">12 / 12 Suites</div><p>100% PASS en <code>node tests/runner.js</code> + 46 casos emulador</p></div>
+      </div>
+    </section>
+
+    <!-- SLIDE 3 -->
+    <section class="slide" data-title="3. Sprint 4 (HU-11..13)">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-emerald">SPRINT 4 · HISTORIAS TERMINADAS (16 SP)</span>
+          <h1>Evidencia Técnica de HU-11, HU-12 y HU-13</h1>
+          <p class="sub">8 de 8 tareas técnicas cerradas · 9 suites QA aprobadas al cierre del 30/10/2026</p>
+        </div>
+      </div>
+
+      <div class="grid-3">
+        <div class="card accent-emerald">
+          <span class="badge badge-emerald">HU-11 · 8 SP · Prioridad 1</span>
+          <h3 style="margin-top:8px;">Cuadre Mensual y Liquidación</h3>
+          <ul>
+            <li><strong>Dominio puro:</strong> <code>calcularCuadreMes()</code> en <code>src/utils/cuadre.js</code> usa algoritmo Greedy (<code>O(N log N)</code>): máximo <code>N - 1</code> transferencias.</li>
+            <li><strong>Persistencia atómica:</strong> <code>src/services/liquidaciones.js</code> con ID determinista <code>&#123;hogarId&#125;_&#123;AAAA-MM&#125;</code> y <code>runTransaction</code> idempotente.</li>
+            <li><strong>UI en vivo:</strong> Selector <code>#select-periodo-liquidacion</code>, balances por conviviente y botón <code>#btn-marcar-saldado</code>.</li>
+            <li><strong>Inmutabilidad:</strong> <code>firestore.rules</code> solo permite <code>create</code>; prohíbe <code>update</code> y <code>delete</code>.</li>
+          </ul>
+        </div>
+
+        <div class="card accent-indigo">
+          <span class="badge badge-indigo">HU-12 · 5 SP · Prioridad 2</span>
+          <h3 style="margin-top:8px;">Categorías Personalizadas</h3>
+          <ul>
+            <li><strong>Servicio CRUD:</strong> <code>src/services/categorias.js</code> (<code>guardarCategoria</code>, <code>obtenerCategorias</code>, <code>actualizarCategoria</code>, <code>eliminarCategoria</code>) con SDK <code>10.13.0</code>.</li>
+            <li><strong>Regla de negocio:</strong> Nombre de <code>3</code> a <code>40</code> caracteres, tipo <code>gasto</code> o <code>ingreso</code>.</li>
+            <li><strong>UI integrada:</strong> Botón <code>#btn-crear-categoria</code> (<code>+ Nueva</code>) en formulario; refresca <code>#transaccion-categoria</code> y <code>#filtro-categoria</code>.</li>
+            <li><strong>Seguridad:</strong> Aislamiento estricto <code>uid == request.auth.uid</code> en <code>firestore.rules</code>.</li>
+          </ul>
+        </div>
+
+        <div class="card accent-amber">
+          <span class="badge badge-amber">HU-13 · 3 SP · Prioridad 3</span>
+          <h3 style="margin-top:8px;">Límite de Descripción (120 chars)</h3>
+          <ul>
+            <li><strong>Alineación 3 capas:</strong> Constante <code>MAX_DESCRIPCION = 120</code> en <code>Transaccion.js</code>, <code>maxlength="120"</code> en <code>public/index.html</code> y validación espejo en <code>firestore.rules</code>.</li>
+            <li><strong>Accesibilidad en vivo:</strong> <code>aria-describedby="contador-descripcion"</code> actualiza en tiempo real <em>"Quedan X caracteres"</em> en <code>dashboard.js</code>.</li>
+            <li><strong>QA:</strong> <code>tests/pruebas-liquidaciones.test.js</code> valida aceptación de 120 chars y rechazo de 121.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 4 -->
+    <section class="slide" data-title="4. Sprint 5 (HU-14..15)">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-cyan">SPRINT 5 · HISTORIAS TERMINADAS (13 SP)</span>
+          <h1>Evidencia Técnica de HU-14, HU-15 y Acuerdos Retro S4</h1>
+          <p class="sub">6 tareas base + anexo 14.4 cerradas · 12 de 12 suites QA en 100% PASS</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card accent-cyan">
+          <span class="badge badge-cyan">HU-14 · 8 SP · Prioridad 1</span>
+          <h3 style="margin-top:8px;">Auditoría de Seguridad, Carga y Resiliencia</h3>
+          <ul>
+            <li><strong>Hardening <code>firestore.rules</code>:</strong> Blindaje completo en las <strong>6 colecciones</strong> + <code>deny-all</code>. Corrección de <strong>13 brechas</strong> (<code>Bolsillo</code> 3–40 chars alineado, <code>esCategoriaValida</code> en update, <code>esAbonoValido</code> impide reescribir abonos previos, topes en <code>transacciones</code> y <code>hogares</code>).</li>
+            <li><strong>Emulador Firestore (<code>auditoria-reglas.mjs</code>):</strong> Pasó de 27/40 a <strong>40/40 ataques bloqueados</strong> + <strong>6/6 flujos legítimos aprobados</strong>.</li>
+            <li><strong>Resiliencia (<code>conexion.js</code>):</strong> <code>ErrorSinConexion</code>, <code>asegurarConexion()</code> corta escrituras offline, <code>conReintentos()</code> con espera exponencial (400–4000 ms) en 5 servicios.</li>
+            <li><strong>Estrés (<code>pruebas-seguridad-carga.test.js</code>):</strong> 50 abonos concurrentes en <strong>1.54 ms (&lt; 500 ms)</strong> y 50 cierres idempotentes (1/50).</li>
+          </ul>
+        </div>
+
+        <div class="card accent-emerald">
+          <span class="badge badge-emerald">HU-15 · 5 SP · Prioridad 2</span>
+          <h3 style="margin-top:8px;">Exportación CSV RFC 4180 y Vista Imprimible PDF</h3>
+          <ul>
+            <li><strong>Serializador puro (<code>src/utils/exportador.js</code>):</strong> Cabeceras <code>Fecha,Descripcion,Monto,Tipo,Ambito,Categoria,Autor</code>, saltos <code>\r\n</code>, <strong>BOM UTF-8</strong> para Excel y neutralización contra <em>CSV Formula Injection</em> (<code>= + - @</code>).</li>
+            <li><strong>Conectado a filtros activos:</strong> <code>#btn-exportar-csv</code> exporta exactamente <code>obtenerTransaccionesFiltradas()</code> y funciona incluso <strong>sin conexión</strong> sobre memoria local.</li>
+            <li><strong>Impresión / PDF (<code>public/style.css</code>):</strong> <code>#btn-imprimir-reporte</code> activa hoja <code>@media print</code>, oculta <code>.no-print</code> y muestra cabecera <code>.only-print</code> con titular, fecha y filtros.</li>
+            <li><strong>Acuerdos Retro S4 + Adelanto S6:</strong> <code>normalizarFecha()</code> en <code>formateo.js</code>, regla SDK <code>10.13.0</code> en <code>definition-of-done.md</code>, y preconfiguración <code>firebase.json</code> / <code>.firebaserc</code> / <code>guia-despliegue.md</code>.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 5 -->
+    <section class="slide" data-title="5. QA & Seguridad">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-emerald">EVIDENCIA DE CALIDAD Y PRUEBAS</span>
+          <h1>Resultados QA (12/12 Suites) y Auditoría de Reglas</h1>
+          <p class="sub">Verificado mediante ejecución real de <code>node tests/runner.js</code> el 14/11/2026</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Ejecución <code>node tests/runner.js</code> (100% PASS)</h3>
+          <table>
+            <thead><tr><th>Suite / Tarea</th><th>Historia</th><th>Resultado</th></tr></thead>
+            <tbody>
+              <tr><td>Filtros del historial (<code>pruebas-filtros.test.js</code>)</td><td>HU-05</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>API TRM, fallback y divisas (<code>pruebas-indicadores.test.js</code>)</td><td>HU-06</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Conexión offline y validación (<code>pruebas-conexion.test.js</code>)</td><td>HU-07</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Bolsillos y saldo disponible (<code>pruebas-bolsillos.test.js</code>)</td><td>HU-04</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Préstamos y abonos atómicos (<code>pruebas-prestamos.test.js</code>)</td><td>HU-08</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Hogar compartido y aislamiento (<code>pruebas-hogares.test.js</code>)</td><td>HU-09</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Gráfica de gastos y divisa (<code>pruebas-grafica.test.js</code>)</td><td>HU-10</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Cuadre del hogar y descripción 120 chars (<code>pruebas-liquidaciones.test.js</code>)</td><td>HU-11/13</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Categorías personalizadas (<code>pruebas-categorias.test.js</code>)</td><td>HU-12</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Degradación elegante y reconexión (<code>pruebas-resiliencia.test.js</code>)</td><td>HU-14</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Blindaje 8 colecciones, estrés 50 ops (0.67 ms) y fechas (<code>pruebas-seguridad-carga.test.js</code>)</td><td>HU-14/18</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Exportación CSV RFC 4180 y BOM UTF-8 (<code>pruebas-exportador.test.js</code>)</td><td>HU-15</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+              <tr><td>Cifrado AES-256-GCM en navegador y límites de reglas (<code>pruebas-cifrado.test.js</code>)</td><td>HU-18</td><td><span class="badge badge-emerald">PASS</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Auditoría en Emulador Firestore (<code>auditoria-reglas.mjs</code> — 88 Casos)</h3>
+          <p style="margin-bottom:10px;">Ejecutada contra las 8 colecciones y cifrado AES-256-GCM atacando directo con el SDK de Firebase:</p>
+          <table>
+            <thead><tr><th>Fase de Auditoría</th><th>S4 (Antes)</th><th>S5 (Reglas)</th><th>S6 (+ AES-256-GCM)</th></tr></thead>
+            <tbody>
+              <tr><td>Casos verificados en emulador</td><td>27 / 40</td><td>46 / 46</td><td><strong>88 / 88 (100%)</strong></td></tr>
+              <tr><td>Suites en <code>node tests/runner.js</code></td><td>9 / 9</td><td>12 / 12</td><td><strong>13 / 13 (100%)</strong></td></tr>
+            </tbody>
+          </table>
+          <h3 style="margin-top:16px;">Principales Vectores Cerrados y Cifrado (HU-14 + HU-18)</h3>
+          <ul>
+            <li><strong>Cifrado AES-256-GCM:</strong> textos y montos guardados como <code>enc:v1:&lt;iv&gt;:&lt;datos&gt;</code> con AAD por campo y claves en <code>clavesUsuario</code> y <code>clavesHogar</code>.</li>
+            <li><code>bolsillos</code> y <code>categorias</code>: <code>hasOnly</code>, nombres de 3–40 chars cifrados y <code>runTransaction</code> en abonos.</li>
+            <li><code>prestamos</code>: bloqueo de reescritura de abonos previos y validación al leer (<code>validarPrestamoLeido</code>).</li>
+            <li><code>transacciones</code> y <code>hogares</code>: topes de texto (100 / 60 chars) y monto (10<sup>12</sup>).</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 6 -->
+    <section class="slide" data-title="6. Checklist Demo en Vivo">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-amber">DEMO EN VIVO DE EJECUCIÓN Y AVANCES</span>
+          <h1>Guion Interactivo para la Demo en el Video</h1>
+          <p class="sub">Arrancar con <code>python3 -m http.server 8000</code> → abrir <code>http://localhost:8000/public/index.html</code> con DevTools (F12) visible</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <h3 style="margin-bottom:10px;">Bloque Demo Sprint 4 (Jorman, Juan Diego, Yerson, Daniel)</h3>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>1. Consola F12 en ceros:</strong> Iniciar sesión y verificar cero errores en consola y tarjetas de saldo activas.</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>2. HU-13 (120 chars):</strong> Escribir en <code>#transaccion-descripcion</code> y mostrar en vivo el contador <code>#contador-descripcion</code> bajando hasta el tope de 120.</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>3. HU-12 (Categorías):</strong> Clic en <code>+ Nueva</code> (<code>#btn-crear-categoria</code>), probar error con &lt; 3 chars (Toast), crear <em>"Veterinaria Hogar"</em> y verla en formulario y <code>#filtro-categoria</code>.</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>4. HU-11 (Cuadre mensual):</strong> En "Mi Hogar", elegir periodo en <code>#select-periodo-liquidacion</code>, mostrar cuánto pagó cada conviviente y las transferencias mínimas.</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>5. HU-11 (Liquidación atómica):</strong> Pulsar <code>Marcar mes como saldado</code> (<code>#btn-marcar-saldado</code>), confirmar y mostrar el badge <strong>"Mes saldado"</strong> persistente tras recargar.</span></label>
+        </div>
+
+        <div>
+          <h3 style="margin-bottom:10px;">Bloque Demo Sprint 5 (Daniel, Fabián, Yerson, Jorman, Juan Diego)</h3>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>6. HU-14 (Offline F12):</strong> Activar <em>DevTools → Network → Offline</em>, mostrar banner <code>#banner-offline</code> y bloqueo preventivo de botones de guardado (<code>ErrorSinConexion</code>).</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>7. HU-15 (CSV filtrado incluso Offline):</strong> Filtrar historial (ej. <code>COMPARTIDO</code>), pulsar <code>Exportar CSV</code> (<code>#btn-exportar-csv</code>) y abrir el <code>.csv</code> validando BOM UTF-8 y solo filas filtradas.</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>8. HU-15 (Imprimir / PDF):</strong> Volver a Online, pulsar <code>Imprimir / PDF</code> (<code>#btn-imprimir-reporte</code>) y mostrar la vista limpia <code>@media print</code> sin barras ni botones.</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>9. HU-14 (Suite QA en vivo):</strong> En terminal ejecutar <code>node tests/runner.js</code> y mostrar las <strong>12/12 suites PASS</strong> y latencia 50 ops &lt; 500 ms.</span></label>
+          <label class="checklist-item"><input type="checkbox" /><span><strong>10. HU-14 (Auditoría reglas):</strong> Mostrar <code>firestore.rules</code> y <code>docs/auditoria-seguridad-sprint5.md</code> (40/40 ataques bloqueados).</span></label>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 7 -->
+    <section class="slide" data-title="7. Riesgos e Impedimentos">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-rose">TRANSPARENCIA DE ENTREGA (REQUISITO #4)</span>
+          <h1>Dependencias, Impedimentos y Riesgos Evidenciados</h1>
+          <p class="sub">Trazabilidad honesta de bloqueos superados en S4–S5 y riesgos activos hacia Sprint 6 / Corte III (21/11/2026)</p>
+        </div>
+      </div>
+
+      <table>
+        <thead>
+          <tr><th>Tipo</th><th>Sprint</th><th>Descripción</th><th>Impacto / Evidencia</th><th>Estado</th><th>Mitigación</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-amber">Impedimento</span></td><td>S4</td>
+            <td>Ausencia justificada de 3 integrantes el 30/10</td>
+            <td>Riesgo de no cubrir sustentación presencial</td>
+            <td><span class="badge badge-emerald">Mitigado</span></td>
+            <td>Suplencia en vivo por PO/Dev; hoy participan los 5 integrantes</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-amber">Impedimento</span></td><td>S4</td>
+            <td>CDN Firebase mixto (<code>10.8.0</code> vs <code>10.13.0</code>) y fechas mixtas</td>
+            <td>Conflictos de instancia y lectura <code>Date</code> vs <code>Timestamp</code></td>
+            <td><span class="badge badge-emerald">Resuelto S5</span></td>
+            <td><code>normalizarFecha()</code> y regla <code>10.13.0</code> en <code>definition-of-done.md</code></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-amber">Impedimento</span></td><td>S5</td>
+            <td>Cableado incompleto en <code>dashboard.js</code> post-S4</td>
+            <td>Posible <code>ReferenceError</code> al iniciar categorías/cuadre</td>
+            <td><span class="badge badge-emerald">Resuelto</span></td>
+            <td>Corregido en Daily 3 por Daniel Cortes (commit <code>321b5f6</code>)</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-indigo">Dependencia</span></td><td>S5</td>
+            <td>Java JDK + <code>npm install</code> local para emulador</td>
+            <td><code>tests/emulador/node_modules</code> excluido de Git</td>
+            <td><span class="badge badge-cyan">Documentado</span></td>
+            <td>Guía en <code>tests/emulador/README.md</code> + validación estática en <code>runner.js</code></td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-rose">Riesgo Activo</span></td><td>S5 → S6</td>
+            <td>Publicar <code>firestore.rules</code> y Hosting en <code>bdcuentasclaras-b1814</code></td>
+            <td>Requiere cuenta propietaria y restringir <code>apiKey</code> HTTP</td>
+            <td><span class="badge badge-amber">En curso (16.3)</span></td>
+            <td><code>firebase.json</code>, <code>.firebaserc</code> y <code>guia-despliegue.md</code> listos; UAT previo al 21/11</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-rose">Riesgo</span></td><td>S5 → S6</td>
+            <td>Integración tardía (13–14 nov) y falta UAT móvil en prod; UI de categorías solo crea/filtra</td>
+            <td>Ventana justa para validar <code>@media print</code>/CSV en dispositivos reales</td>
+            <td><span class="badge badge-amber">En curso (16.4)</span></td>
+            <td>Jorman y Yerson asignados a UAT completo entre 16 y 20 nov</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-indigo">Riesgo Aceptado</span></td><td>S5</td>
+            <td><code>allow get</code> en <code>hogares/&#123;codigo&#125;</code> y tope de 5 items en <code>transferencias</code></td>
+            <td>Necesario para unirse por código de 6 chars (36<sup>6</sup> combinaciones)</td>
+            <td><span class="badge badge-emerald">Controlado</span></td>
+            <td>Validación de contenido en <code>liquidaciones.js</code> y doc <code>auditoria-seguridad-sprint5.md</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- SLIDE 8 -->
+    <section class="slide" data-title="8. Preguntas Sprint 4">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-emerald">REFLEXIÓN DE REVIEW — SPRINT 4 (REQUISITO #5)</span>
+          <h1>Las 6 Preguntas de la Review — Sprint 4</h1>
+          <p class="sub">Periodo: 17/10 – 30/10/2026 · 16 SP entregados (HU-11, HU-12, HU-13)</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card accent-emerald">
+          <h3>1. ¿Cuáles fueron los principales aprendizajes?</h3>
+          <p>Desacoplar matemáticas puras en <code>cuadre.js</code> (Greedy <em>N − 1</em>) permitió probar sin red; usar ID determinista <code>&#123;hogarId&#125;_&#123;AAAA-MM&#125;</code> + <code>runTransaction</code> dio idempotencia real; aprendimos a alinear reglas entre HTML, modelo y <code>firestore.rules</code> (120 chars), estandarizar SDK <code>10.13.0</code> y sostener propiedad colectiva del código.</p>
+        </div>
+        <div class="card accent-cyan">
+          <h3>2. ¿Cuál fue la emoción que predominaba?</h3>
+          <p><strong>Satisfacción técnica, confianza y respaldo mutuo:</strong> orgullo al resolver la promesa central (<em>"¿quién le debe a quién?"</em>) y acumular 4 sprints al 100% (68 SP), junto con alerta constructiva por fricciones de fechas y versiones de CDN.</p>
+        </div>
+        <div class="card accent-indigo">
+          <h3>3. ¿Cómo se sienten con la nueva forma de trabajar?</h3>
+          <p><strong>Cómodos y organizados:</strong> sprints de 2 semanas, tablero Miro con límite WIP estricto (máx. 5 equipo / 2 dev), Vanilla JS ES6 por capas sin bundlers, registro transparente de IA y la <em>Dinámica del Barco</em> convirtiendo Anclas en acciones verificables.</p>
+        </div>
+        <div class="card accent-amber">
+          <h3>4. ¿Principales impedimentos o barreras organizativas?</h3>
+          <p>Sincronización de ramas en <code>origin/main</code>, mezcla temporal de Firebase <code>10.8.0</code> vs <code>10.13.0</code>, fechas mixtas <code>Date</code>/<code>Timestamp</code>, casos borde en hogares unipersonales, ausencia justificada de 3 miembros el 30/10 y licencia de Planner (resuelta con Miro autorizado).</p>
+        </div>
+        <div class="card accent-rose">
+          <h3>5. ¿Qué puedo hacer para ayudar a impactar los objetivos?</h3>
+          <p><strong>Al Stakeholder:</strong> validar usabilidad del cuadre e inmutabilidad de cierres y priorizar vectores críticos para S5.<br/><strong>Equipo:</strong> cumplir las Anclas 1 y 2 (<code>normalizarFecha()</code> y SDK <code>10.13.0</code>), reforzar <code>git pull</code> diario y dominar las 4 capas del código.</p>
+        </div>
+        <div class="card accent-emerald">
+          <h3>6. ¿Dónde está el valor capturado durante el sprint?</h3>
+          <p>En el <strong>corazón del Product Goal</strong>: liquidar el mes en segundos con transferencias mínimas e inmutables (HU-11), personalizar categorías por usuario (HU-12) y blindar la integridad descriptiva a 120 chars (HU-13), sumando <strong>16 SP</strong> (76.47% del proyecto cerrado).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 9 -->
+    <section class="slide" data-title="9. Preguntas Sprint 5">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-cyan">REFLEXIÓN DE REVIEW — SPRINT 5 (REQUISITO #5)</span>
+          <h1>Las 6 Preguntas de la Review — Sprint 5</h1>
+          <p class="sub">Periodo: 31/10 – 13/11/2026 · 13 SP entregados (HU-14, HU-15 + Acuerdos S4)</p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card accent-cyan">
+          <h3>1. ¿Cuáles fueron los principales aprendizajes?</h3>
+          <p>Atacar las reglas directo con el SDK en emulador descubrió 13 brechas invisibles desde UI (subiendo de 27/40 a <strong>40/40 bloqueos</strong>); aprendimos a cortar escrituras offline (<code>asegurarConexion</code>), reintentar solo operaciones idempotentes (<code>conReintentos</code>) y construir exportación CSV RFC 4180 segura contra inyección de fórmulas y disponible offline.</p>
+        </div>
+        <div class="card accent-emerald">
+          <h3>2. ¿Cuál fue la emoción que predominaba?</h3>
+          <p><strong>Rigor técnico, alivio de estabilidad y expectativa positiva:</strong> satisfacción al ver 12/12 suites en verde y 50 ops concurrentes en 1.54 ms, mezclada con tensión sana en la consolidación del 13–14 nov y entusiasmo por salir a producción.</p>
+        </div>
+        <div class="card accent-indigo">
+          <h3>3. ¿Cómo se sienten con la nueva forma de trabajar?</h3>
+          <p><strong>Maduros y coordinados:</strong> la DoD endurecida (SDK <code>10.13.0</code>, <code>normalizarFecha()</code>, pruebas de estrés y auditoría en emulador) tradujo las retrospectivas en calidad real. El reparto en frentes especializados agilizó la entrega sin romper la arquitectura SoC.</p>
+        </div>
+        <div class="card accent-amber">
+          <h3>4. ¿Principales impedimentos o barreras organizativas?</h3>
+          <p>Cableado roto temporalmente en <code>dashboard.js</code> (corregido en <code>321b5f6</code>), requerimiento local de Java + <code>npm install</code> en emulador, alerta de baja de Firebase Dynamic Links (sin impacto), consolidación ajustada al cierre y dependencia de acceso propietario a <code>bdcuentasclaras-b1814</code> para desplegar.</p>
+        </div>
+        <div class="card accent-rose">
+          <h3>5. ¿Qué puedo hacer para ayudar a impactar los objetivos?</h3>
+          <p><strong>Al Stakeholder:</strong> retroalimentar formato CSV y vista PDF e indicar si desea UI para editar/borrar categorías.<br/><strong>Equipo hacia S6:</strong> ejecutar <code>firebase deploy</code> de reglas y Hosting, restringir <code>apiKey</code> HTTP, hacer UAT en URL pública y ensayar sustentación del 21/11.</p>
+        </div>
+        <div class="card accent-cyan">
+          <h3>6. ¿Dónde está el valor capturado durante el sprint?</h3>
+          <p>En convertir la app en un <strong>sistema auditable, resiliente y portable</strong>: 6 colecciones blindadas, cero race conditions bajo estrés, degradación elegante offline y respaldo contable CSV/PDF, logrando <strong>15/17 HUs (88.24%)</strong> y <strong>81/94 SP (86.17%)</strong>.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- SLIDE 10 -->
+    <section class="slide" data-title="10. Gráfica del Proyecto">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-indigo">MÉTRICAS GLOBALES DEL PROYECTO (REQUISITO #6)</span>
+          <h1>Gráfica de Sprints, Historias Cerradas y % del Proyecto</h1>
+          <p class="sub">15 de 17 Historias de Usuario cerradas (88.24%) · 81 de 94 Story Points (86.17%) · Aporte S4 + S5: 5 HUs (29.41%)</p>
+        </div>
+      </div>
+      <div style="background:#ffffff;border-radius:12px;padding:8px;">
+        <svg xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;max-height:600px;display:block;border-radius:10px;" viewBox="0 0 1600 980" font-family="DejaVu Sans, Inter, Arial, sans-serif">
+<defs>
+  <linearGradient id="hdrGrad" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#0f172a"/>
+    <stop offset="100%" stop-color="#1e293b"/>
+  </linearGradient>
+  <filter id="cardShadow" x="-2%" y="-2%" width="104%" height="106%">
+    <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#0f172a" flood-opacity="0.06"/>
+  </filter>
+</defs>
+<rect width="1600" height="980" fill="#f8fafc"/>
+<rect x="0" y="0" width="1600" height="104" fill="url(#hdrGrad)"/>
+<text x="48" y="44" fill="#ffffff" font-size="26" font-weight="700">Cuentas Claras — Avance por Sprint, Historias Cerradas y % del Proyecto</text>
+<text x="48" y="75" fill="#cbd5e1" font-size="14.5">Sprints 1 a 6 Completados · Práctica Aplicada TIC42695 · Backlog Total: 18 Historias (102 Story Points · 13 Suites QA PASS)</text>
+<rect x="1296" y="25" width="256" height="54" rx="10" fill="#10b981" fill-opacity="0.18" stroke="#10b981" stroke-width="1.5"/>
+<text x="1424" y="49" text-anchor="middle" fill="#6ee7b7" font-size="11.5" font-weight="700">CIERRE SEMESTRAL (S1–S6)</text>
+<text x="1424" y="70" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="700">18 / 18 HUs · 100.0%</text>
+<rect x="48" y="124" width="362" height="90" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" filter="url(#cardShadow)"/>
+<rect x="48" y="124" width="6" height="90" rx="3" fill="#10b981"/>
+<text x="68" y="148" fill="#64748b" font-size="11.5" font-weight="700">TOTAL HISTORIAS CERRADAS</text>
+<text x="68" y="178" fill="#0f172a" font-size="24" font-weight="700">18 / 18 HUs</text>
+<text x="68" y="200" fill="#475569" font-size="12">100% del proyecto (S1–S5: 15 · S6: 3)</text>
+<rect x="428" y="124" width="362" height="90" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" filter="url(#cardShadow)"/>
+<rect x="428" y="124" width="6" height="90" rx="3" fill="#06b6d4"/>
+<text x="448" y="148" fill="#64748b" font-size="11.5" font-weight="700">AVANCE CORTE S4 + S5</text>
+<text x="448" y="178" fill="#0f172a" font-size="24" font-weight="700">5 HUs (29 SP)</text>
+<text x="448" y="200" fill="#475569" font-size="12">S4: 3 HUs (16 SP) · S5: 2 HUs (13 SP)</text>
+<rect x="808" y="124" width="362" height="90" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" filter="url(#cardShadow)"/>
+<rect x="808" y="124" width="6" height="90" rx="3" fill="#0ea5e9"/>
+<text x="828" y="148" fill="#64748b" font-size="11.5" font-weight="700">CIERRE SPRINT 6 (HU-16..18)</text>
+<text x="828" y="178" fill="#0f172a" font-size="24" font-weight="700">3 HUs (21 SP)</text>
+<text x="828" y="200" fill="#475569" font-size="12">Hosting, Sustentación y Cifrado AES-256-GCM</text>
+<rect x="1188" y="124" width="362" height="90" rx="12" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" filter="url(#cardShadow)"/>
+<rect x="1188" y="124" width="6" height="90" rx="3" fill="#6366f1"/>
+<text x="1208" y="148" fill="#64748b" font-size="11.5" font-weight="700">STORY POINTS Y CALIDAD QA</text>
+<text x="1208" y="178" fill="#0f172a" font-size="24" font-weight="700">102 / 102 SP</text>
+<text x="1208" y="200" fill="#475569" font-size="12">13/13 suites PASS · 88 casos en emulador</text>
+<rect x="48" y="232" width="926" height="520" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" filter="url(#cardShadow)"/>
+<text x="74" y="266" fill="#0f172a" font-size="17" font-weight="700">1. Historias de Usuario Cerradas por Sprint y Avance Acumulado (%)</text>
+<text x="74" y="287" fill="#64748b" font-size="12.5">Barras: HUs cerradas por sprint (eje izq. 0–6) · Línea: % acumulado sobre las 18 HUs del proyecto (eje der. 0–100%)</text>
+<line x1="120" y1="644.0" x2="896" y2="644.0" stroke="#cbd5e1" stroke-width="1"/>
+<text x="108" y="648.0" text-anchor="end" fill="#475569" font-size="12" font-weight="600">0</text>
+<line x1="120" y1="590.0" x2="896" y2="590.0" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="108" y="594.0" text-anchor="end" fill="#475569" font-size="12" font-weight="600">1</text>
+<line x1="120" y1="536.0" x2="896" y2="536.0" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="108" y="540.0" text-anchor="end" fill="#475569" font-size="12" font-weight="600">2</text>
+<line x1="120" y1="482.0" x2="896" y2="482.0" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="108" y="486.0" text-anchor="end" fill="#475569" font-size="12" font-weight="600">3</text>
+<line x1="120" y1="428.0" x2="896" y2="428.0" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="108" y="432.0" text-anchor="end" fill="#475569" font-size="12" font-weight="600">4</text>
+<line x1="120" y1="374.0" x2="896" y2="374.0" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="108" y="378.0" text-anchor="end" fill="#475569" font-size="12" font-weight="600">5</text>
+<line x1="120" y1="320.0" x2="896" y2="320.0" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="4 4"/>
+<text x="108" y="324.0" text-anchor="end" fill="#475569" font-size="12" font-weight="600">6</text>
+<text x="908" y="648.0" text-anchor="start" fill="#0f766e" font-size="12" font-weight="600">0%</text>
+<text x="908" y="583.2" text-anchor="start" fill="#0f766e" font-size="12" font-weight="600">20%</text>
+<text x="908" y="518.4" text-anchor="start" fill="#0f766e" font-size="12" font-weight="600">40%</text>
+<text x="908" y="453.6" text-anchor="start" fill="#0f766e" font-size="12" font-weight="600">60%</text>
+<text x="908" y="388.8" text-anchor="start" fill="#0f766e" font-size="12" font-weight="600">80%</text>
+<text x="908" y="324.0" text-anchor="start" fill="#0f766e" font-size="12" font-weight="600">100%</text>
+<text x="76" y="482.0" text-anchor="middle" fill="#475569" font-size="12" font-weight="700" transform="rotate(-90 76 482.0)">Historias Cerradas (HUs)</text>
+<text x="952" y="482.0" text-anchor="middle" fill="#0f766e" font-size="12" font-weight="700" transform="rotate(90 952 482.0)">% Acumulado del Proyecto</text>
+<rect x="147.7" y="482.0" width="74" height="162.0" rx="8" fill="#6366f1"/>
+<text x="184.7" y="514.0" text-anchor="middle" fill="#ffffff" font-size="15.5" font-weight="700">3 HUs</text>
+<text x="184.7" y="531.0" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="600">(16.67%)</text>
+<text x="184.7" y="666" text-anchor="middle" fill="#334155" font-size="13" font-weight="600">Sprint 1</text>
+<text x="184.7" y="683" text-anchor="middle" fill="#64748b" font-size="11">05/09–18/09</text>
+<text x="184.7" y="699" text-anchor="middle" fill="#334155" font-size="11" font-weight="700">15 SP · HU-01..03</text>
+<rect x="277.0" y="428.0" width="74" height="216.0" rx="8" fill="#3b82f6"/>
+<text x="314.0" y="460.0" text-anchor="middle" fill="#ffffff" font-size="15.5" font-weight="700">4 HUs</text>
+<text x="314.0" y="477.0" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="600">(22.22%)</text>
+<text x="314.0" y="666" text-anchor="middle" fill="#334155" font-size="13" font-weight="600">Sprint 2</text>
+<text x="314.0" y="683" text-anchor="middle" fill="#64748b" font-size="11">19/09–02/10</text>
+<text x="314.0" y="699" text-anchor="middle" fill="#334155" font-size="11" font-weight="700">21 SP · HU-04..07</text>
+<rect x="406.3" y="482.0" width="74" height="162.0" rx="8" fill="#8b5cf6"/>
+<text x="443.3" y="561.0" text-anchor="middle" fill="#ffffff" font-size="15.5" font-weight="700">3 HUs</text>
+<text x="443.3" y="578.0" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="600">(16.67%)</text>
+<text x="443.3" y="666" text-anchor="middle" fill="#334155" font-size="13" font-weight="600">Sprint 3</text>
+<text x="443.3" y="683" text-anchor="middle" fill="#64748b" font-size="11">03/10–16/10</text>
+<text x="443.3" y="699" text-anchor="middle" fill="#334155" font-size="11" font-weight="700">16 SP · HU-08..10</text>
+<rect x="535.7" y="482.0" width="74" height="162.0" rx="8" fill="#10b981" stroke="#0f172a" stroke-width="2.2"/>
+<text x="572.7" y="561.0" text-anchor="middle" fill="#ffffff" font-size="15.5" font-weight="700">3 HUs</text>
+<text x="572.7" y="578.0" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="600">(16.67%)</text>
+<text x="572.7" y="666" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="700">Sprint 4 ★</text>
+<text x="572.7" y="683" text-anchor="middle" fill="#64748b" font-size="11">17/10–30/10</text>
+<text x="572.7" y="699" text-anchor="middle" fill="#334155" font-size="11" font-weight="700">16 SP · HU-11..13</text>
+<rect x="665.0" y="536.0" width="74" height="108.0" rx="8" fill="#06b6d4" stroke="#0f172a" stroke-width="2.2"/>
+<text x="702.0" y="588.0" text-anchor="middle" fill="#ffffff" font-size="15.5" font-weight="700">2 HUs</text>
+<text x="702.0" y="605.0" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="600">(11.11%)</text>
+<text x="702.0" y="666" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="700">Sprint 5 ★</text>
+<text x="702.0" y="683" text-anchor="middle" fill="#64748b" font-size="11">31/10–13/11</text>
+<text x="702.0" y="699" text-anchor="middle" fill="#334155" font-size="11" font-weight="700">13 SP · HU-14..15</text>
+<rect x="794.3" y="482.0" width="74" height="162.0" rx="8" fill="#0ea5e9" stroke="#0f172a" stroke-width="2.2"/>
+<text x="831.3" y="561.0" text-anchor="middle" fill="#ffffff" font-size="15.5" font-weight="700">3 HUs</text>
+<text x="831.3" y="578.0" text-anchor="middle" fill="#f8fafc" font-size="11.5" font-weight="600">(16.67%)</text>
+<text x="831.3" y="666" text-anchor="middle" fill="#0f172a" font-size="13" font-weight="700">Sprint 6 ★</text>
+<text x="831.3" y="683" text-anchor="middle" fill="#64748b" font-size="11">14/11–27/11</text>
+<text x="831.3" y="699" text-anchor="middle" fill="#334155" font-size="11" font-weight="700">21 SP · HU-16..18</text>
+<path d="M 184.7 590.0 L 314.0 518.0 L 443.3 464.0 L 572.7 410.0 L 702.0 374.0 L 831.3 320.0" fill="none" stroke="#0f766e" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+<circle cx="184.7" cy="590.0" r="6.5" fill="#ffffff" stroke="#0f766e" stroke-width="3"/>
+<rect x="148.7" y="558.0" width="72" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+<text x="184.7" y="572.0" text-anchor="middle" fill="#065f46" font-size="11.5" font-weight="700">16.67%</text>
+<circle cx="314.0" cy="518.0" r="6.5" fill="#ffffff" stroke="#0f766e" stroke-width="3"/>
+<rect x="278.0" y="530.0" width="72" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+<text x="314.0" y="544.0" text-anchor="middle" fill="#065f46" font-size="11.5" font-weight="700">38.89%</text>
+<circle cx="443.3" cy="464.0" r="6.5" fill="#ffffff" stroke="#0f766e" stroke-width="3"/>
+<rect x="407.3" y="430.0" width="72" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+<text x="443.3" y="444.0" text-anchor="middle" fill="#065f46" font-size="11.5" font-weight="700">55.56%</text>
+<circle cx="572.7" cy="410.0" r="6.5" fill="#ffffff" stroke="#0f766e" stroke-width="3"/>
+<rect x="536.7" y="376.0" width="72" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+<text x="572.7" y="390.0" text-anchor="middle" fill="#065f46" font-size="11.5" font-weight="700">72.22%</text>
+<circle cx="702.0" cy="374.0" r="6.5" fill="#ffffff" stroke="#0f766e" stroke-width="3"/>
+<rect x="666.0" y="340.0" width="72" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+<text x="702.0" y="354.0" text-anchor="middle" fill="#065f46" font-size="11.5" font-weight="700">83.33%</text>
+<circle cx="831.3" cy="320.0" r="6.5" fill="#ffffff" stroke="#0f766e" stroke-width="3"/>
+<rect x="795.3" y="288.0" width="72" height="20" rx="5" fill="#ecfdf5" stroke="#10b981" stroke-width="1.2"/>
+<text x="831.3" y="302.0" text-anchor="middle" fill="#065f46" font-size="11.5" font-weight="700">100.00%</text>
+<rect x="76" y="721" width="14" height="14" rx="3" fill="#10b981" stroke="#0f172a" stroke-width="1.5"/>
+<text x="96" y="732" fill="#334155" font-size="11.5">Corte III (S4–S6: 8 HUs · 44.44% · 50 SP)</text>
+<line x1="413" y1="728" x2="443" y2="728" stroke="#0f766e" stroke-width="3"/>
+<circle cx="428" cy="728" r="4.5" fill="#ffffff" stroke="#0f766e" stroke-width="2.5"/>
+<text x="451" y="732" fill="#334155" font-size="11.5">% Acumulado Cerrado (18/18 HUs = 100.00%)</text>
+<rect x="994" y="232" width="558" height="520" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" filter="url(#cardShadow)"/>
+<text x="1018" y="266" fill="#0f172a" font-size="17" font-weight="700">2. Participación por Sprint (% del Proyecto Total)</text>
+<text x="1018" y="287" fill="#64748b" font-size="12.5">Distribución de las 18 Historias de Usuario (102 Story Points)</text>
+<path d="M 1273.00 308.00 A 122 122 0 0 1 1377.35 366.80 L 1331.16 394.77 A 68 68 0 0 0 1273.00 362.00 Z" fill="#6366f1" stroke="#ffffff" stroke-width="1.5"/>
+<text x="1320.5" y="351.7" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">16.7%</text>
+<path d="M 1378.66 369.00 A 122 122 0 0 1 1353.36 521.79 L 1317.79 481.16 A 68 68 0 0 0 1331.89 396.00 Z" fill="#3b82f6" stroke="#ffffff" stroke-width="1.5"/>
+<text x="1366.6" y="450.5" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">22.2%</text>
+<path d="M 1351.42 523.46 A 122 122 0 0 1 1233.68 545.49 L 1251.09 494.37 A 68 68 0 0 0 1316.71 482.09 Z" fill="#8b5cf6" stroke="#ffffff" stroke-width="1.5"/>
+<text x="1289.5" y="527.6" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">16.7%</text>
+<path d="M 1231.27 544.64 A 122 122 0 0 1 1153.32 453.70 L 1206.30 443.21 A 68 68 0 0 0 1249.74 493.90 Z" fill="#10b981" stroke="#0f172a" stroke-width="2"/>
+<text x="1200.2" y="495.1" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">16.7%</text>
+<path d="M 1152.85 451.19 A 122 122 0 0 1 1166.09 371.23 L 1213.41 397.24 A 68 68 0 0 0 1206.03 441.81 Z" fill="#06b6d4" stroke="#0f172a" stroke-width="2"/>
+<text x="1179.4" y="417.5" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">11.1%</text>
+<path d="M 1167.34 369.00 A 122 122 0 0 1 1270.45 308.03 L 1271.58 362.01 A 68 68 0 0 0 1214.11 396.00 Z" fill="#0ea5e9" stroke="#0f172a" stroke-width="2"/>
+<text x="1225.5" y="351.7" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">16.7%</text>
+<text x="1273.0" y="424.0" text-anchor="middle" fill="#0f172a" font-size="24" font-weight="700">100.0%</text>
+<text x="1273.0" y="445.0" text-anchor="middle" fill="#059669" font-size="12.5" font-weight="700">18 / 18 HUs</text>
+<text x="1273.0" y="462.0" text-anchor="middle" fill="#64748b" font-size="11">102 / 102 SP</text>
+<rect x="1014" y="571" width="518" height="22" rx="4" fill="#f8fafc"/>
+<rect x="1022" y="576" width="12" height="12" rx="3" fill="#6366f1"/>
+<text x="1040" y="586" fill="#0f172a" font-size="12" font-weight="700">Sprint 1</text>
+<text x="1130" y="586" fill="#475569" font-size="11.5">HU-01..03</text>
+<text x="1220" y="586" fill="#0f172a" font-size="11.5" font-weight="600">3 cerradas</text>
+<text x="1360" y="586" text-anchor="end" fill="#0f172a" font-size="12" font-weight="700">16.67%</text>
+<text x="1422" y="586" text-anchor="end" fill="#475569" font-size="11.5">15 SP</text>
+<text x="1520" y="586" text-anchor="end" fill="#059669" font-size="11.5" font-weight="700">100% Done</text>
+<rect x="1014" y="596" width="518" height="22" rx="4" fill="#ffffff"/>
+<rect x="1022" y="601" width="12" height="12" rx="3" fill="#3b82f6"/>
+<text x="1040" y="611" fill="#0f172a" font-size="12" font-weight="700">Sprint 2</text>
+<text x="1130" y="611" fill="#475569" font-size="11.5">HU-04..07</text>
+<text x="1220" y="611" fill="#0f172a" font-size="11.5" font-weight="600">4 cerradas</text>
+<text x="1360" y="611" text-anchor="end" fill="#0f172a" font-size="12" font-weight="700">22.22%</text>
+<text x="1422" y="611" text-anchor="end" fill="#475569" font-size="11.5">21 SP</text>
+<text x="1520" y="611" text-anchor="end" fill="#059669" font-size="11.5" font-weight="700">100% Done</text>
+<rect x="1014" y="621" width="518" height="22" rx="4" fill="#f8fafc"/>
+<rect x="1022" y="626" width="12" height="12" rx="3" fill="#8b5cf6"/>
+<text x="1040" y="636" fill="#0f172a" font-size="12" font-weight="700">Sprint 3</text>
+<text x="1130" y="636" fill="#475569" font-size="11.5">HU-08..10</text>
+<text x="1220" y="636" fill="#0f172a" font-size="11.5" font-weight="600">3 cerradas</text>
+<text x="1360" y="636" text-anchor="end" fill="#0f172a" font-size="12" font-weight="700">16.67%</text>
+<text x="1422" y="636" text-anchor="end" fill="#475569" font-size="11.5">16 SP</text>
+<text x="1520" y="636" text-anchor="end" fill="#059669" font-size="11.5" font-weight="700">100% Done</text>
+<rect x="1014" y="646" width="518" height="22" rx="4" fill="#ecfdf5"/>
+<rect x="1022" y="651" width="12" height="12" rx="3" fill="#10b981"/>
+<text x="1040" y="661" fill="#0f172a" font-size="12" font-weight="700">Sprint 4 ★</text>
+<text x="1130" y="661" fill="#475569" font-size="11.5">HU-11..13</text>
+<text x="1220" y="661" fill="#0f172a" font-size="11.5" font-weight="600">3 cerradas</text>
+<text x="1360" y="661" text-anchor="end" fill="#0f172a" font-size="12" font-weight="700">16.67%</text>
+<text x="1422" y="661" text-anchor="end" fill="#475569" font-size="11.5">16 SP</text>
+<text x="1520" y="661" text-anchor="end" fill="#059669" font-size="11.5" font-weight="700">100% Done</text>
+<rect x="1014" y="671" width="518" height="22" rx="4" fill="#ecfdf5"/>
+<rect x="1022" y="676" width="12" height="12" rx="3" fill="#06b6d4"/>
+<text x="1040" y="686" fill="#0f172a" font-size="12" font-weight="700">Sprint 5 ★</text>
+<text x="1130" y="686" fill="#475569" font-size="11.5">HU-14..15</text>
+<text x="1220" y="686" fill="#0f172a" font-size="11.5" font-weight="600">2 cerradas</text>
+<text x="1360" y="686" text-anchor="end" fill="#0f172a" font-size="12" font-weight="700">11.11%</text>
+<text x="1422" y="686" text-anchor="end" fill="#475569" font-size="11.5">13 SP</text>
+<text x="1520" y="686" text-anchor="end" fill="#059669" font-size="11.5" font-weight="700">100% Done</text>
+<rect x="1014" y="696" width="518" height="22" rx="4" fill="#ecfdf5"/>
+<rect x="1022" y="701" width="12" height="12" rx="3" fill="#0ea5e9"/>
+<text x="1040" y="711" fill="#0f172a" font-size="12" font-weight="700">Sprint 6 ★</text>
+<text x="1130" y="711" fill="#475569" font-size="11.5">HU-16..18</text>
+<text x="1220" y="711" fill="#0f172a" font-size="11.5" font-weight="600">3 cerradas</text>
+<text x="1360" y="711" text-anchor="end" fill="#0f172a" font-size="12" font-weight="700">16.67%</text>
+<text x="1422" y="711" text-anchor="end" fill="#475569" font-size="11.5">21 SP</text>
+<text x="1520" y="711" text-anchor="end" fill="#059669" font-size="11.5" font-weight="700">100% Done</text>
+<rect x="48" y="772" width="1504" height="174" rx="14" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.2" filter="url(#cardShadow)"/>
+<text x="72" y="800" fill="#0f172a" font-size="14.5" font-weight="700">Resumen Cuantitativo de Avance Acumulado por Sprint (18 Historias de Usuario · 102 Story Points)</text>
+<rect x="64" y="812" width="1472" height="28" rx="6" fill="#0f172a"/>
+<text x="72" y="831" text-anchor="start" fill="#ffffff" font-size="11.5" font-weight="700">Métrica / Indicador</text>
+<text x="413" y="831" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">Sprint 1</text>
+<text x="583" y="831" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">Sprint 2</text>
+<text x="753" y="831" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">Sprint 3</text>
+<text x="923" y="831" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">Sprint 4 ★</text>
+<text x="1093" y="831" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">Sprint 5 ★</text>
+<text x="1273" y="831" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">Sprint 6 ★</text>
+<text x="1458" y="831" text-anchor="middle" fill="#ffffff" font-size="11.5" font-weight="700">Total Proyecto (S1–S6)</text>
+<text x="72" y="864" fill="#334155" font-size="12" font-weight="700">Historias cerradas en el sprint</text>
+<text x="413" y="864" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">3 (HU-01..03)</text>
+<text x="583" y="864" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">4 (HU-04..07)</text>
+<text x="753" y="864" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">3 (HU-08..10)</text>
+<text x="923" y="864" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">3 (HU-11..13)</text>
+<text x="1093" y="864" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">2 (HU-14..15)</text>
+<text x="1273" y="864" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">3 (HU-16..18)</text>
+<text x="1458" y="864" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">18 / 18 HUs (100%)</text>
+<rect x="64" y="875" width="1472" height="24" rx="4" fill="#f8fafc"/>
+<text x="72" y="891" fill="#334155" font-size="12" font-weight="700">% por sprint / % Acumulado</text>
+<text x="413" y="891" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">16.67% / 16.67%</text>
+<text x="583" y="891" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">22.22% / 38.89%</text>
+<text x="753" y="891" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">16.67% / 55.56%</text>
+<text x="923" y="891" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">16.67% / 72.22%</text>
+<text x="1093" y="891" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">11.11% / 83.33%</text>
+<text x="1273" y="891" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">16.67% / 100.0%</text>
+<text x="1458" y="891" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">100.0% Completado</text>
+<text x="72" y="918" fill="#334155" font-size="12" font-weight="700">Story Points / Acumulado (%)</text>
+<text x="413" y="918" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">15 / 15 (14.71%)</text>
+<text x="583" y="918" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">21 / 36 (35.29%)</text>
+<text x="753" y="918" text-anchor="middle" fill="#1e293b" font-size="11.5" font-weight="500">16 / 52 (50.98%)</text>
+<text x="923" y="918" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">16 / 68 (66.67%)</text>
+<text x="1093" y="918" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">13 / 81 (79.41%)</text>
+<text x="1273" y="918" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">21 / 102 (100%)</text>
+<text x="1458" y="918" text-anchor="middle" fill="#059669" font-size="11.5" font-weight="700">102 / 102 SP (100%)</text>
+<text x="48" y="966" fill="#64748b" font-size="11">Fuente: README.md, docs/sprint-goals.md, docs/acta-review-sprint6.md · Suite QA: 13/13 PASS (100%) · Emulador: 88/88 casos.</text>
+</svg>
+      </div>
+    </section>
+
+    <!-- SLIDE 11 -->
+    <section class="slide" data-title="11. Agenda Video y Cierre">
+      <div class="slide-header">
+        <div>
+          <span class="badge badge-emerald">CIERRE DE CEREMONIA Y PRÓXIMOS PASOS</span>
+          <h1>Agenda del Video (52 min) y Ruta hacia Sprint 6 (Corte III)</h1>
+          <p class="sub">Meta de sustentación final: Sábado 21 de noviembre de 2026 · URL destino: <code>https://bdcuentasclaras-b1814.web.app</code></p>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Distribución de Tiempo en el Video (45–60 min)</h3>
+          <table>
+            <thead><tr><th>Minutos</th><th>Bloque</th><th>Responsables</th></tr></thead>
+            <tbody>
+              <tr><td><code>00:00–04:30</code></td><td>Apertura, Product Goal y Tablero Miro</td><td>Juan Diego &amp; Fabián</td></tr>
+              <tr><td><code>04:30–13:30</code></td><td>Sprint 4: HU-11 Cuadre Mensual (código + demo)</td><td>Yerson, Daniel &amp; Jorman</td></tr>
+              <tr><td><code>13:30–19:30</code></td><td>Sprint 4: HU-12 Categorías + HU-13 Límite 120</td><td>Juan Diego &amp; Jorman</td></tr>
+              <tr><td><code>19:30–28:30</code></td><td>Sprint 5: HU-14 Seguridad, Offline &amp; <code>runner.js</code></td><td>Daniel &amp; Fabián</td></tr>
+              <tr><td><code>28:30–35:30</code></td><td>Sprint 5: HU-15 CSV RFC 4180, PDF y Acuerdos S4</td><td>Yerson, Jorman &amp; Juan Diego</td></tr>
+              <tr><td><code>35:30–40:00</code></td><td>Dependencias, Impedimentos y Riesgos</td><td>Fabián &amp; Daniel</td></tr>
+              <tr><td><code>40:00–47:30</code></td><td>Las 6 Preguntas de Review (Sprint 4 y Sprint 5)</td><td>Todos los 5 integrantes</td></tr>
+              <tr><td><code>47:30–52:00</code></td><td>Gráfica de Avance, Feedback y Próximos Pasos S6</td><td>Fabián &amp; Juan Diego</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card accent-indigo">
+          <h3>Próximos Pasos Inmediatos — Sprint 6 (14/11 – 27/11/2026)</h3>
+          <ul>
+            <li><strong>HU-16 (8 SP):</strong> Desplegar <code>firestore:rules</code> y <code>hosting</code> en <code>bdcuentasclaras-b1814</code> (Tareas 16.1 y 16.2 ya adelantadas).</li>
+            <li><strong>Hardening en Google Cloud:</strong> Restringir referentes HTTP de la <code>apiKey</code> y confirmar dominios Auth autorizados (<code>docs/guia-despliegue.md</code>).</li>
+            <li><strong>UAT en producción (Tarea 16.4):</strong> Jorman y Yerson validan flujos completos, CSV y PDF en desktop/móvil sin errores F12.</li>
+            <li><strong>HU-17 (5 SP):</strong> Ensayo de sustentación de 30 min para el <strong>Parcial Corte III (21/11/2026)</strong> y cierre semestral el 27/11.</li>
+          </ul>
+          <div class="quote" style="margin-top:16px;">
+            <strong>Pregunta abierta a la Stakeholder:</strong> ¿Qué ajustes visuales, funcionales o escenarios prioritarios nos recomienda validar antes del despliegue final de Corte III?
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    (function () {
+      const slides = Array.from(document.querySelectorAll(".slide"));
+      const tabsContainer = document.getElementById("slide-tabs");
+      const counter = document.getElementById("slide-counter");
+      const btnPrev = document.getElementById("btn-prev");
+      const btnNext = document.getElementById("btn-next");
+      const btnViewAll = document.getElementById("btn-view-all");
+      const btnPrint = document.getElementById("btn-print");
+      let idx = 0;
+
+      function renderTabs() {
+        tabsContainer.innerHTML = slides
+          .map((s, i) => `<button type="button" class="slide-tab ${i === idx ? "active" : ""}" data-idx="${i}">${s.dataset.title}</button>`)
+          .join("");
+      }
+
+      function goTo(newIdx) {
+        idx = Math.max(0, Math.min(slides.length - 1, newIdx));
+        slides.forEach((s, i) => s.classList.toggle("active", i === idx));
+        counter.textContent = `${idx + 1} / ${slides.length}`;
+        renderTabs();
+      }
+
+      tabsContainer.addEventListener("click", (e) => {
+        const tab = e.target.closest(".slide-tab");
+        if (!tab) return;
+        document.body.classList.remove("view-all");
+        btnViewAll.textContent = "Ver todas";
+        goTo(Number(tab.dataset.idx));
+      });
+
+      btnPrev.addEventListener("click", () => goTo(idx - 1));
+      btnNext.addEventListener("click", () => goTo(idx + 1));
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowRight") goTo(idx + 1);
+        if (e.key === "ArrowLeft") goTo(idx - 1);
+      });
+
+      btnViewAll.addEventListener("click", () => {
+        const all = document.body.classList.toggle("view-all");
+        btnViewAll.textContent = all ? "Modo diapositiva" : "Ver todas";
+      });
+
+      btnPrint.addEventListener("click", () => window.print());
+
+      // Checklist interactivo para demo en vivo
+      document.querySelectorAll(".checklist-item input[type='checkbox']").forEach((chk) => {
+        chk.addEventListener("change", () => {
+          chk.closest(".checklist-item").classList.toggle("done", chk.checked);
+        });
+      });
+
+      // Temporizador de ceremonia (objetivo 45:00 - 60:00)
+      let seconds = 0;
+      let timerId = null;
+      const timerDisplay = document.getElementById("timer-display");
+      const btnTimerToggle = document.getElementById("btn-timer-toggle");
+      const btnTimerReset = document.getElementById("btn-timer-reset");
+
+      function updateTimer() {
+        const m = String(Math.floor(seconds / 60)).padStart(2, "0");
+        const s = String(seconds % 60).padStart(2, "0");
+        timerDisplay.textContent = `${m}:${s}`;
+        if (seconds >= 45 * 60 && seconds <= 60 * 60) {
+          timerDisplay.style.color = "#10b981";
+        } else if (seconds > 60 * 60) {
+          timerDisplay.style.color = "#f43f5e";
+        } else {
+          timerDisplay.style.color = "#f8fafc";
+        }
+      }
+
+      btnTimerToggle.addEventListener("click", () => {
+        if (timerId) {
+          clearInterval(timerId);
+          timerId = null;
+          btnTimerToggle.textContent = "Reanudar";
+        } else {
+          timerId = setInterval(() => { seconds++; updateTimer(); }, 1000);
+          btnTimerToggle.textContent = "Pausar";
+        }
+      });
+
+      btnTimerReset.addEventListener("click", () => {
+        clearInterval(timerId);
+        timerId = null;
+        seconds = 0;
+        btnTimerToggle.textContent = "Iniciar";
+        updateTimer();
+      });
+
+      goTo(0);
+    })();
+  </script>
+</body>
+</html>

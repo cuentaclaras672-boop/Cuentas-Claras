@@ -37,7 +37,8 @@ Para que una Historia de Usuario, funcionalidad o tarea se considere **TERMINADA
 ### 2.2 Persistencia e Integridad de Datos
 - [x] **Persistencia Real:** Toda información financiera se almacena de forma asíncrona en Cloud Firestore.
 - [x] **Prohibición de Datos Financieros en Memoria/LocalStorage:** Prohibido usar `localStorage` o variables globales volátiles para balances, bolsillos o transacciones.
-- [x] **Aislamiento de Seguridad en Backend:** Reglas en `firestore.rules` que validan en servidor que solo el usuario autenticado (`request.auth.uid`) pueda leer, crear o mutar sus datos, impidiendo reasignaciones no autorizadas.
+- [x] **Aislamiento de Seguridad en Backend:** Reglas en `firestore.rules` que validan en servidor que solo el usuario autenticado (`request.auth.uid`) pueda leer, crear o mutar sus datos en las 8 colecciones del sistema, impidiendo reasignaciones no autorizadas.
+- [x] **Cifrado de Datos Sensibles en Cliente (HU-18 — Sprint 6):** Los textos y montos sensibles de transacciones, bolsillos, préstamos, liquidaciones y categorías se cifran en el navegador con **AES-256-GCM** (`src/utils/cifrado.js` y `src/services/claves.js`) antes de enviarse a Firestore (`enc:v1:<iv>:<datos>`), autenticando el nombre del campo como AAD y validando defensivamente los registros al leerlos.
 
 ### 2.3 Resiliencia y Manejo Visible de Errores
 - [x] **Manejo Visible de Errores:** Todos los bloques `try/catch` capturan fallos y los proyectan al usuario mediante el sistema de Toasts (`src/ui/notificaciones.js`) o mensajes por campo.
@@ -54,7 +55,7 @@ Para que una Historia de Usuario, funcionalidad o tarea se considere **TERMINADA
 ### 2.5 Pruebas y Verificación en Vivo
 - [x] **Cero Errores de Consola:** La aplicación corre localmente en el navegador (`Live Server` o servidor HTTP) sin ningún error ni advertencia en DevTools (F12 en ceros).
 - [x] **Criterios de Aceptación 100% Verificados:** Cada criterio de aceptación de la historia fue probado y certificado por el Scrum Master / QA Lead.
-- [x] **Suite Automatizada de Pruebas (QA):** Ejecución exitosa de `node tests/runner.js` certificando las suites de pruebas unitarias, de integración y seguridad con tasa de éxito del 100% (registrada en los informes de pruebas en `docs/`).
+- [x] **Suite Automatizada de Pruebas (QA):** Ejecución exitosa de `node tests/runner.js` certificando las 13 suites de pruebas unitarias, de integración, concurrencia y cifrado AES-256-GCM con tasa de éxito del 100% (registrada en los informes de pruebas en `docs/`).
 
 ### 2.6 Control de Versiones y Seguridad en Servidor (Git y Firebase)
 - [x] **Commits Semánticos:** Registro de cambios con prefijos convencionales (`feat:`, `fix:`, `docs:`, `test:`, `refactor:`) en la rama `main`.

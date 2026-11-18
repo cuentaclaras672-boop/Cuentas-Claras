@@ -38,7 +38,7 @@ npx firebase-tools deploy --only firestore:rules
 Debe terminar con `Deploy complete!`. Se puede confirmar en la consola:
 **Firestore Database → Reglas** muestra la fecha de la última publicación.
 
-> Las reglas nuevas (auditoría 14.1) solo afectan escrituras malintencionadas; la app sigue funcionando igual.
+> Las reglas nuevas (auditoría 14.1 y cifrado AES-256-GCM de HU-18) protegen las **8 colecciones** (`transacciones`, `bolsillos`, `prestamos`, `hogares`, `liquidaciones`, `categorias`, `clavesUsuario` y `clavesHogar`) y exigen que los campos sensibles lleguen cifrados (`esCifrado` / `esNumeroCifrado`).
 > Si algo falla, la consola guarda el historial de reglas y permite volver a la versión anterior.
 
 ## 2. Desplegar la app en Firebase Hosting (Tarea 16.1)

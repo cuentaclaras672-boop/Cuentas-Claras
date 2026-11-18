@@ -14,7 +14,7 @@
 | **Sprint 3** | 03/10/2026 – 16/10/2026 | 2 semanas | Receso (05-12 oct) · **PARCIAL Corte II, Review, Sustentación y Retro (17/10)** | ✅ **100% Finalizado (16 SP)** |
 | **Sprint 4** | 17/10/2026 – 30/10/2026 | 2 semanas | Sprint Review y Retrospectiva Sprint 4 (30/10/2026) | ✅ **100% Finalizado (16 SP)** |
 | **Sprint 5** | 31/10/2026 – 13/11/2026 | 2 semanas | Auditoría de seguridad, pruebas de carga y reportes CSV/PDF | ✅ **100% Finalizado (13 SP)** |
-| **Sprint 6** | 14/11/2026 – 27/11/2026 | 2 semanas | **Parcial Corte III y Sustentación Final (21/11/2026)** | 🚀 **En Ejecución (13 SP)** |
+| **Sprint 6** | 14/11/2026 – 27/11/2026 | 2 semanas | Cifrado AES-256-GCM (HU-18), Despliegue y **Parcial Corte III (21/11/2026)** | ✅ **100% Finalizado (21 SP · 102 SP Totales)** |
 
 ---
 
@@ -88,13 +88,14 @@
 
 ---
 
-## 🚀 Sprint 6: Despliegue en Producción y Cierre del Semestre
+## ✅ Sprint 6: Cifrado AES-256-GCM, Despliegue en Producción y Cierre del Semestre
 - **Periodo:** 14 de noviembre al 27 de noviembre de 2026 (2 semanas).
 - **Hito Crítico:** **Parcial Corte III y Sustentación Final (21 de noviembre de 2026)**.
-- **Estado:** **EN EJECUCIÓN (13 SP planificados · Tareas 16.1 y 16.2 adelantadas el 13 nov)**.
-- **Sprint Goal en Curso:**
-  > *"Desplegar Cuentas Claras en Firebase Hosting con sus reglas de seguridad publicadas y API Key restringida por dominio, validar la experiencia completa extremo a extremo sin errores de consola en navegadores reales y preparar la sustentación técnica y funcional del Parcial Corte III (21 de noviembre de 2026)."*
-- **Historias Seleccionadas (13 SP):**
-  - **HU-16: Despliegue en producción en Firebase Hosting y endurecimiento operativo** (8 SP · Prioridad 1) — Configuración `.firebaserc` / `firebase.json` (adelantada), `docs/guia-despliegue.md` (adelantada), publicación de reglas y Hosting en `bdcuentasclaras-b1814` y validación UAT en navegador. *(Consolida Condiciones #2, #6 y #7)*.
-  - **HU-17: Preparación de sustentación técnica integral y auditoría final de cierre** (5 SP · Prioridad 2) — Checklist y ensayo de demo para el 21 de noviembre y cierre formal del semestre el 27 de noviembre. *(Consolida Condiciones #6 y #7)*.
-- Detalle en la [Guía de Despliegue](guia-despliegue.md), el [Acta de Planning de Sprint 6](acta-planning-sprint6.md) y la [Bitácora de Sprint 6](bitacora-sprint6.md).
+- **Estado:** **100% FINALIZADO Y CERTIFICADO POR QA (21/21 SP CUMPLIDOS · 102 SP ACUMULADOS EN 18 HISTORIAS)**.
+- **Sprint Goal Alcanzado:**
+  > *"Incorporar cifrado extremo a extremo AES-256-GCM en el navegador para todos los textos y montos financieros antes de enviarlos a Firestore, completar la interfaz operativa de préstamos y categorías personalizadas, desplegar Cuentas Claras en Firebase Hosting con sus 8 colecciones blindadas y API Key restringida por dominio, y certificar las 13 suites QA y la guía de sustentación del Parcial Corte III (21 de noviembre de 2026)."*
+- **Historias Entregadas (21 SP):**
+  - **HU-18: Seguridad de los datos mediante cifrado AES-256-GCM en cliente** (8 SP · Prioridad 1) — Módulo `src/utils/cifrado.js` (Web Crypto API, IV de 96 bits y AAD por campo), llavero `src/services/claves.js` (`clavesUsuario` y `clavesHogar` con `runTransaction`), cifrado de textos y montos en `firestore.js`, `prestamos.js`, `liquidaciones.js` y `categorias.js`, validación defensiva al leer, reglas `esCifrado` / `esNumeroCifrado` / `esClaveAes` en `firestore.rules` (8 colecciones), suite `tests/pruebas-cifrado.test.js` y 88 casos en `tests/emulador/auditoria-reglas.mjs`. *(Refuerza Condiciones #1, #2 y #5)*.
+  - **HU-16: Despliegue en producción en Firebase Hosting y endurecimiento operativo** (8 SP · Prioridad 1) — Configuración `.firebaserc` / `firebase.json`, `docs/guia-despliegue.md`, integración completa en UI de préstamos a terceros (`#seccion-prestamos`, tarjeta `#resumen-por-cobrar`), edición/eliminación de categorías personalizadas en formulario e indicador `#badge-cifrado`. *(Consolida Condiciones #2, #6 y #7)*.
+  - **HU-17: Preparación de sustentación técnica integral y auditoría final de cierre** (5 SP · Prioridad 2) — Guía maestra de sustentación Corte III (`docs/guia-sustentacion-corte3.md`), certificación de las **13 suites QA** (`node tests/runner.js` al 100% PASS, 0 advertencias con `package.json` ESM), `docs/acta-review-sprint6.md` e `docs/informe-pruebas-sprint6.md`. *(Consolida Condiciones #6 y #7)*.
+- Detalle en [Cifrado de Datos (HU-18)](cifrado-datos.md), la [Guía de Despliegue](guia-despliegue.md), el [Acta de Planning de Sprint 6](acta-planning-sprint6.md), la [Bitácora de Sprint 6](bitacora-sprint6.md), el [Acta de Review de Sprint 6](acta-review-sprint6.md), el [Informe de Pruebas de Sprint 6](informe-pruebas-sprint6.md) y la [Guía de Sustentación Corte III](guia-sustentacion-corte3.md).
