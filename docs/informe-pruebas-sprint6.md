@@ -11,7 +11,7 @@
 
 Este informe certifica las pruebas de cifrado criptográfico AES-256-GCM en cliente, validación defensiva al leer, cobertura de las 8 colecciones en `firestore.rules`, integración funcional de interfaz y regresión completa de las **18 Historias de Usuario (102 Story Points)** del proyecto:
 - **HU-18:** Seguridad de los datos mediante cifrado AES-256-GCM en cliente (8 SP) — *Refuerza Condiciones #1 (Persistencia), #2 (Control de Acceso y Privacidad) y #5 (Manejo de Errores y Validación al Leer)*.
-- **HU-16:** Despliegue en producción en Firebase Hosting, completitud UI y endurecimiento operativo (8 SP) — *Consolida Condiciones #2, #4, #6 y #7*.
+- **HU-16:** Preparación de despliegue en Firebase Hosting, completitud UI y endurecimiento operativo (8 SP) — *Consolida Condiciones #2, #4, #6 y #7 (alcance evaluado: MVP en local con Hosting listo para publicar)*.
 - **HU-17:** Preparación de sustentación técnica integral y auditoría final de cierre (5 SP) — *Consolida Condiciones #6 y #7*.
 
 ---

@@ -21,7 +21,7 @@
 
 ## 2. Objetivo del Sprint (Sprint Goal)
 
-> *"Incorporar cifrado extremo a extremo AES-256-GCM en el navegador para todos los textos y montos financieros antes de enviarlos a Firestore, completar la interfaz operativa de préstamos y categorías personalizadas, desplegar Cuentas Claras en Firebase Hosting con sus 8 colecciones blindadas y API Key restringida por dominio, y certificar las 13 suites QA y la guía de sustentación del Parcial Corte III (21 de noviembre de 2026)."*
+> *"Incorporar cifrado extremo a extremo AES-256-GCM en el navegador para todos los textos y montos financieros antes de enviarlos a Firestore, completar la interfaz operativa de préstamos y categorías personalizadas, dejar lista la configuración de despliegue en Firebase Hosting y las 8 colecciones blindadas en `firestore.rules` (alcance evaluado: MVP funcional en local), y certificar las 13 suites QA y la guía de sustentación del Parcial Corte III (21 de noviembre de 2026)."*
 
 ---
 
@@ -65,10 +65,10 @@
 
 ---
 
-### [HU-16] Despliegue en producción en Firebase Hosting, completitud UI y endurecimiento operativo
-- **Talla:** M · **Estimación:** 8 SP · **Prioridad:** 1 (Disponibilidad pública, completitud funcional en UI y seguridad operativa).
+### [HU-16] Preparación de despliegue en Firebase Hosting, completitud UI y endurecimiento operativo
+- **Talla:** M · **Estimación:** 8 SP · **Prioridad:** 1 (Configuración de despliegue lista, completitud funcional en UI y seguridad operativa).
 - **Condiciones técnicas que consolida:** #2 (Control de Acceso), #4 (Filtrado), #6 (Repositorio y Despliegue) y #7 (Documentación Operativa).
-- **Descripción:** Como equipo de ingeniería, queremos publicar la aplicación web estática y las reglas `firestore.rules` (8 colecciones) en el proyecto Firebase `bdcuentasclaras-b1814`, restringiendo los dominios autorizados y la API Key de cliente web y asegurando que el 100% de los módulos del backlog (incluidos préstamos a terceros y edición/borrado de categorías personalizadas) estén operativos en la interfaz.
+- **Descripción:** Como equipo de ingeniería, queremos dejar preparada la publicación de la aplicación web estática y las reglas `firestore.rules` (8 colecciones) para el proyecto Firebase `bdcuentasclaras-b1814` (manteniendo como alcance evaluado el MVP en local, con despliegue a Firebase Hosting a un solo comando), documentar la restricción de dominios autorizados y API Key, y asegurar que el 100% de los módulos del backlog (incluidos préstamos a terceros y edición/borrado de categorías personalizadas) estén operativos en la interfaz.
 
 #### Criterios de Aceptación:
 - **CA-16.1:** Configuración declarativa de Hosting y Firestore Rules en `firebase.json` y `.firebaserc` sirviendo `public/` y `src/` con cabeceras de seguridad y `Cache-Control: no-cache`, más `package.json` con `"type": "module"` excluido del despliegue.

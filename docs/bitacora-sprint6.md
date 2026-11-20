@@ -1,4 +1,4 @@
-# Bitácora de Seguimiento — Sprint 6 (Cifrado AES-256-GCM, Despliegue y Cierre)
+# Bitácora de Seguimiento — Sprint 6 (Cifrado AES-256-GCM, Prep. Despliegue y Cierre)
 **Proyecto:** Cuentas Claras — Finanzas Compartidas en el Hogar  
 **Materia:** Práctica Aplicada (TIC42695) · Ingeniería de Sistemas · Semestre 2026-2  
 **Scrum Master:** Fabián Eduardo Córdoba (`cuentaclaras672@gmail.com`)  
@@ -9,7 +9,7 @@
 
 ## 1. Resumen Ejecutivo del Sprint 6
 
-El Sprint 6 culmina el desarrollo semestral de **Cuentas Claras** incorporando cifrado criptográfico de extremo a extremo en el navegador con **AES-256-GCM (Web Crypto API)** tanto para textos como para montos financieros (**HU-18**, 8 SP), completando la integración en interfaz de usuario para préstamos a terceros (`#seccion-prestamos`, tarjeta `#resumen-por-cobrar`), edición y borrado de categorías personalizadas e indicador visual `#badge-cifrado` junto con la configuración operativa de Firebase Hosting y restricción de API Key (**HU-16**, 8 SP), y consolidando la suite de **13 pruebas automatizadas (100% PASS)**, la auditoría de **88 casos en emulador** y la guía maestra de sustentación final (**HU-17**, 5 SP).
+El Sprint 6 culmina el desarrollo semestral de **Cuentas Claras** incorporando cifrado criptográfico de extremo a extremo en el navegador con **AES-256-GCM (Web Crypto API)** tanto para textos como para montos financieros (**HU-18**, 8 SP), completando la integración en interfaz de usuario para préstamos a terceros (`#seccion-prestamos`, tarjeta `#resumen-por-cobrar`), edición y borrado de categorías personalizadas e indicador visual `#badge-cifrado` junto con la preparación operativa de Firebase Hosting y restricción de API Key para el MVP local (**HU-16**, 8 SP), y consolidando la suite de **13 pruebas automatizadas (100% PASS)**, la auditoría de **88 casos en emulador** y la guía maestra de sustentación final (**HU-17**, 5 SP).
 
 | Métrica | Planificado | Resultado Final del Sprint 6 |
 |---|:---:|:---:|
@@ -105,4 +105,4 @@ Total de tareas del Sprint 6: **9 tareas técnicas** (`16.1–16.4`, `17.1–17.
 - **⚓ LAS ANCLAS (¿Qué retos superamos en el Sprint 6?):**
   - **Cifrar montos sin perder consistencia:** Al cifrar montos, Firestore ya no puede sumar con `increment()` ni validar `monto > 0` en reglas; lo resolvimos usando `runTransaction` (leer, descifrar, validar, sumar y volver a cifrar) y agregando validación defensiva al leer en cliente.
 - **🪨 LAS ROCAS (Cuidados para el día de la Sustentación Final — 21/11/2026):**
-  - Asegurar que las reglas actualizadas de las **8 colecciones** (`firestore.rules`) estén publicadas en Firebase Console antes de la demostración en vivo (`npx firebase-tools deploy --only firestore:rules,hosting`).
+  - Asegurar que las reglas actualizadas de las **8 colecciones** (`firestore.rules`) estén publicadas en Firebase Console antes de la demostración del MVP en local (`npx firebase-tools deploy --only firestore:rules`), dejando el despliegue web en Hosting (`--only hosting`) listo en un solo paso si se decide publicar en línea.

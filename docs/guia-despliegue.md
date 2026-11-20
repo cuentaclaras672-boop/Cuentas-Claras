@@ -2,7 +2,10 @@
 
 **Responsable:** Daniel Felipe Cortes  
 **Proyecto de Firebase:** `bdcuentasclaras-b1814` (definido en [`.firebaserc`](../.firebaserc))  
-**URL pública:** https://bdcuentasclaras-b1814.web.app (alternativa: https://bdcuentasclaras-b1814.firebaseapp.com)
+**URL de destino al publicar:** https://bdcuentasclaras-b1814.web.app (alternativa: https://bdcuentasclaras-b1814.firebaseapp.com)
+
+> [!NOTE]
+> **Estado actual del alcance:** Para la sustentación y demo se ejecuta el **MVP funcional en entorno local** (`http://localhost:8000/public/index.html`) conectado a Cloud Firestore y Firebase Auth reales; el sitio en Firebase Hosting **aún no se ha publicado en línea**. Esta guía deja listo el procedimiento completo de un solo comando para publicarlo en producción cuando se requiera.
 
 Los comandos se ejecutan en **Git Bash** desde la carpeta del repositorio. No hace falta instalar nada
 globalmente: `npx` descarga la herramienta de Firebase la primera vez.

@@ -22,7 +22,7 @@
 
 ## 2. Objetivo del Sprint (Sprint Goal)
 
-> *"Incorporar cifrado extremo a extremo AES-256-GCM en el navegador para todos los textos y montos financieros antes de enviarlos a Firestore, completar la interfaz operativa de préstamos y categorías personalizadas, desplegar Cuentas Claras en Firebase Hosting con sus 8 colecciones blindadas y API Key restringida por dominio, y certificar las 13 suites QA y la guía de sustentación del Parcial Corte III (21 de noviembre de 2026)."*
+> *"Incorporar cifrado extremo a extremo AES-256-GCM en el navegador para todos los textos y montos financieros antes de enviarlos a Firestore, completar la interfaz operativa de préstamos y categorías personalizadas, dejar lista la configuración de despliegue en Firebase Hosting y las 8 colecciones blindadas en `firestore.rules` (alcance evaluado: MVP funcional en local), y certificar las 13 suites QA y la guía de sustentación del Parcial Corte III (21 de noviembre de 2026)."*
 
 **Resultado:** **CUMPLIDO AL 100% (21/21 Story Points entregados · 102/102 SP acumulados en el semestre · 18/18 Historias de Usuario terminadas)**.
 
@@ -40,9 +40,9 @@
   - [`tests/pruebas-cifrado.test.js`](../tests/pruebas-cifrado.test.js) y [`tests/emulador/auditoria-reglas.mjs`](../tests/emulador/auditoria-reglas.mjs) (**88 casos**).
 - **Resultado:** Aprobada al 100% por el Product Owner.
 
-### 3.2 [HU-16] Despliegue en Firebase Hosting, completitud UI y endurecimiento operativo (8 SP · Prioridad 1)
+### 3.2 [HU-16] Preparación de despliegue en Firebase Hosting, completitud UI y endurecimiento operativo (8 SP · Prioridad 1)
 - **Componentes Entregados:**
-  - [`firebase.json`](../firebase.json), [`.firebaserc`](../.firebaserc), [`package.json`](../package.json) y [`docs/guia-despliegue.md`](guia-despliegue.md): Configuración declarativa para Hosting y `firestore:rules` en el proyecto `bdcuentasclaras-b1814`, cabeceras de seguridad (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Cache-Control: no-cache`) y guía paso a paso de restricción de API Key.
+  - [`firebase.json`](../firebase.json), [`.firebaserc`](../.firebaserc), [`package.json`](../package.json) y [`docs/guia-despliegue.md`](guia-despliegue.md): Configuración declarativa lista para Hosting y `firestore:rules` en el proyecto `bdcuentasclaras-b1814` (alcance evaluado: MVP en local; publicación web pendiente como un único comando de despliegue), cabeceras de seguridad (`X-Frame-Options`, `X-Content-Type-Options`, `Referrer-Policy`, `Cache-Control: no-cache`) y guía paso a paso de restricción de API Key.
   - [`public/index.html`](../public/index.html), [`src/ui/dashboard.js`](../src/ui/dashboard.js) y [`src/app.js`](../src/app.js):
     - Tarjeta de resumen **Por Cobrar** (`#resumen-por-cobrar`) y sección interactiva **Préstamos a Terceros (`#seccion-prestamos`)** con filtro por estado (`TODOS`, `PENDIENTE`, `SALDADO`), registro de préstamo, abonos parciales y eliminación.
     - Botones **Editar (`#btn-editar-categoria`)** y **Borrar (`#btn-eliminar-categoria`)** junto a `+ Nueva` para gestionar categorías personalizadas directamente desde la interfaz (`CA-12.3`).
