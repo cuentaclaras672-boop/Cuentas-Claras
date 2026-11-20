@@ -11,7 +11,7 @@ import { escucharTransacciones, escucharBolsillos } from "./services/firestore.j
 import { escucharHogarDelUsuario } from "./services/hogares.js";
 import { escucharPrestamos } from "./services/prestamos.js";
 import { inicializarAuthUI } from "./ui/ui-auth.js";
-import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI, actualizarHogarUI, actualizarPrestamosUI } from "./ui/dashboard.js?v=10";
+import { inicializarDashboardUI, actualizarDashboard, actualizarBolsillosUI, actualizarHogarUI, actualizarPrestamosUI } from "./ui/dashboard.js?v=11";
 import { mostrarToast } from "./ui/notificaciones.js";
 
 let desuscribirTransacciones = null;

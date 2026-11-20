@@ -28,6 +28,7 @@ import {
   periodoDe 
 } from "../services/liquidaciones.js";
 import { calcularCuadreMes } from "../utils/cuadre.js";
+import { calcularSaldoDisponible, validarGastoContraSaldo } from "../utils/saldo.js";
 import { guardarCategoria, obtenerCategorias, actualizarCategoria, eliminarCategoria } from "../services/categorias.js";
 import {
   registrarPrestamo,
@@ -363,6 +364,14 @@ export function inicializarDashboardUI(usuario) {
           fecha: new Date(),
           hogarId: idHogarDestino
         });
+
+        // CA-4.3 / CA-4.5: no se puede gastar más de lo que hay en el saldo disponible.
+        // Los montos están cifrados (HU-18), así que Firestore no puede validarlo: se valida aquí.
+        validarGastoContraSaldo(
+          nuevaTransaccion.tipo,
+          nuevaTransaccion.monto,
+          calcularSaldoDisponible(transaccionesEnMemoria, bolsillosEnMemoria)
+        );
 
         await registrarTransaccion(nuevaTransaccion, idHogarDestino);
 

@@ -21,6 +21,7 @@ import { ejecutarPruebasResiliencia } from "./pruebas-resiliencia.test.js";
 import { ejecutarPruebasSeguridadCarga } from "./pruebas-seguridad-carga.test.js";
 import { ejecutarPruebasExportador } from "./pruebas-exportador.test.js";
 import { ejecutarPruebasCifrado } from "./pruebas-cifrado.test.js";
+import { ejecutarPruebasSaldo } from "./pruebas-saldo.test.js";
 
 async function ejecutarTodasLasPruebas() {
   console.log("===============================================================");
@@ -41,7 +42,8 @@ async function ejecutarTodasLasPruebas() {
     { nombre: "Sprint 5 - Tarea 14.3: Degradación Elegante y Reconexión (HU-14)", fn: ejecutarPruebasResiliencia },
     { nombre: "Sprint 5 - Tarea 14.2: Blindaje de Reglas, Estrés (50 ops) y Fechas (HU-14)", fn: ejecutarPruebasSeguridadCarga },
     { nombre: "Sprint 5 - Tarea 15.1: Exportación CSV RFC 4180 y BOM UTF-8 (HU-15)", fn: ejecutarPruebasExportador },
-    { nombre: "Seguridad: Cifrado AES-256-GCM de los datos antes de Firestore", fn: ejecutarPruebasCifrado }
+    { nombre: "Seguridad: Cifrado AES-256-GCM de los datos antes de Firestore", fn: ejecutarPruebasCifrado },
+    { nombre: "HU-04: Gastos limitados al saldo disponible (CA-4.3 / CA-4.5)", fn: ejecutarPruebasSaldo }
   ];
 
   let exitosas = 0;
